@@ -1,0 +1,13 @@
+{
+    "cSpell.words": [
+        "astype",
+        "ifft",
+        "ndarray",
+        "ndim"
+    ],
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
