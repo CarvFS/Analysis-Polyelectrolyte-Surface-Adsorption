@@ -2,8 +2,13 @@
     "cSpell.words": [
         "astype",
         "ifft",
+        "levelname",
+        "nanmax",
+        "nanmin",
+        "nanpercentile",
         "ndarray",
-        "ndim"
+        "ndim",
+        "nondim"
     ],
     "python.testing.pytestArgs": [
         "src"
