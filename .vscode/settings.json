@@ -1,14 +1,35 @@
 {
     "cSpell.words": [
         "astype",
+        "blit",
+        "cbar",
+        "cmasher",
+        "colorbar",
+        "colour",
+        "COLVAR",
+        "figsize",
         "ifft",
+        "labelpad",
         "levelname",
+        "linewidth",
+        "logpdf",
+        "mathrm",
         "nanmax",
         "nanmin",
         "nanpercentile",
+        "ncols",
         "ndarray",
         "ndim",
-        "nondim"
+        "neff",
+        "nker",
+        "nondim",
+        "sjobid",
+        "tqdm",
+        "usecols",
+        "xlabel",
+        "ydata",
+        "ylabel",
+        "ylim"
     ],
     "python.testing.pytestArgs": [
         "src"
