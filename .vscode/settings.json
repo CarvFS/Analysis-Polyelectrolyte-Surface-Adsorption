@@ -12,6 +12,7 @@
         "dimensionalize",
         "figsize",
         "fontsize",
+        "hremd",
         "ifft",
         "labelpad",
         "levelname",
