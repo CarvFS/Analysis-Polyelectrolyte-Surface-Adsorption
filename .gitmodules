@@ -1,0 +1,12 @@
+[submodule "ddpm/examples/denoising-diffusion-pytorch"]
+	path = ddpm/examples/denoising-diffusion-pytorch
+	url = https://github.com/lucidrains/denoising-diffusion-pytorch.git
+[submodule "ddpm/examples/improved-diffusion"]
+	path = ddpm/examples/improved-diffusion
+	url = https://github.com/openai/improved-diffusion.git
+[submodule "ddpm/examples/targetdiff"]
+	path = ddpm/examples/targetdiff
+	url = https://github.com/guanjq/targetdiff.git
+[submodule "ddpm/examples/e3_diffusion_for_molecules"]
+	path = ddpm/examples/e3_diffusion_for_molecules
+	url = https://github.com/ehoogeboom/e3_diffusion_for_molecules.git
