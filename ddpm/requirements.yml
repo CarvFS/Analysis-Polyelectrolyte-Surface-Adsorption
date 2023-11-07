@@ -1,0 +1,62 @@
+# Conda environment file for ddpm project
+# Author: Alec Glisman (GitHub: @alec-glisman)
+# Date: 2023-10-06
+#
+# Create environment with: $ conda env create -f requirements.yml
+# Update environment with: $ conda env update -f requirements.yml
+# Remove environment with: $ conda env remove -n ddpm
+# 
+# Notes:
+# - We recommend using mamba instead of conda as the solver for faster
+#  environment creation. To do this, run:
+#  $ conda install -n base conda-libmamba-solver
+#  $ conda config --set solver libmamba
+# - Strict channel priority is enabled to ensure that packages are installed
+#  from the channels listed below. To do this, run:
+#  $ conda config --set channel_priority strict
+
+name: ml-diffusion
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # conda
+  - conda-libmamba-solver
+  # pytorch
+  - pytorch 
+  - torchvision 
+  - torchaudio 
+  - pytorch-cuda=12.1
+  # diffusion model
+  - einops 
+  - datasets
+  # data analysis
+  - numpy
+  - pandas
+  - pyarrow
+  - fastparquet
+  - scipy
+  - scikit-learn
+  # MD packages
+  - mdanalysis
+  - mdanalysistests
+  - panedr
+  - parmed
+  - rdkit
+  # plotting
+  - matplotlib
+  - seaborn
+  - colorcet
+  - cmasher
+  # Jupyter notebooks
+  - ipykernel
+  - ipywidgets
+  - ipympl
+  # formatting
+  - autopep8
+  - black
+  - flake8
+  - pylint
+
