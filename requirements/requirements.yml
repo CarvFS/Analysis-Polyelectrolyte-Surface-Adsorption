@@ -1,0 +1,64 @@
+# Conda environment file for gromacs surface analysis project
+# Author: Alec Glisman (GitHub: @alec-glisman)
+# Date: 2023-11-08
+#
+# Create environment with: $ conda env create -f requirements.yml
+# Update environment with: $ conda env update -f requirements.yml
+# Remove environment with: $ conda env remove -n ddpm
+# 
+# Notes:
+# - We recommend using mamba instead of conda as the solver for faster
+#  environment creation. To do this, run:
+#  $ conda install -n base conda-libmamba-solver
+#  $ conda config --set solver libmamba
+# - Strict channel priority is enabled to ensure that packages are installed
+#  from the channels listed below. To do this, run:
+#  $ conda config --set channel_priority strict
+name: analysis-surface
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # conda
+  - conda-libmamba-solver
+  # parallelization
+  - dask
+  - dask-labextension
+  - tqdm
+  # data analysis
+  - numpy
+  - pandas
+  - pyarrow
+  - fastparquet
+  - rdkit
+  # MD packages
+  - mdanalysis
+  - mdanalysistests
+  - panedr
+  - parmed
+  # plotting
+  - matplotlib
+  - seaborn
+  - colorcet
+  - cmasher
+  # Jupyter notebooks
+  - ipykernel
+  - ipywidgets
+  - ipympl
+  - pandoc
+  - notebook
+  - jupyter_client
+  # testing
+  - pytest
+  - pytest-cov
+  # formatting
+  - autopep8
+  - black
+  - flake8
+  - pylint
+  # documentation
+  - sphinx
+  - sphinx_rtd_theme
+  - nbsphinx
