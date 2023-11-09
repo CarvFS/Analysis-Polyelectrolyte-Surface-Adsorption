@@ -20,8 +20,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  # conda
-  - conda-libmamba-solver
   # pytorch
   - pytorch 
   - torchvision 
