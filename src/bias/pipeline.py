@@ -1,0 +1,300 @@
+"""
+Author: Alec Glisman (GitHub: @alec-glisman)
+Date: 2023-11-08
+Description: Module for a pipeline to load, clean, and analyze data from the 
+    molecular dynamics simulation.
+"""
+
+# standard library
+import logging
+from pathlib import Path
+
+# third party
+import numpy as np
+import MDAnalysis as mda
+import pandas as pd
+import panedr as edr
+
+
+class DataPipeline:
+    def __init__(
+        self,
+        data_path_base: Path,
+        temperature: float = 300.0,
+        verbose: bool = False,
+        ext_top: str = "tpr",
+        ext_traj: str = "xtc",
+        ext_energy: str = "edr",
+        ext_plumed: str = "dat",
+    ) -> None:
+        # external parameters
+        self.tag = data_path_base.parts[-1]
+        self.data_path_base = data_path_base
+        self.temperature = temperature
+
+        # internal parameters
+        self._kb = 8.314462618e-3  # [kJ/mol/K]
+        self._beta = 1.0 / (self._kb * self.temperature)
+        self._verbose = verbose
+        self._ext_top = ext_top
+        self._ext_traj = ext_traj
+        self._ext_energy = ext_energy
+        self._ext_plumed = ext_plumed
+        self._sampling_prefix = "3-sampling-"
+        self._repl_prefix = "replica_"
+
+        # loaded data
+        self.sampling_methods = None
+        self.universe = None
+        self.energy = None
+
+        self._init_log()
+        self._log.info(
+            f"Initializing data pipeline with data path: {self.data_path_base}"
+        )
+        self._find_data_files()
+
+    def _init_log(self) -> None:
+        self._log = logging.getLogger(__name__)
+
+        # add handler if not already present to stdout
+        if not self._log.hasHandlers():
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(
+                fmt="%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : "
+                + "%(lineno)d : Log : %(message)s",
+                datefmt="%Y-%m-%d %I:%M:%S",
+            )
+            handler.setFormatter(formatter)
+            self._log.addHandler(handler)
+        else:
+            handler = self._log.handlers[0]
+
+        # set logging level
+        if self._verbose:
+            self._log.setLevel(logging.DEBUG)
+            handler.setLevel(logging.DEBUG)
+        else:
+            self._log.setLevel(logging.WARNING)
+            handler.setLevel(logging.WARNING)
+
+    def _find_data_files(self) -> None:
+        # find all sampling methods: subdirectories of the data path starting with "3-sampling-"
+        self.sampling_paths = [
+            x
+            for x in self.data_path_base.iterdir()
+            if x.is_dir() and x.name.startswith(self._sampling_prefix)
+        ]
+        # remove prefix from sampling method names and remove "eqbm" sampling methods
+        self.sampling_methods = [
+            x.name[len(self._sampling_prefix) :]
+            for x in self.sampling_paths
+            if "eqbm" not in x.name
+        ]
+        # if sampling method has multiple replicas (subdirectories of the sampling method directory of the form "replica-#")
+        # then append the replica number to the sampling method name (e.g. "hremd" -> "hremd-1") for each replica
+        self._log.debug(
+            f"Found {len(self.sampling_methods)} sampling methods: {self.sampling_methods}"
+        )
+        orig_sampling_methods = self.sampling_methods.copy()
+        for method in orig_sampling_methods:
+            replicas = [
+                x
+                for x in (
+                    self.data_path_base / f"{self._sampling_prefix}{method}"
+                ).iterdir()
+                if x.is_dir() and x.name.startswith(self._repl_prefix)
+            ]
+            self._log.debug(f"Found {len(replicas)} replicas for method {method}")
+            if len(replicas) > 0:
+                # remove the sampling method name from the list of sampling methods and add the sampling method name with the replica number
+                self.sampling_methods.remove(method)
+                self.sampling_methods += [f"{method}-{x.name}" for x in replicas]
+                # remove the sampling method directory from the list of sampling paths and add the replica directories
+                repl_base = self.data_path_base / f"{self._sampling_prefix}{method}"
+                repl_paths = [repl_base / x.name for x in replicas]
+                self.sampling_paths.remove(repl_base)
+                self.sampling_paths += repl_paths
+
+        # check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path
+        if len(self.sampling_methods) != len(set(self.sampling_methods)):
+            raise ValueError("Found duplicate sampling methods")
+        if len(self.sampling_methods) != len(self.sampling_paths):
+            raise ValueError(
+                "Number of sampling methods does not match number of sampling paths"
+            )
+        for p in self.sampling_paths:
+            if not p.exists():
+                raise ValueError(f"Sampling path {p} does not exist")
+        self._log.debug("All sampling methods and paths are valid")
+
+        # find all data files
+        self.top_files = list(self.data_path_base.rglob(f"*.{self._ext_top}"))
+        self.traj_files = list(self.data_path_base.rglob(f"*.{self._ext_traj}"))
+        self.energy_files = list(self.data_path_base.rglob(f"*.{self._ext_energy}"))
+        self.plumed_files = list(self.data_path_base.rglob(f"*.{self._ext_plumed}"))
+
+        # create a dictionary of data files where the key is the sampling method
+        self.data_files = {}
+        for method, path in zip(self.sampling_methods, self.sampling_paths):
+            self.data_files[method] = {}
+            # find all files for this sampling method and add them to the dictionary
+            self.data_files[method]["top"] = [
+                x for x in self.top_files if x.parent == path
+            ]
+            self.data_files[method]["traj"] = [
+                x for x in self.traj_files if x.parent == path
+            ]
+            self.data_files[method]["energy"] = [
+                x for x in self.energy_files if x.parent == path
+            ]
+            self.data_files[method]["plumed"] = [
+                x for x in self.plumed_files if x.parent == path
+            ]
+            self.data_files[method]["colvar"] = None
+
+            # log the number of files found for this sampling method
+            self._log.debug(
+                f"Found {len(self.data_files[method]['top'])} topology files for method {method}"
+            )
+            self._log.debug(
+                f"Found {len(self.data_files[method]['traj'])} trajectory files for method {method}"
+            )
+            self._log.debug(
+                f"Found {len(self.data_files[method]['energy'])} energy files for method {method}"
+            )
+            self._log.debug(
+                f"Found {len(self.data_files[method]['plumed'])} plumed files for method {method}"
+            )
+
+            if len(self.data_files[method]["top"]) == 0:
+                raise ValueError(
+                    f"No topology files found for sampling method {method}"
+                )
+            if len(self.data_files[method]["traj"]) == 0:
+                raise ValueError(
+                    f"No trajectory files found for sampling method {method}"
+                )
+            if len(self.data_files[method]["plumed"]) == 0:
+                raise ValueError(f"No plumed files found for sampling method {method}")
+            if len(self.data_files[method]["top"]) > 1:
+                raise ValueError(
+                    f"Found {len(self.data_files[method]['top'])} topology files for sampling method {method}, expected 1"
+                )
+            if len(self.data_files[method]["plumed"]) > 1:
+                raise ValueError(
+                    f"Found {len(self.data_files[method]['plumed'])} plumed files for sampling method {method}, expected 1"
+                )
+
+    def _statistical_weight(self, df: pd.DataFrame) -> pd.DataFrame:
+        # get all columns ending in ".bias"
+        cols = [col for col in df.columns if col.endswith(".bias")]
+        if "metad.bias" in df.columns and "metad.rbias" in df.columns:
+            cols.remove("metad.bias")
+        if "metad.rbias" in df.columns:
+            cols.append("metad.rbias")
+        self._log.info(f"Found bias columns: {cols}")
+
+        # calculate statistical weight
+        df["bias"] = df[cols].sum(axis=1).astype(np.float128)
+        df["bias_nondim"] = (df["bias"] - np.nanmax(df["bias"])) * self._beta
+        df["weight"] = np.exp(df["bias_nondim"])
+        df["weight"] /= df["weight"].sum()
+
+        return df
+
+    def load_plumed_colvar(self, method: str) -> pd.DataFrame:
+        # check that there is only one plumed file for this method
+        if len(self.data_files[method]["plumed"]) != 1:
+            raise ValueError(
+                f"Found {len(self.data_files[method]['plumed'])} plumed files for method {method}, expected 1"
+            )
+
+        file = self.data_files[method]["plumed"][0]
+        self._log.info(f"Loading plumed file for method: {method}")
+
+        # first line of file contains column names
+        with open(str(file), encoding="utf8") as f:
+            header = f.readline()
+        header = header.split()[2:]  # remove "#!" FIELDS
+        n_cols = len(header)
+        self._log.debug(f"Found {n_cols} columns in plumed file")
+        self._log.debug(f"Columns: {header}")
+
+        # read in data
+        df = pd.read_csv(
+            str(file),
+            names=header,
+            comment="#",
+            delim_whitespace=True,
+            skipinitialspace=True,
+            usecols=list(range(n_cols)),
+        )
+
+        # if duplicate "time" rows, keep only the last one
+        df = df.drop_duplicates(subset="time", keep="last")
+        df = self._statistical_weight(df)
+        self.data_files[method]["colvar"] = df.copy()
+        self._log.debug(f"Number of rows in plumed file: {len(df)}")
+        return df.copy()
+
+    def save_plumed_colvar(
+        self, method: str = None, file: Path = None, directory: Path = None
+    ) -> Path:
+        if directory is None:
+            directory = self.data_path_base / "analysis"
+
+        if method is not None:
+            if file is None:
+                file = f"colvar_{method}.parquet"
+            file = directory / file
+            self._log.debug(f"Saving plumed colvar file: {file}")
+            self.data_files[method]["colvar"].to_parquet(file)
+            return file
+
+        files = []
+        for method in self.sampling_methods:
+            if file is None:
+                file = f"colvar_{method}.parquet"
+            file = directory / file
+            files.append(file)
+            self._log.debug(f"Saving plumed colvar file: {file}")
+            self.data_files[method]["colvar"].to_parquet(file)
+            file = None
+
+        return files
+
+    def load_universe(self, method: str, **kwargs) -> mda.Universe:
+        self._log.info(f"Loading universe for method: {method}")
+        self._log.debug(
+            f"Found {len(self.data_files[method]['traj'])} trajectory files"
+        )
+        self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
+
+        # check that there is only one topology file for this method
+        if len(self.data_files[method]["top"]) != 1:
+            raise ValueError(
+                f"Found {len(self.data_files[method]['top'])} topology files for method {method}, expected 1"
+            )
+
+        self.universe = mda.Universe(
+            self.data_files[method]["top"][0],
+            self.data_files[method]["traj"],
+            verbose=self._verbose,
+            **kwargs,
+        )
+        return self.universe
+
+    def load_energy(self, method: str) -> pd.DataFrame:
+        self._log.debug(f"Loading energy files for method: {method}")
+        self._log.debug(f"Found {len(self.data_files[method]['energy'])} energy files")
+        self._log.debug(f"Energy files: {self.data_files[method]['energy']}")
+
+        # iterate over all energy files
+        energy = []
+        for file in self.data_files[method]["energy"]:
+            energy.append(edr.edr_to_df(file))
+
+        # concatenate all energy files
+        self.energy = pd.concat(energy)
+        return self.energy
