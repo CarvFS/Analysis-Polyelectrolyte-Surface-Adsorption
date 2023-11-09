@@ -3,6 +3,39 @@ Author: Alec Glisman (GitHub: @alec-glisman)
 Date: 2023-11-08
 Description: Module for a pipeline to load, clean, and analyze data from the 
     molecular dynamics simulation.
+
+This module defines a class `DataPipeline` that provides methods to load and process data from molecular dynamics simulations. The class takes a base directory containing the simulation data and optional parameters such as temperature, file extensions, and verbosity. The class provides methods to load plumed collective variables, molecular dynamics universe, and statistical weights. 
+
+Attributes:
+    tag (str): The name of the simulation data directory.
+    data_path_base (Path): The base directory containing the simulation data.
+    temperature (float): The temperature of the simulation in Kelvin.
+    sampling_methods (list of str): The names of the sampling methods.
+    sampling_paths (list of Path): The paths to the sampling method directories.
+    top_files (list of Path): The paths to the topology files.
+    traj_files (list of Path): The paths to the trajectory files.
+    energy_files (list of Path): The paths to the energy files.
+    plumed_files (list of Path): The paths to the plumed files.
+    data_files (dict of dict of list of Path): A dictionary of data files where the key is the sampling method.
+    _kb (float): The Boltzmann constant in kJ/mol/K.
+    _beta (float): The inverse temperature in 1/kJ/mol.
+    _verbose (bool): Whether to print verbose logging messages.
+    _ext_top (str): The file extension for topology files.
+    _ext_traj (str): The file extension for trajectory files.
+    _ext_energy (str): The file extension for energy files.
+    _ext_plumed (str): The file extension for plumed files.
+    _sampling_prefix (str): The prefix for sampling method directories.
+    _repl_prefix (str): The prefix for replica directories.
+
+Methods:
+    load_plumed_colvar(method: str) -> pd.DataFrame:
+        Load the plumed collective variables for a given sampling method.
+    save_plumed_colvar(method: str = None, file: Path = None, directory: Path = None) -> Path:
+        Save the plumed collective variables for all or a specific sampling method.
+    load_universe(method: str, **kwargs) -> mda.Universe:
+        Load the molecular dynamics universe for a given sampling method.
+    _statistical_weight(df: pd.DataFrame) -> pd.DataFrame:
+        Calculate the statistical weight of each frame in the trajectory.
 """
 
 # standard library
@@ -17,44 +50,267 @@ import panedr as edr
 
 
 class DataPipeline:
-    def __init__(
-        self,
-        data_path_base: Path,
-        temperature: float = 300.0,
-        verbose: bool = False,
-        ext_top: str = "tpr",
-        ext_traj: str = "xtc",
-        ext_energy: str = "edr",
-        ext_plumed: str = "dat",
-    ) -> None:
-        # external parameters
-        self.tag = data_path_base.parts[-1]
-        self.data_path_base = data_path_base
-        self.temperature = temperature
+    """
+    A class for loading and processing data from molecular dynamics simulations.
 
-        # internal parameters
-        self._kb = 8.314462618e-3  # [kJ/mol/K]
-        self._beta = 1.0 / (self._kb * self.temperature)
-        self._verbose = verbose
-        self._ext_top = ext_top
-        self._ext_traj = ext_traj
-        self._ext_energy = ext_energy
-        self._ext_plumed = ext_plumed
-        self._sampling_prefix = "3-sampling-"
-        self._repl_prefix = "replica_"
+    Parameters
+    ----------
+    data_path_base : Path
+        The base directory containing the simulation data.
+    temperature : float, optional
+        The temperature of the simulation in Kelvin, by default 300.0.
+    verbose : bool, optional
+        Whether to print verbose logging messages, by default False.
+    ext_top : str, optional
+        The file extension for topology files, by default "tpr".
+    ext_traj : str, optional
+        The file extension for trajectory files, by default "xtc".
+    ext_energy : str, optional
+        The file extension for energy files, by default "edr".
+    ext_plumed : str, optional
+        The file extension for plumed files, by default "dat".
 
-        # loaded data
-        self.sampling_methods = None
-        self.universe = None
-        self.energy = None
+    Attributes
+    ----------
+    tag : str
+        The name of the simulation data directory.
+    data_path_base : Path
+        The base directory containing the simulation data.
+    temperature : float
+        The temperature of the simulation in Kelvin.
+    _kb : float
+        The Boltzmann constant in kJ/mol/K.
+    _beta : float
+        The inverse temperature in 1/kJ/mol.
+    _verbose : bool
+        Whether to print verbose logging messages.
+    _ext_top : str
+        The file extension for topology files.
+    _ext_traj : str
+        The file extension for trajectory files.
+    _ext_energy : str
+        The file extension for energy files.
+    _ext_plumed : str
+        The file extension for plumed files.
+    _sampling_prefix : str
+        The prefix for sampling method directories.
+    _repl_prefix : str
+        The prefix for replica directories.
+    sampling_methods : list of str
+        The names of the sampling methods.
+    sampling_paths : list of Path
+        The paths to the sampling method directories.
+    top_files : list of Path
+        The paths to the topology files.
+    traj_files : list of Path
+        The paths to the trajectory files.
+    energy_files : list of Path
+        The paths to the energy files.
+    plumed_files : list of Path
+        The paths to the plumed files.
+    data_files : dict of dict of list of Path
+        A dictionary of data files where the key is the sampling method.
 
-        self._init_log()
-        self._log.info(
-            f"Initializing data pipeline with data path: {self.data_path_base}"
-        )
-        self._find_data_files()
+    Methods
+    -------
+    load_plumed_colvar(method: str) -> pd.DataFrame:
+        Load the plumed collective variables for a given sampling method.
+    save_plumed_colvar(method: str = None, file: Path = None, directory: Path = None) -> Path:
+        Save the plumed collective variables for all or a specific sampling method.
+    load_universe(method: str, **kwargs) -> mda.Universe:
+        Load the molecular dynamics universe for a given sampling method.
+    """
+
+
+class DataPipeline:
+    """
+    A class for loading and processing data from molecular dynamics simulations.
+
+    Parameters
+    ----------
+    data_path_base : Path
+        The base directory containing the simulation data.
+    temperature : float, optional
+        The temperature of the simulation in Kelvin, by default 300.0.
+    verbose : bool, optional
+        Whether to print verbose logging messages, by default False.
+    ext_top : str, optional
+        The file extension for topology files, by default "tpr".
+    ext_traj : str, optional
+        The file extension for trajectory files, by default "xtc".
+    ext_energy : str, optional
+        The file extension for energy files, by default "edr".
+    ext_plumed : str, optional
+        The file extension for plumed files, by default "dat".
+
+    Attributes
+    ----------
+    tag : str
+        The name of the directory containing the simulation data.
+    data_path_base : Path
+        The base directory containing the simulation data.
+    temperature : float
+        The temperature of the simulation in Kelvin.
+    _kb : float
+        The Boltzmann constant in kJ/mol/K.
+    _beta : float
+        The inverse temperature in 1/kJ/mol.
+    _verbose : bool
+        Whether to print verbose logging messages.
+    _ext_top : str
+        The file extension for topology files.
+    _ext_traj : str
+        The file extension for trajectory files.
+    _ext_energy : str
+        The file extension for energy files.
+    _ext_plumed : str
+        The file extension for plumed files.
+    _sampling_prefix : str
+        The prefix for directories containing sampling data.
+    _repl_prefix : str
+        The prefix for directories containing replica data.
+    sampling_methods : list of str
+        The names of the sampling methods used in the simulation.
+    sampling_paths : list of Path
+        The paths to the directories containing the sampling data.
+    top_files : list of Path
+        The paths to the topology files.
+    traj_files : list of Path
+        The paths to the trajectory files.
+    energy_files : list of Path
+        The paths to the energy files.
+    plumed_files : list of Path
+        The paths to the plumed files.
+    data_files : dict
+        A dictionary containing the data files for each sampling method.
+
+    Methods
+    -------
+    load_plumed_colvar(method)
+        Load the collective variables from the plumed file for a given sampling method.
+    save_plumed_colvar(method=None, file=None, directory=None)
+        Save the collective variables to a parquet file for a given sampling method or all sampling methods.
+    load_universe(method, **kwargs)
+        Load the molecular dynamics universe for a given sampling method.
+    """
+
+    class Pipeline:
+        def __init__(
+            self,
+            data_path_base: Path,
+            temperature: float = 300.0,
+            verbose: bool = False,
+            ext_top: str = "tpr",
+            ext_traj: str = "xtc",
+            ext_energy: str = "edr",
+            ext_plumed: str = "data",
+        ) -> None:
+            """
+            Initialize a Pipeline object.
+
+            Parameters
+            ----------
+            data_path_base : Path
+                The base directory containing the simulation data.
+            temperature : float, optional
+                The temperature of the simulation in Kelvin, by default 300.0.
+            verbose : bool, optional
+                Whether to print verbose logging messages, by default False.
+            ext_top : str, optional
+                The file extension for topology files, by default "tpr".
+            ext_traj : str, optional
+                The file extension for trajectory files, by default "xtc".
+            ext_energy : str, optional
+                The file extension for energy files, by default "edr".
+            ext_plumed : str, optional
+                The file extension for plumed files, by default "data".
+
+            Attributes
+            ----------
+            tag : str
+                The name of the directory containing the simulation data.
+            data_path_base : Path
+                The base directory containing the simulation data.
+            temperature : float
+                The temperature of the simulation in Kelvin.
+            sampling_methods : list of str
+                The names of the sampling methods used in the simulation.
+            sampling_paths : list of Path
+                The paths to the directories containing the sampling data.
+            top_files : list of Path
+                The paths to the topology files.
+            traj_files : list of Path
+                The paths to the trajectory files.
+            energy_files : list of Path
+                The paths to the energy files.
+            plumed_files : list of Path
+                The paths to the plumed files.
+            data_files : dict
+                A dictionary containing the data files for each sampling method.
+            _kb : float
+                The Boltzmann constant in kJ/mol/K.
+            _beta : float
+                The inverse temperature in 1/kJ/mol.
+            _verbose : bool
+                Whether to print verbose logging messages.
+            _ext_top : str
+                The file extension for topology files.
+            _ext_traj : str
+                The file extension for trajectory files.
+            _ext_energy : str
+                The file extension for energy files.
+            _ext_plumed : str
+                The file extension for plumed files.
+            _sampling_prefix : str
+                The prefix for directories containing sampling data.
+            _repl_prefix : str
+                The prefix for directories containing replica data.
+            """
+
+            # external parameters
+            self.tag = data_path_base.parts[-1]
+            self.data_path_base = data_path_base
+            self.temperature = temperature
+
+            # internal parameters
+            self._kb = 8.314462618e-3  # [kJ/mol/K]
+            self._beta = 1.0 / (self._kb * self.temperature)
+            self._verbose = verbose
+            self._ext_top = ext_top
+            self._ext_traj = ext_traj
+            self._ext_energy = ext_energy
+            self._ext_plumed = ext_plumed
+            self._sampling_prefix = "3-sampling-"
+            self._repl_prefix = "replica_"
+
+            # loaded data
+            self.sampling_methods = None
+            self.universe = None
+            self.energy = None
+
+            # setup class object
+            self._init_log()
+            self._log.info(
+                f"Initializing data pipeline with data path: {self.data_path_base}"
+            )
+            self._find_data_files()
 
     def _init_log(self) -> None:
+        """
+        Initializes the logger for the pipeline.
+
+        The logger is initialized with a StreamHandler that outputs to stdout. If the logger already has a handler, the
+        existing handler is used instead. The logging level is set to DEBUG if the pipeline is in verbose mode, and to
+        WARNING otherwise.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         self._log = logging.getLogger(__name__)
 
         # add handler if not already present to stdout
@@ -79,6 +335,38 @@ class DataPipeline:
             handler.setLevel(logging.WARNING)
 
     def _find_data_files(self) -> None:
+        """
+        Find all data files for each sampling method and create a dictionary of data files where the key is the sampling method.
+        Check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If there are duplicate sampling methods.
+        ValueError
+            If the number of sampling methods does not match the number of sampling paths.
+        ValueError
+            If a sampling path does not exist.
+        ValueError
+            If there are no topology files for a sampling method.
+        ValueError
+            If there are no trajectory files for a sampling method.
+        ValueError
+            If there are no plumed files for a sampling method.
+        ValueError
+            If there is more than one topology file for a sampling method.
+        ValueError
+            If there is more than one plumed file for a sampling method.
+        """
+
         # find all sampling methods: subdirectories of the data path starting with "3-sampling-"
         self.sampling_paths = [
             x
@@ -187,6 +475,26 @@ class DataPipeline:
                 )
 
     def _statistical_weight(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculates the statistical weight of each sample in the input DataFrame based on the bias values.
+        The statistical weight is calculated as exp(-beta * (bias - max(bias))).
+        The statistical weight is normalized so that the sum of all weights is 1.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            The input DataFrame containing the bias values.
+
+        Returns
+        -------
+        pd.DataFrame
+            The input DataFrame with the statistical weight added as a column.
+
+        Raises
+        ------
+        ValueError
+            If the input DataFrame does not contain any bias columns.
+        """
         # get all columns ending in ".bias"
         cols = [col for col in df.columns if col.endswith(".bias")]
         if "metad.bias" in df.columns and "metad.rbias" in df.columns:
@@ -194,6 +502,9 @@ class DataPipeline:
         if "metad.rbias" in df.columns:
             cols.append("metad.rbias")
         self._log.info(f"Found bias columns: {cols}")
+
+        if len(cols) == 0:
+            raise ValueError("No bias columns found in DataFrame")
 
         # calculate statistical weight
         df["bias"] = df[cols].sum(axis=1).astype(np.float128)
@@ -204,6 +515,25 @@ class DataPipeline:
         return df
 
     def load_plumed_colvar(self, method: str) -> pd.DataFrame:
+        """
+        Load the collective variables (colvar) data from the plumed file associated with the given method.
+
+        Parameters
+        ----------
+        method : str
+            The name of the sampling method.
+
+        Returns
+        -------
+        pd.DataFrame
+            The collective variables data.
+
+        Raises
+        ------
+        ValueError
+            If there is not exactly one plumed file for the given method.
+        """
+
         # check that there is only one plumed file for this method
         if len(self.data_files[method]["plumed"]) != 1:
             raise ValueError(
@@ -241,6 +571,24 @@ class DataPipeline:
     def save_plumed_colvar(
         self, method: str = None, file: Path = None, directory: Path = None
     ) -> Path:
+        """
+        Save the collective variables (colvar) data to a parquet file for a given sampling method or all sampling methods.
+
+        Parameters
+        ----------
+        method : str, optional
+            The name of the sampling method, by default None
+        file : Path, optional
+            The name of the output file, by default None
+        directory : Path, optional
+            The directory to save the output file, by default None
+
+        Returns
+        -------
+        Path
+            The path to the output file.
+        """
+
         if directory is None:
             directory = self.data_path_base / "analysis"
 
@@ -249,6 +597,8 @@ class DataPipeline:
                 file = f"colvar_{method}.parquet"
             file = directory / file
             self._log.debug(f"Saving plumed colvar file: {file}")
+            if self.data_files[method]["colvar"] is None:
+                self.load_plumed_colvar(method)
             self.data_files[method]["colvar"].to_parquet(file)
             return file
 
@@ -259,12 +609,33 @@ class DataPipeline:
             file = directory / file
             files.append(file)
             self._log.debug(f"Saving plumed colvar file: {file}")
+            if self.data_files[method]["colvar"] is None:
+                self.load_plumed_colvar(method)
             self.data_files[method]["colvar"].to_parquet(file)
             file = None
 
         return files
 
     def load_universe(self, method: str, **kwargs) -> mda.Universe:
+        """
+        Load the MDAnalysis universe for a given sampling method.
+
+        Parameters
+        ----------
+        method : str
+            The name of the sampling method.
+
+        Returns
+        -------
+        mda.Universe
+            The MDAnalysis universe.
+
+        Raises
+        ------
+        ValueError
+            If there is not exactly one topology file for the given method.
+        """
+
         self._log.info(f"Loading universe for method: {method}")
         self._log.debug(
             f"Found {len(self.data_files[method]['traj'])} trajectory files"
@@ -286,9 +657,30 @@ class DataPipeline:
         return self.universe
 
     def load_energy(self, method: str) -> pd.DataFrame:
+        """
+        Load the energy data for a given sampling method.
+
+        Parameters
+        ----------
+        method : str
+            The name of the sampling method.
+
+        Returns
+        -------
+        pd.DataFrame
+            The energy data.
+
+        Raises
+        ------
+        ValueError
+            If there are no energy files for the given method.
+        """
         self._log.debug(f"Loading energy files for method: {method}")
         self._log.debug(f"Found {len(self.data_files[method]['energy'])} energy files")
         self._log.debug(f"Energy files: {self.data_files[method]['energy']}")
+
+        if len(self.data_files[method]["energy"]) == 0:
+            raise ValueError(f"No energy files found for sampling method {method}")
 
         # iterate over all energy files
         energy = []
