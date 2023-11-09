@@ -16,6 +16,7 @@
         "ddpm",
         "dimensionalize",
         "einops",
+        "eqbm",
         "fastparquet",
         "figsize",
         "fontsize",

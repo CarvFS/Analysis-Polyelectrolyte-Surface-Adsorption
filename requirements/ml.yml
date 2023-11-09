@@ -2,23 +2,21 @@
 # Author: Alec Glisman (GitHub: @alec-glisman)
 # Date: 2023-10-06
 #
-# Create environment with: $ conda env create -f requirements.yml
-# Update environment with: $ conda env update -f requirements.yml
-# Remove environment with: $ conda env remove -n ddpm
+# Create environment with: $ conda env create -f ml.yml
+# Update environment with: $ conda env update -f ml.yml
+# Remove environment with: $ conda env remove -n ml-diffusion
 # 
 # Notes:
 # - We recommend using mamba instead of conda as the solver for faster
 #  environment creation. To do this, run:
 #  $ conda install -n base conda-libmamba-solver
 #  $ conda config --set solver libmamba
-# - Strict channel priority is enabled to ensure that packages are installed
-#  from the channels listed below. To do this, run:
-#  $ conda config --set channel_priority strict
 
 name: ml-diffusion
 channels:
   - pytorch
   - nvidia
+  - anaconda
   - conda-forge
   - defaults
 dependencies:

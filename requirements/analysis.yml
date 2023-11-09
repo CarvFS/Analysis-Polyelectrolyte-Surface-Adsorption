@@ -2,34 +2,33 @@
 # Author: Alec Glisman (GitHub: @alec-glisman)
 # Date: 2023-11-08
 #
-# Create environment with: $ conda env create -f requirements.yml
-# Update environment with: $ conda env update -f requirements.yml
-# Remove environment with: $ conda env remove -n ddpm
+# Create environment with: $ conda env create -f analysis.yml
+# Update environment with: $ conda env update --prune -f analysis.yml
+# Remove environment with: $ conda env remove -n analysis-surface
 # 
 # Notes:
 # - We recommend using mamba instead of conda as the solver for faster
 #  environment creation. To do this, run:
 #  $ conda install -n base conda-libmamba-solver
 #  $ conda config --set solver libmamba
-# - Strict channel priority is enabled to ensure that packages are installed
-#  from the channels listed below. To do this, run:
-#  $ conda config --set channel_priority strict
 
 name: analysis-surface
 channels:
+  - anaconda
   - conda-forge
+  - defaults
 dependencies:
   # parallelization
-  - dask
+  - dask>=2023.10.0
   - tqdm
   # data analysis
-  - numpy
-  - scipy
-  - scikit-learn
-  - pandas
+  - numpy>=1.24.0
+  - scipy>=1.11.0
+  - scikit-learn>=1.2.0
+  - pandas>=2.1.0
   - pyarrow
   # MD packages
-  - mdanalysis
+  - mdanalysis>=2.6.0
   - mdanalysistests
   - panedr
   # plotting
