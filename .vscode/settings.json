@@ -68,6 +68,7 @@
         "torchaudio",
         "torchvision",
         "tqdm",
+        "traj",
         "unitless",
         "usecols",
         "uwall",

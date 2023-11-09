@@ -14,30 +14,24 @@
 # - Strict channel priority is enabled to ensure that packages are installed
 #  from the channels listed below. To do this, run:
 #  $ conda config --set channel_priority strict
+
 name: analysis-surface
 channels:
-  - pytorch
-  - nvidia
   - conda-forge
-  - defaults
 dependencies:
-  # conda
-  - conda-libmamba-solver
   # parallelization
   - dask
-  - dask-labextension
   - tqdm
   # data analysis
   - numpy
+  - scipy
+  - scikit-learn
   - pandas
   - pyarrow
-  - fastparquet
-  - rdkit
   # MD packages
   - mdanalysis
   - mdanalysistests
   - panedr
-  - parmed
   # plotting
   - matplotlib
   - seaborn
