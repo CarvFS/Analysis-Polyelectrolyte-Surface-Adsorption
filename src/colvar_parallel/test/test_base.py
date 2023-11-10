@@ -39,7 +39,7 @@ class NoneAnalysis(ParallelAnalysisBase):
 
 @pytest.fixture(scope="module")
 def scheduler() -> Client:
-    cluster = LocalCluster(n_workers=1, threads_per_worker=1)
+    cluster = LocalCluster(n_workers=4, threads_per_worker=1)
     client = Client(cluster)
     return client
 

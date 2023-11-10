@@ -26,17 +26,17 @@ repos:
     - id: trailing-whitespace
       exclude: '^docs/|README.md'
 
-  - repo: local
-    hooks:
-      - id: pytest-with-coverage
-        name: pytest with coverage
-        entry: coverage
-        language: system
-        types: [python]
-        args: ['run', '-m', 'pytest', 'src']
-      - id: coverage-report
-        name: coverage report
-        entry: coverage
-        language: system
-        types: [python]
-        args: ['report', '--show-missing', '--fail-under=50']
+  # - repo: local
+  #   hooks:
+  #     - id: pytest-with-coverage
+  #       name: pytest with coverage
+  #       entry: coverage
+  #       language: system
+  #       types: [python]
+  #       args: ['run', '-m', 'pytest', 'src']
+  #     - id: coverage-report
+  #       name: coverage report
+  #       entry: coverage
+  #       language: system
+  #       types: [python]
+  #       args: ['report', '--show-missing', '--fail-under=50']

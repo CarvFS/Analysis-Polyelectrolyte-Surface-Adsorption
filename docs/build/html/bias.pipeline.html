@@ -432,6 +432,18 @@ Calculate the statistical weight of each frame in the trajectory.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="bias.pipeline.DataPipeline._init_log">
+<span class="sig-name descname"><span class="pre">_init_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline._init_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline._init_log" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the logger for the pipeline.</p>
+<p>The logger is initialized with a StreamHandler that outputs to stdout.
+If the logger already has a handler, the existing handler is used
+instead. The logging level is set to DEBUG if the pipeline is in
+verbose mode, and to WARNING otherwise.</p>
+<p>None</p>
+<p>None</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bias.pipeline.DataPipeline._find_data_files">
 <span class="sig-name descname"><span class="pre">_find_data_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline._find_data_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline._find_data_files" title="Permalink to this definition"></a></dt>
 <dd><p>Find all data files for each sampling method and create a dictionary of
@@ -462,18 +474,6 @@ paths.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="bias.pipeline.DataPipeline._init_log">
-<span class="sig-name descname"><span class="pre">_init_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline._init_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline._init_log" title="Permalink to this definition"></a></dt>
-<dd><p>Initializes the logger for the pipeline.</p>
-<p>The logger is initialized with a StreamHandler that outputs to stdout.
-If the logger already has a handler, the existing handler is used
-instead. The logging level is set to DEBUG if the pipeline is in
-verbose mode, and to WARNING otherwise.</p>
-<p>None</p>
-<p>None</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="bias.pipeline.DataPipeline._statistical_weight">
 <span class="sig-name descname"><span class="pre">_statistical_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline._statistical_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline._statistical_weight" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the statistical weight of each sample in the input DataFrame based
@@ -492,24 +492,6 @@ The statistical weight is normalized so that the sum of all weights is 1.</p>
 <dt>ValueError</dt><dd><p>If the input DataFrame does not contain any bias columns.</p>
 </dd>
 <dt>ValueError</dt><dd><p>If all statistical weights are zero.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="bias.pipeline.DataPipeline.load_energy">
-<span class="sig-name descname"><span class="pre">load_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline.load_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline.load_energy" title="Permalink to this definition"></a></dt>
-<dd><p>Load the energy data for a given sampling method.</p>
-<dl class="simple">
-<dt>method<span class="classifier">str</span></dt><dd><p>The name of the sampling method.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>pd.DataFrame</dt><dd><p>The energy data.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If there are no energy files for the given method.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -534,6 +516,25 @@ with the given method.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="bias.pipeline.DataPipeline.save_plumed_colvar">
+<span class="sig-name descname"><span class="pre">save_plumed_colvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline.save_plumed_colvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline.save_plumed_colvar" title="Permalink to this definition"></a></dt>
+<dd><p>Save the collective variables (colvar) data to a parquet file for a given
+sampling method or all sampling methods.</p>
+<dl class="simple">
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>The name of the sampling method, by default None</p>
+</dd>
+<dt>file<span class="classifier">Path, optional</span></dt><dd><p>The name of the output file, by default None</p>
+</dd>
+<dt>directory<span class="classifier">Path, optional</span></dt><dd><p>The directory to save the output file, by default None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Path</dt><dd><p>The path to the output file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="bias.pipeline.DataPipeline.load_universe">
 <span class="sig-name descname"><span class="pre">load_universe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.Universe</span></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline.load_universe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline.load_universe" title="Permalink to this definition"></a></dt>
 <dd><p>Load the MDAnalysis universe for a given sampling method.</p>
@@ -552,20 +553,19 @@ with the given method.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="bias.pipeline.DataPipeline.save_plumed_colvar">
-<span class="sig-name descname"><span class="pre">save_plumed_colvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline.save_plumed_colvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline.save_plumed_colvar" title="Permalink to this definition"></a></dt>
-<dd><p>Save the collective variables (colvar) data to a parquet file for a given
-sampling method or all sampling methods.</p>
+<dt class="sig sig-object py" id="bias.pipeline.DataPipeline.load_energy">
+<span class="sig-name descname"><span class="pre">load_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/bias/pipeline.html#DataPipeline.load_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.pipeline.DataPipeline.load_energy" title="Permalink to this definition"></a></dt>
+<dd><p>Load the energy data for a given sampling method.</p>
 <dl class="simple">
-<dt>method<span class="classifier">str, optional</span></dt><dd><p>The name of the sampling method, by default None</p>
-</dd>
-<dt>file<span class="classifier">Path, optional</span></dt><dd><p>The name of the output file, by default None</p>
-</dd>
-<dt>directory<span class="classifier">Path, optional</span></dt><dd><p>The directory to save the output file, by default None</p>
+<dt>method<span class="classifier">str</span></dt><dd><p>The name of the sampling method.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>Path</dt><dd><p>The path to the output file.</p>
+<dt>pd.DataFrame</dt><dd><p>The energy data.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are no energy files for the given method.</p>
 </dd>
 </dl>
 </dd></dl>

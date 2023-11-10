@@ -149,13 +149,13 @@ correctly identified.</p>
 </dd>
 <dt>hydrogens_sel<span class="classifier">str</span></dt><dd><p>Selection string for the hydrogen bond hydrogen atoms. Leave as
 <cite>None</cite> to guess which hydrogens to use in the analysis using
-<a class="reference internal" href="#id19" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a>. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is left as
+<a class="reference internal" href="#id7" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a>. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is left as
 <cite>None</cite>, also leave <code class="xref py py-attr docutils literal notranslate"><span class="pre">donors_sel</span></code> as None so that
 donor-hydrogen pairs can be correctly identified.</p>
 </dd>
 <dt>acceptors_sel<span class="classifier">str</span></dt><dd><p>Selection string for the hydrogen bond acceptor atoms. Leave as
 <cite>None</cite> to guess which atoms to use in the analysis using
-<a class="reference internal" href="#id17" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a></p>
+<a class="reference internal" href="#id9" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a></p>
 </dd>
 <dt>d_h_cutoff<span class="classifier">float (optional)</span></dt><dd><p>Distance cutoff used for finding donor-hydrogen pairs [1.2]. Only
 used to find donor-hydrogen pairs if the universe topology does
@@ -200,9 +200,9 @@ in the analysis. For example, to find all hydrogen bonds in water:</p>
 </pre></div>
 </div>
 <p>Alternatively, <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> may be
-generated via the <a class="reference internal" href="#id19" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a> and <a class="reference internal" href="#id17" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a>.
+generated via the <a class="reference internal" href="#id7" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a> and <a class="reference internal" href="#id9" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a>.
 This selection strings may then be modified prior to calling
-<a class="reference internal" href="#id21" title="colvar_parallel.hbonds.HydrogenBondAnalysis.run"><code class="xref py py-attr docutils literal notranslate"><span class="pre">run</span></code></a>, or a subset of the universe may be used to guess the
+<a class="reference internal" href="#id22" title="colvar_parallel.hbonds.HydrogenBondAnalysis.run"><code class="xref py py-attr docutils literal notranslate"><span class="pre">run</span></code></a>, or a subset of the universe may be used to guess the
 atoms. For example, find hydrogens and acceptors belonging to a
 protein:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">MDAnalysis</span>
@@ -264,159 +264,34 @@ pairs will be identified via a distance cutoff, <code class="xref py py-attr doc
 </pre></div>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._conclude">
-<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._conclude" title="Permalink to this definition"></a></dt>
-<dd><p>Finalize the results of the calculation. This is called once
-after the analysis is finished inside the run() method. The method
-concatenates the results from the single frame analysis and
-input weights dataframe, if provided.</p>
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens">
+<span class="sig-name descname"><span class="pre">guess_hydrogens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_hydrogens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens" title="Permalink to this definition"></a></dt>
+<dd><p>Guesses which hydrogen atoms should be used in the analysis.</p>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>If no results are found.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._filter_atoms">
-<span class="sig-name descname"><span class="pre">_filter_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">donors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._filter_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._filter_atoms" title="Permalink to this definition"></a></dt>
-<dd><p>Create a mask to filter donor, hydrogen and acceptor atoms.</p>
-<p>This can be used to consider only hydrogen bonds between two or more
-specified groups.</p>
-<p>Groups are specified with the <cite>between</cite> keyword when creating the
-HydrogenBondAnalysis object.</p>
-<p>mask: np.ndarray</p>
-<div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Change return value to a mask instead of separate AtomGroups.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._get_dh_pairs">
-<span class="sig-name descname"><span class="pre">_get_dh_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._get_dh_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._get_dh_pairs" title="Permalink to this definition"></a></dt>
-<dd><p>Finds donor-hydrogen pairs.</p>
-<dl class="simple">
-<dt>donors, hydrogens: AtomGroup, AtomGroup</dt><dd><p>AtomGroups corresponding to all donors and all hydrogens.
-AtomGroups are ordered such that, if zipped, will produce a list
-of donor-hydrogen pairs.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._job_block">
-<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._job_block" title="Permalink to this definition"></a></dt>
-<dd><p>Helper function to actually setup the Dask tasks</p>
-<dl class="simple">
-<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
-and refer to frame numbers in the trajectory.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._prepare">
-<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._prepare" title="Permalink to this definition"></a></dt>
-<dd><p>Prepare the analysis class for the single frame analysis.
-This is called once before the analysis is started inside
-the run() method.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._reduce">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._reduce" title="Permalink to this definition"></a></dt>
-<dd><p>Use numpy array append to combine results</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._single_frame">
-<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._single_frame" title="Permalink to this definition"></a></dt>
-<dd><p>Analyze a single frame in the trajectory.</p>
-<dl class="simple">
-<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>Array of hydrogen bonds for the current frame.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_ids">
-<span class="sig-name descname"><span class="pre">count_by_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_ids" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the total number hydrogen bonds formed by unique
-combinations of donor, hydrogen and acceptor atoms.</p>
-<dl class="simple">
-<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor atom id, hydrogen atom
-id, acceptor atom id and the total number of times the hydrogen
-bond was observed. The array is sorted by frequency of
-occurrence.</p>
-</dd>
-</dl>
-<p>Unique hydrogen bonds are determined through a consideration of the
-hydrogen atom id and acceptor atom id in a hydrogen bond.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_time">
-<span class="sig-name descname"><span class="pre">count_by_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_time" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the number of hydrogen bonds per timestep.
-Returns
-——-
-counts : numpy.ndarray</p>
-<blockquote>
-<div><p>Contains the total number of hydrogen bonds found at each
-timestep.
-Can be used along with <code class="xref py py-attr docutils literal notranslate"><span class="pre">HydrogenBondAnalysis.timesteps</span></code> to
-plot the number of hydrogen bonds over time.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_type">
-<span class="sig-name descname"><span class="pre">count_by_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_type" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the total number of each unique type of hydrogen bond.</p>
-<dl class="simple">
-<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor resname, donor atom
-type, acceptor resname, acceptor atom type and the total number
-of times the hydrogen bond was found.</p>
-</dd>
-</dl>
-<p>Unique hydrogen bonds are determined through a consideration of the
-resname and atom type of the donor and acceptor atoms in a hydrogen
-bond.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors">
-<span class="sig-name descname"><span class="pre">guess_acceptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_acceptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors" title="Permalink to this definition"></a></dt>
-<dd><p>Guesses which atoms could be considered acceptors in the analysis.</p>
-<dl class="simple">
-<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which acceptors will be
+<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which hydrogens will be
 identified.</p>
 </dd>
-<dt>max_charge: float (optional)</dt><dd><p>Maximum allowed charge of an acceptor atom.</p>
+<dt>max_mass: float (optional)</dt><dd><p>Maximum allowed mass of a hydrogen atom.</p>
+</dd>
+<dt>min_charge: float (optional)</dt><dd><p>Minimum allowed charge of a hydrogen atom.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>potential_acceptors: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
-atoms that potentially capable of forming hydrogen bonds.</p>
+<dt>potential_hydrogens: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
+hydrogen atoms potentially capable of forming hydrogen bonds.</p>
 </dd>
 </dl>
-<p>This function makes use of and atomic charges to identify which atoms
-could be considered acceptor atoms in the hydrogen bond analysis.
-If an atom has an atomic charge less than <code class="xref py py-attr docutils literal notranslate"><span class="pre">max_charge</span></code> then it
-is considered capable of participating in hydrogen bonds.</p>
-<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> is <cite>None</cite>, this function is called to guess
+<p>This function makes use of atomic masses and atomic charges to
+identify which atoms are hydrogen atoms that are capable of
+participating in hydrogen bonding. If an atom has a mass less than
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">max_mass</span></code> and an atomic charge greater than <code class="xref py py-attr docutils literal notranslate"><span class="pre">min_charge</span></code>
+then it is considered capable of participating in hydrogen bonds.</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is <cite>None</cite>, this function is called to guess
 the selection.</p>
 <p>Alternatively, this function may be used to quickly generate a
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential acceptor atoms involved in hydrogen bonding.
-This <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> may then be modified before being used to set the
-attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential hydrogen atoms involved in hydrogen bonding.
+This str may then be modified before being used to set the attribute
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -453,34 +328,182 @@ attribute <code class="xref py py-attr docutils literal notranslate"><span class
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens">
-<span class="sig-name descname"><span class="pre">guess_hydrogens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_hydrogens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens" title="Permalink to this definition"></a></dt>
-<dd><p>Guesses which hydrogen atoms should be used in the analysis.</p>
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors">
+<span class="sig-name descname"><span class="pre">guess_acceptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_acceptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors" title="Permalink to this definition"></a></dt>
+<dd><p>Guesses which atoms could be considered acceptors in the analysis.</p>
 <dl class="simple">
-<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which hydrogens will be
+<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which acceptors will be
 identified.</p>
 </dd>
-<dt>max_mass: float (optional)</dt><dd><p>Maximum allowed mass of a hydrogen atom.</p>
-</dd>
-<dt>min_charge: float (optional)</dt><dd><p>Minimum allowed charge of a hydrogen atom.</p>
+<dt>max_charge: float (optional)</dt><dd><p>Maximum allowed charge of an acceptor atom.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>potential_hydrogens: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
-hydrogen atoms potentially capable of forming hydrogen bonds.</p>
+<dt>potential_acceptors: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
+atoms that potentially capable of forming hydrogen bonds.</p>
 </dd>
 </dl>
-<p>This function makes use of atomic masses and atomic charges to
-identify which atoms are hydrogen atoms that are capable of
-participating in hydrogen bonding. If an atom has a mass less than
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">max_mass</span></code> and an atomic charge greater than <code class="xref py py-attr docutils literal notranslate"><span class="pre">min_charge</span></code>
-then it is considered capable of participating in hydrogen bonds.</p>
-<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is <cite>None</cite>, this function is called to guess
+<p>This function makes use of and atomic charges to identify which atoms
+could be considered acceptor atoms in the hydrogen bond analysis.
+If an atom has an atomic charge less than <code class="xref py py-attr docutils literal notranslate"><span class="pre">max_charge</span></code> then it
+is considered capable of participating in hydrogen bonds.</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> is <cite>None</cite>, this function is called to guess
 the selection.</p>
 <p>Alternatively, this function may be used to quickly generate a
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential hydrogen atoms involved in hydrogen bonding.
-This str may then be modified before being used to set the attribute
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential acceptor atoms involved in hydrogen bonding.
+This <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> may then be modified before being used to set the
+attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._get_dh_pairs">
+<span class="sig-name descname"><span class="pre">_get_dh_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._get_dh_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._get_dh_pairs" title="Permalink to this definition"></a></dt>
+<dd><p>Finds donor-hydrogen pairs.</p>
+<dl class="simple">
+<dt>donors, hydrogens: AtomGroup, AtomGroup</dt><dd><p>AtomGroups corresponding to all donors and all hydrogens.
+AtomGroups are ordered such that, if zipped, will produce a list
+of donor-hydrogen pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._filter_atoms">
+<span class="sig-name descname"><span class="pre">_filter_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">donors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._filter_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._filter_atoms" title="Permalink to this definition"></a></dt>
+<dd><p>Create a mask to filter donor, hydrogen and acceptor atoms.</p>
+<p>This can be used to consider only hydrogen bonds between two or more
+specified groups.</p>
+<p>Groups are specified with the <cite>between</cite> keyword when creating the
+HydrogenBondAnalysis object.</p>
+<p>mask: np.ndarray</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Change return value to a mask instead of separate AtomGroups.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._prepare">
+<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._prepare" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare the analysis class for the single frame analysis.
+This is called once before the analysis is started inside
+the run() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._single_frame">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._single_frame" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of hydrogen bonds for the current frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._conclude">
+<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._conclude" title="Permalink to this definition"></a></dt>
+<dd><p>Finalize the results of the calculation. This is called once
+after the analysis is finished inside the run() method. The method
+concatenates the results from the single frame analysis and
+input weights dataframe, if provided.</p>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save the results of the analysis to a parquet file. The results
+are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<dl class="simple">
+<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
+results are saved to the directory specified in the
+<cite>dir_out</cite> attribute.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no filename is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_time">
+<span class="sig-name descname"><span class="pre">count_by_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_time" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the number of hydrogen bonds per timestep.
+Returns
+——-
+counts : numpy.ndarray</p>
+<blockquote>
+<div><p>Contains the total number of hydrogen bonds found at each
+timestep.
+Can be used along with <code class="xref py py-attr docutils literal notranslate"><span class="pre">HydrogenBondAnalysis.timesteps</span></code> to
+plot the number of hydrogen bonds over time.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_type">
+<span class="sig-name descname"><span class="pre">count_by_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_type" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the total number of each unique type of hydrogen bond.</p>
+<dl class="simple">
+<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor resname, donor atom
+type, acceptor resname, acceptor atom type and the total number
+of times the hydrogen bond was found.</p>
+</dd>
+</dl>
+<p>Unique hydrogen bonds are determined through a consideration of the
+resname and atom type of the donor and acceptor atoms in a hydrogen
+bond.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_ids">
+<span class="sig-name descname"><span class="pre">count_by_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.count_by_ids" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the total number hydrogen bonds formed by unique
+combinations of donor, hydrogen and acceptor atoms.</p>
+<dl class="simple">
+<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor atom id, hydrogen atom
+id, acceptor atom id and the total number of times the hydrogen
+bond was observed. The array is sorted by frequency of
+occurrence.</p>
+</dd>
+</dl>
+<p>Unique hydrogen bonds are determined through a consideration of the
+hydrogen atom id and acceptor atom id in a hydrogen bond.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._job_block">
+<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._job_block" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to actually setup the Dask tasks</p>
+<dl class="simple">
+<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
+and refer to frame numbers in the trajectory.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._reduce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._reduce" title="Permalink to this definition"></a></dt>
+<dd><p>Use numpy array append to combine results</p>
 </dd></dl>
 
 <dl class="py method">
@@ -557,29 +580,6 @@ frame indices in the <cite>frames</cite> keyword argument.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis.save" title="Permalink to this definition"></a></dt>
-<dd><p>Save the results of the analysis to a parquet file. The results
-are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
-<p>This method should only be called after the analysis has been
-run.</p>
-<dl class="simple">
-<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
-results are saved to the directory specified in the
-<cite>dir_out</cite> attribute.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If no filename is found.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -614,13 +614,13 @@ correctly identified.</p>
 </dd>
 <dt>hydrogens_sel<span class="classifier">str</span></dt><dd><p>Selection string for the hydrogen bond hydrogen atoms. Leave as
 <cite>None</cite> to guess which hydrogens to use in the analysis using
-<a class="reference internal" href="#id19" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a>. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is left as
+<a class="reference internal" href="#id7" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a>. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is left as
 <cite>None</cite>, also leave <code class="xref py py-attr docutils literal notranslate"><span class="pre">donors_sel</span></code> as None so that
 donor-hydrogen pairs can be correctly identified.</p>
 </dd>
 <dt>acceptors_sel<span class="classifier">str</span></dt><dd><p>Selection string for the hydrogen bond acceptor atoms. Leave as
 <cite>None</cite> to guess which atoms to use in the analysis using
-<a class="reference internal" href="#id17" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a></p>
+<a class="reference internal" href="#id9" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a></p>
 </dd>
 <dt>d_h_cutoff<span class="classifier">float (optional)</span></dt><dd><p>Distance cutoff used for finding donor-hydrogen pairs [1.2]. Only
 used to find donor-hydrogen pairs if the universe topology does
@@ -665,9 +665,9 @@ in the analysis. For example, to find all hydrogen bonds in water:</p>
 </pre></div>
 </div>
 <p>Alternatively, <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> may be
-generated via the <a class="reference internal" href="#id19" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a> and <a class="reference internal" href="#id17" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a>.
+generated via the <a class="reference internal" href="#id7" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_hydrogens"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_hydrogens</span></code></a> and <a class="reference internal" href="#id9" title="colvar_parallel.hbonds.HydrogenBondAnalysis.guess_acceptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">guess_acceptors</span></code></a>.
 This selection strings may then be modified prior to calling
-<a class="reference internal" href="#id21" title="colvar_parallel.hbonds.HydrogenBondAnalysis.run"><code class="xref py py-attr docutils literal notranslate"><span class="pre">run</span></code></a>, or a subset of the universe may be used to guess the
+<a class="reference internal" href="#id22" title="colvar_parallel.hbonds.HydrogenBondAnalysis.run"><code class="xref py py-attr docutils literal notranslate"><span class="pre">run</span></code></a>, or a subset of the universe may be used to guess the
 atoms. For example, find hydrogens and acceptors belonging to a
 protein:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">MDAnalysis</span>
@@ -730,168 +730,38 @@ pairs will be identified via a distance cutoff, <code class="xref py py-attr doc
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
-<dd><p>Finalize the results of the calculation. This is called once
-after the analysis is finished inside the run() method. The method
-concatenates the results from the single frame analysis and
-input weights dataframe, if provided.</p>
+<span class="sig-name descname"><span class="pre">guess_hydrogens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_hydrogens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd><p>Guesses which hydrogen atoms should be used in the analysis.</p>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>If no results are found.</p>
+<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which hydrogens will be
+identified.</p>
+</dd>
+<dt>max_mass: float (optional)</dt><dd><p>Maximum allowed mass of a hydrogen atom.</p>
+</dd>
+<dt>min_charge: float (optional)</dt><dd><p>Minimum allowed charge of a hydrogen atom.</p>
 </dd>
 </dl>
+<dl class="simple">
+<dt>potential_hydrogens: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
+hydrogen atoms potentially capable of forming hydrogen bonds.</p>
+</dd>
+</dl>
+<p>This function makes use of atomic masses and atomic charges to
+identify which atoms are hydrogen atoms that are capable of
+participating in hydrogen bonding. If an atom has a mass less than
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">max_mass</span></code> and an atomic charge greater than <code class="xref py py-attr docutils literal notranslate"><span class="pre">min_charge</span></code>
+then it is considered capable of participating in hydrogen bonds.</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is <cite>None</cite>, this function is called to guess
+the selection.</p>
+<p>Alternatively, this function may be used to quickly generate a
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential hydrogen atoms involved in hydrogen bonding.
+This str may then be modified before being used to set the attribute
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">_filter_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">donors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._filter_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
-<dd><p>Create a mask to filter donor, hydrogen and acceptor atoms.</p>
-<p>This can be used to consider only hydrogen bonds between two or more
-specified groups.</p>
-<p>Groups are specified with the <cite>between</cite> keyword when creating the
-HydrogenBondAnalysis object.</p>
-<p>mask: np.ndarray</p>
-<div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Change return value to a mask instead of separate AtomGroups.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">_get_dh_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._get_dh_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
-<dd><p>Finds donor-hydrogen pairs.</p>
-<dl class="simple">
-<dt>donors, hydrogens: AtomGroup, AtomGroup</dt><dd><p>AtomGroups corresponding to all donors and all hydrogens.
-AtomGroups are ordered such that, if zipped, will produce a list
-of donor-hydrogen pairs.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
-<dd><p>Helper function to actually setup the Dask tasks</p>
-<dl class="simple">
-<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
-and refer to frame numbers in the trajectory.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
-<dd><p>Prepare the analysis class for the single frame analysis.
-This is called once before the analysis is started inside
-the run() method.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id12">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
-<dd><p>Use numpy array append to combine results</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
-<dd><p>Analyze a single frame in the trajectory.</p>
-<dl class="simple">
-<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>Array of hydrogen bonds for the current frame.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._universe_check">
-<span class="sig-name descname"><span class="pre">_universe_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._universe_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._universe_check" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">count_by_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the total number hydrogen bonds formed by unique
-combinations of donor, hydrogen and acceptor atoms.</p>
-<dl class="simple">
-<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor atom id, hydrogen atom
-id, acceptor atom id and the total number of times the hydrogen
-bond was observed. The array is sorted by frequency of
-occurrence.</p>
-</dd>
-</dl>
-<p>Unique hydrogen bonds are determined through a consideration of the
-hydrogen atom id and acceptor atom id in a hydrogen bond.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">count_by_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the number of hydrogen bonds per timestep.
-Returns
-——-
-counts : numpy.ndarray</p>
-<blockquote>
-<div><p>Contains the total number of hydrogen bonds found at each
-timestep.
-Can be used along with <code class="xref py py-attr docutils literal notranslate"><span class="pre">HydrogenBondAnalysis.timesteps</span></code> to
-plot the number of hydrogen bonds over time.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id16">
-<span class="sig-name descname"><span class="pre">count_by_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
-<dd><p>Counts the total number of each unique type of hydrogen bond.</p>
-<dl class="simple">
-<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor resname, donor atom
-type, acceptor resname, acceptor atom type and the total number
-of times the hydrogen bond was found.</p>
-</dd>
-</dl>
-<p>Unique hydrogen bonds are determined through a consideration of the
-resname and atom type of the donor and acceptor atoms in a hydrogen
-bond.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id17">
-<span class="sig-name descname"><span class="pre">guess_acceptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_acceptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
-<dd><p>Guesses which atoms could be considered acceptors in the analysis.</p>
-<dl class="simple">
-<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which acceptors will be
-identified.</p>
-</dd>
-<dt>max_charge: float (optional)</dt><dd><p>Maximum allowed charge of an acceptor atom.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>potential_acceptors: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
-atoms that potentially capable of forming hydrogen bonds.</p>
-</dd>
-</dl>
-<p>This function makes use of and atomic charges to identify which atoms
-could be considered acceptor atoms in the hydrogen bond analysis.
-If an atom has an atomic charge less than <code class="xref py py-attr docutils literal notranslate"><span class="pre">max_charge</span></code> then it
-is considered capable of participating in hydrogen bonds.</p>
-<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> is <cite>None</cite>, this function is called to guess
-the selection.</p>
-<p>Alternatively, this function may be used to quickly generate a
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential acceptor atoms involved in hydrogen bonding.
-This <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> may then be modified before being used to set the
-attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-name descname"><span class="pre">guess_donors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_donors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">guess_donors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_donors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
 <dd><p>Guesses which atoms could be considered donors in the analysis.
 Only use if the universe topology does not contain bonding
 information, otherwise donor-hydrogen pairs may be incorrectly
@@ -923,39 +793,192 @@ attribute <code class="xref py py-attr docutils literal notranslate"><span class
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id19">
-<span class="sig-name descname"><span class="pre">guess_hydrogens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_hydrogens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
-<dd><p>Guesses which hydrogen atoms should be used in the analysis.</p>
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">guess_acceptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.guess_acceptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
+<dd><p>Guesses which atoms could be considered acceptors in the analysis.</p>
 <dl class="simple">
-<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which hydrogens will be
+<dt>selection: str (optional)</dt><dd><p>Selection string for atom group from which acceptors will be
 identified.</p>
 </dd>
-<dt>max_mass: float (optional)</dt><dd><p>Maximum allowed mass of a hydrogen atom.</p>
-</dd>
-<dt>min_charge: float (optional)</dt><dd><p>Minimum allowed charge of a hydrogen atom.</p>
+<dt>max_charge: float (optional)</dt><dd><p>Maximum allowed charge of an acceptor atom.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>potential_hydrogens: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
-hydrogen atoms potentially capable of forming hydrogen bonds.</p>
+<dt>potential_acceptors: str</dt><dd><p>String containing the <code class="xref py py-attr docutils literal notranslate"><span class="pre">resname</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code> of all
+atoms that potentially capable of forming hydrogen bonds.</p>
 </dd>
 </dl>
-<p>This function makes use of atomic masses and atomic charges to
-identify which atoms are hydrogen atoms that are capable of
-participating in hydrogen bonding. If an atom has a mass less than
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">max_mass</span></code> and an atomic charge greater than <code class="xref py py-attr docutils literal notranslate"><span class="pre">min_charge</span></code>
-then it is considered capable of participating in hydrogen bonds.</p>
-<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code> is <cite>None</cite>, this function is called to guess
+<p>This function makes use of and atomic charges to identify which atoms
+could be considered acceptor atoms in the hydrogen bond analysis.
+If an atom has an atomic charge less than <code class="xref py py-attr docutils literal notranslate"><span class="pre">max_charge</span></code> then it
+is considered capable of participating in hydrogen bonds.</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code> is <cite>None</cite>, this function is called to guess
 the selection.</p>
 <p>Alternatively, this function may be used to quickly generate a
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential hydrogen atoms involved in hydrogen bonding.
-This str may then be modified before being used to set the attribute
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">hydrogens_sel</span></code>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> of potential acceptor atoms involved in hydrogen bonding.
+This <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> may then be modified before being used to set the
+attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">acceptors_sel</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">_get_dh_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._get_dh_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
+<dd><p>Finds donor-hydrogen pairs.</p>
+<dl class="simple">
+<dt>donors, hydrogens: AtomGroup, AtomGroup</dt><dd><p>AtomGroups corresponding to all donors and all hydrogens.
+AtomGroups are ordered such that, if zipped, will produce a list
+of donor-hydrogen pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">_filter_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">donors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._filter_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<dd><p>Create a mask to filter donor, hydrogen and acceptor atoms.</p>
+<p>This can be used to consider only hydrogen bonds between two or more
+specified groups.</p>
+<p>Groups are specified with the <cite>between</cite> keyword when creating the
+HydrogenBondAnalysis object.</p>
+<p>mask: np.ndarray</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.5.0: </span>Change return value to a mask instead of separate AtomGroups.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
+<dd><p>Prepare the analysis class for the single frame analysis.
+This is called once before the analysis is started inside
+the run() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of hydrogen bonds for the current frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
+<dd><p>Finalize the results of the calculation. This is called once
+after the analysis is finished inside the run() method. The method
+concatenates the results from the single frame analysis and
+input weights dataframe, if provided.</p>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
+<dd><p>Save the results of the analysis to a parquet file. The results
+are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<dl class="simple">
+<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
+results are saved to the directory specified in the
+<cite>dir_out</cite> attribute.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no filename is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">count_by_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the number of hydrogen bonds per timestep.
+Returns
+——-
+counts : numpy.ndarray</p>
+<blockquote>
+<div><p>Contains the total number of hydrogen bonds found at each
+timestep.
+Can be used along with <code class="xref py py-attr docutils literal notranslate"><span class="pre">HydrogenBondAnalysis.timesteps</span></code> to
+plot the number of hydrogen bonds over time.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">count_by_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the total number of each unique type of hydrogen bond.</p>
+<dl class="simple">
+<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor resname, donor atom
+type, acceptor resname, acceptor atom type and the total number
+of times the hydrogen bond was found.</p>
+</dd>
+</dl>
+<p>Unique hydrogen bonds are determined through a consideration of the
+resname and atom type of the donor and acceptor atoms in a hydrogen
+bond.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">count_by_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.count_by_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the total number hydrogen bonds formed by unique
+combinations of donor, hydrogen and acceptor atoms.</p>
+<dl class="simple">
+<dt>counts<span class="classifier">numpy.ndarray</span></dt><dd><p>Each row of the array contains the donor atom id, hydrogen atom
+id, acceptor atom id and the total number of times the hydrogen
+bond was observed. The array is sorted by frequency of
+occurrence.</p>
+</dd>
+</dl>
+<p>Unique hydrogen bonds are determined through a consideration of the
+hydrogen atom id and acceptor atom id in a hydrogen bond.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.hbonds.HydrogenBondAnalysis._universe_check">
+<span class="sig-name descname"><span class="pre">_universe_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._universe_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.hbonds.HydrogenBondAnalysis._universe_check" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to actually setup the Dask tasks</p>
+<dl class="simple">
+<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
+and refer to frame numbers in the trajectory.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id20">
-<span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#id20" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id20" title="Permalink to this definition"></a></dt>
+<dd><p>Use numpy array append to combine results</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#id21" title="Permalink to this definition"></a></dt>
 <dd><p>Merge external data with the results of the analysis</p>
 <dl class="simple">
 <dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>Dataframe containing the data to merge</p>
@@ -976,8 +999,8 @@ This str may then be modified before being used to set the attribute
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id21">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="colvar_parallel.base.html#colvar_parallel.base.ParallelAnalysisBase" title="colvar_parallel.base.ParallelAnalysisBase"><span class="pre">colvar_parallel.base.ParallelAnalysisBase</span></a></span></span><a class="headerlink" href="#id21" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="colvar_parallel.base.html#colvar_parallel.base.ParallelAnalysisBase" title="colvar_parallel.base.ParallelAnalysisBase"><span class="pre">colvar_parallel.base.ParallelAnalysisBase</span></a></span></span><a class="headerlink" href="#id22" title="Permalink to this definition"></a></dt>
 <dd><p>Perform the calculation</p>
 <dl class="simple">
 <dt>start<span class="classifier">int, optional</span></dt><dd><p>start frame of analysis</p>
@@ -1010,7 +1033,7 @@ Joblib backend, or the multiprocessing method. Default: <code class="docutils li
 to n_jobs or number of available workers in scheduler.
 .. versionadded:: PERSONAL-COPY</p>
 </dd>
-<dt><a href="#id22"><span class="problematic" id="id23">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.base.compute()</span></code>.</p>
+<dt><a href="#id23"><span class="problematic" id="id24">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.base.compute()</span></code>.</p>
 </dd>
 </dl>
 <div class="versionchanged">
@@ -1023,29 +1046,6 @@ frame indices in the <cite>frames</cite> keyword argument.</p>
 </dl>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If <cite>frames</cite> is used in conjunction with <cite>start</cite>, <cite>stop</cite>, or <cite>step</cite>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/hbonds.html#HydrogenBondAnalysis.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id24" title="Permalink to this definition"></a></dt>
-<dd><p>Save the results of the analysis to a parquet file. The results
-are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
-<p>This method should only be called after the analysis has been
-run.</p>
-<dl class="simple">
-<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
-results are saved to the directory specified in the
-<cite>dir_out</cite> attribute.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If no filename is found.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
 </dd>
 </dl>
 </dd></dl>

@@ -43,17 +43,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="bias.html">bias package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="colvar_parallel.html">colvar_parallel package</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="stats.html">stats package</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="stats.html#submodules">Submodules</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">stats.block_error module</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bias.html">bias package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="colvar_parallel.html">colvar_parallel package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="stats.html">stats package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="stats.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">stats.block_error module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html#module-stats">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul class="current">
@@ -85,6 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
           <li class="breadcrumb-item"><a href="stats.html">stats package</a></li>
       <li class="breadcrumb-item active">stats.block_error module</li>
       <li class="wy-breadcrumbs-aside">
@@ -125,6 +129,61 @@ plateau. This is because the histogram estimates from each block become
 uncorrelated and independent. This allows us to use the central limit theorem
 to calculate the true error estimates. Using the raw data before block
 averaging would underestimate the error, as the raw data is not independent.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stats.block_error.kde">
+<span class="sig-prename descclassname"><span class="pre">stats.block_error.</span></span><span class="sig-name descname"><span class="pre">kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_pts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stats.block_error.kde" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the kernel density estimate (KDE) of the input data.
+This function is used to parallelize the KDE calculation.</p>
+<dl class="simple">
+<dt>block_idx<span class="classifier">int</span></dt><dd><p>Index of the block to calculate the KDE for.</p>
+</dd>
+<dt>block_size<span class="classifier">int</span></dt><dd><p>Size of the block to calculate the KDE for.</p>
+</dd>
+<dt>bandwidth<span class="classifier">float</span></dt><dd><p>Bandwidth of the KDE.</p>
+</dd>
+<dt>data<span class="classifier">np.array</span></dt><dd><p>Array of data to calculate the KDE for.</p>
+</dd>
+<dt>x_pts<span class="classifier">np.array</span></dt><dd><p>Array of x points to evaluate the KDE at.</p>
+</dd>
+<dt>weights<span class="classifier">np.array, optional</span></dt><dd><p>Array of weights for each data point. This should be a 1D array.
+If not specified, the data will be assumed to be unweighted.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>hist<span class="classifier">np.array</span></dt><dd><p>Array of the KDE evaluated at the x points.</p>
+</dd>
+<dt>weight_norm<span class="classifier">float</span></dt><dd><p>Sum of the weights for the block.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stats.block_error.histogram">
+<span class="sig-prename descclassname"><span class="pre">stats.block_error.</span></span><span class="sig-name descname"><span class="pre">histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stats.block_error.histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the histogram of the input data. This function is used to
+parallelize the histogram calculation. The histogram is normalized to be a
+probability density.</p>
+<dl class="simple">
+<dt>block_idx<span class="classifier">int</span></dt><dd><p>Index of the block to calculate the histogram for.</p>
+</dd>
+<dt>block_size<span class="classifier">int</span></dt><dd><p>Size of the block to calculate the histogram for.</p>
+</dd>
+<dt>data<span class="classifier">np.array</span></dt><dd><p>Array of data to calculate the histogram for.</p>
+</dd>
+<dt>bins<span class="classifier">np.array</span></dt><dd><p>Array of bin edges to use for the histogram.</p>
+</dd>
+<dt>weights<span class="classifier">np.array, optional</span></dt><dd><p>Array of weights for each data point. This should be a 1D array.
+If not specified, the data will be assumed to be unweighted.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>hist<span class="classifier">np.array</span></dt><dd><p>Array of the histogram evaluated at the x points.</p>
+</dd>
+<dt>weight_norm<span class="classifier">float</span></dt><dd><p>Sum of the weights for the block.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="stats.block_error.BlockError">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stats.block_error.</span></span><span class="sig-name descname"><span class="pre">BlockError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/block_error.html#BlockError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError" title="Permalink to this definition"></a></dt>
@@ -174,55 +233,14 @@ If not specified, the data will be assumed to be unweighted.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="stats.block_error.BlockError.x_histo">
-<span class="sig-name descname"><span class="pre">x_histo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_histo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_histo" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the block average and error of the histogram of the input
-distribution of the x data.</p>
+<dt class="sig sig-object py" id="stats.block_error.BlockError.x_val">
+<span class="sig-name descname"><span class="pre">x_val</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_val" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the block average and error of the value of the input
+values of the x data.</p>
 <dl class="simple">
-<dt>bins<span class="classifier">int or list or np.array, optional</span></dt><dd><p>Number of bins to use for the histogram. If a list or np.array is
-provided, the values will be used as the bin edges.</p>
+<dt>x_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the input x data.</p>
 </dd>
-<dt>return_edges<span class="classifier">bool, optional</span></dt><dd><p>If True, the bin edges will be returned.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>centers<span class="classifier">np.array</span></dt><dd><p>Array of histogram bin centers.</p>
-</dd>
-<dt>histo_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the histogram.</p>
-</dd>
-<dt>histo_var<span class="classifier">np.array</span></dt><dd><p>Array of block average variances of the histogram.</p>
-</dd>
-<dt>histo_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the histogram.</p>
-</dd>
-<dt>edges<span class="classifier">np.array, optional</span></dt><dd><p>Array of histogram bin edges. Only returned if return_edges is
-True.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="stats.block_error.BlockError.x_histo_fes">
-<span class="sig-name descname"><span class="pre">x_histo_fes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_histo_fes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_histo_fes" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the block average and error of the free energy surface
-of the input distribution of the x data using discrete histograms.</p>
-<dl class="simple">
-<dt>bins<span class="classifier">int or list or np.array, optional</span></dt><dd><p>Number of bins to use for the histogram. If a list or np.array is
-provided, the values will be used as the bin edges.</p>
-</dd>
-<dt>return_edges<span class="classifier">bool, optional</span></dt><dd><p>If True, the bin edges will be returned.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>centers<span class="classifier">np.array</span></dt><dd><p>Array of histogram bin centers.</p>
-</dd>
-<dt>fes_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the free energy surface.</p>
-</dd>
-<dt>fes_var<span class="classifier">np.array</span></dt><dd><p>Array of block average variances of the free energy surface.</p>
-</dd>
-<dt>fes_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the free energy surface.</p>
-</dd>
-<dt>edges<span class="classifier">np.array, optional</span></dt><dd><p>Array of histogram bin edges. Only returned if return_edges is
-True.</p>
+<dt>x_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the input x data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -291,73 +309,59 @@ be estimated using the Scott’s rule of thumb.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="stats.block_error.BlockError.x_val">
-<span class="sig-name descname"><span class="pre">x_val</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_val" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the block average and error of the value of the input
-values of the x data.</p>
+<dt class="sig sig-object py" id="stats.block_error.BlockError.x_histo">
+<span class="sig-name descname"><span class="pre">x_histo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_histo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_histo" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the block average and error of the histogram of the input
+distribution of the x data.</p>
 <dl class="simple">
-<dt>x_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the input x data.</p>
+<dt>bins<span class="classifier">int or list or np.array, optional</span></dt><dd><p>Number of bins to use for the histogram. If a list or np.array is
+provided, the values will be used as the bin edges.</p>
 </dd>
-<dt>x_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the input x data.</p>
+<dt>return_edges<span class="classifier">bool, optional</span></dt><dd><p>If True, the bin edges will be returned.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>centers<span class="classifier">np.array</span></dt><dd><p>Array of histogram bin centers.</p>
+</dd>
+<dt>histo_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the histogram.</p>
+</dd>
+<dt>histo_var<span class="classifier">np.array</span></dt><dd><p>Array of block average variances of the histogram.</p>
+</dd>
+<dt>histo_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the histogram.</p>
+</dd>
+<dt>edges<span class="classifier">np.array, optional</span></dt><dd><p>Array of histogram bin edges. Only returned if return_edges is
+True.</p>
 </dd>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stats.block_error.histogram">
-<span class="sig-prename descclassname"><span class="pre">stats.block_error.</span></span><span class="sig-name descname"><span class="pre">histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stats.block_error.histogram" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the histogram of the input data. This function is used to
-parallelize the histogram calculation. The histogram is normalized to be a
-probability density.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="stats.block_error.BlockError.x_histo_fes">
+<span class="sig-name descname"><span class="pre">x_histo_fes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/stats/block_error.html#BlockError.x_histo_fes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stats.block_error.BlockError.x_histo_fes" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the block average and error of the free energy surface
+of the input distribution of the x data using discrete histograms.</p>
 <dl class="simple">
-<dt>block_idx<span class="classifier">int</span></dt><dd><p>Index of the block to calculate the histogram for.</p>
+<dt>bins<span class="classifier">int or list or np.array, optional</span></dt><dd><p>Number of bins to use for the histogram. If a list or np.array is
+provided, the values will be used as the bin edges.</p>
 </dd>
-<dt>block_size<span class="classifier">int</span></dt><dd><p>Size of the block to calculate the histogram for.</p>
-</dd>
-<dt>data<span class="classifier">np.array</span></dt><dd><p>Array of data to calculate the histogram for.</p>
-</dd>
-<dt>bins<span class="classifier">np.array</span></dt><dd><p>Array of bin edges to use for the histogram.</p>
-</dd>
-<dt>weights<span class="classifier">np.array, optional</span></dt><dd><p>Array of weights for each data point. This should be a 1D array.
-If not specified, the data will be assumed to be unweighted.</p>
+<dt>return_edges<span class="classifier">bool, optional</span></dt><dd><p>If True, the bin edges will be returned.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>hist<span class="classifier">np.array</span></dt><dd><p>Array of the histogram evaluated at the x points.</p>
+<dt>centers<span class="classifier">np.array</span></dt><dd><p>Array of histogram bin centers.</p>
 </dd>
-<dt>weight_norm<span class="classifier">float</span></dt><dd><p>Sum of the weights for the block.</p>
+<dt>fes_mean<span class="classifier">np.array</span></dt><dd><p>Array of block average values of the free energy surface.</p>
+</dd>
+<dt>fes_var<span class="classifier">np.array</span></dt><dd><p>Array of block average variances of the free energy surface.</p>
+</dd>
+<dt>fes_err<span class="classifier">np.array</span></dt><dd><p>Array of block average standard errors of the free energy surface.</p>
+</dd>
+<dt>edges<span class="classifier">np.array, optional</span></dt><dd><p>Array of histogram bin edges. Only returned if return_edges is
+True.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="stats.block_error.kde">
-<span class="sig-prename descclassname"><span class="pre">stats.block_error.</span></span><span class="sig-name descname"><span class="pre">kde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_pts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#stats.block_error.kde" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the kernel density estimate (KDE) of the input data.
-This function is used to parallelize the KDE calculation.</p>
-<dl class="simple">
-<dt>block_idx<span class="classifier">int</span></dt><dd><p>Index of the block to calculate the KDE for.</p>
-</dd>
-<dt>block_size<span class="classifier">int</span></dt><dd><p>Size of the block to calculate the KDE for.</p>
-</dd>
-<dt>bandwidth<span class="classifier">float</span></dt><dd><p>Bandwidth of the KDE.</p>
-</dd>
-<dt>data<span class="classifier">np.array</span></dt><dd><p>Array of data to calculate the KDE for.</p>
-</dd>
-<dt>x_pts<span class="classifier">np.array</span></dt><dd><p>Array of x points to evaluate the KDE at.</p>
-</dd>
-<dt>weights<span class="classifier">np.array, optional</span></dt><dd><p>Array of weights for each data point. This should be a 1D array.
-If not specified, the data will be assumed to be unweighted.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>hist<span class="classifier">np.array</span></dt><dd><p>Array of the KDE evaluated at the x points.</p>
-</dd>
-<dt>weight_norm<span class="classifier">float</span></dt><dd><p>Sum of the weights for the block.</p>
-</dd>
-</dl>
 </dd></dl>
 
 </section>

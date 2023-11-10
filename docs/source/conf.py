@@ -62,7 +62,14 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    # "sphinx_copybutton",
+    # "sphinx_togglebutton",
+    # "myst_nb",
 ]
+
+autodoc_member_order = "bysource"
+toc_object_entries_show_parents = "hide"
+nb_execution_timeout = -1
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

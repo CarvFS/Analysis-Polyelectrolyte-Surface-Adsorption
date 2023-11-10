@@ -119,6 +119,42 @@ parquet file. The <cite>figures</cite> method plots the results.</p>
 the default <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis/contacts.html#MDAnalysis.analysis.contacts.Contacts" title="(in MDAnalysis v2.6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MDAnalysis.analysis.contacts.Contacts</span></code></a> class. I added
 functionality for weighted frames, center of mass distributions, and
 excluding frames that do not meet other input boolean criteria.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="colvar_parallel.contacts.coordination_rational">
+<span class="sig-prename descclassname"><span class="pre">colvar_parallel.contacts.</span></span><span class="sig-name descname"><span class="pre">coordination_rational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">r0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#coordination_rational"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.coordination_rational" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Calculate the coordination number for a given distance r, with
+characteristic distance r0, using a rational switching function.
+The function is defined as:
+.. math:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">=</span> \<span class="n">frac</span><span class="p">{</span><span class="mi">1</span> <span class="o">-</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>rac{r - d_0}{r_0})^n}{1 -
+rac{r - d_0}{r_0})^m}</p>
+<blockquote>
+<div><dl class="simple">
+<dt>r<span class="classifier">float</span></dt><dd><p>The distance at which to calculate the coordination number</p>
+</dd>
+<dt>r0<span class="classifier">float</span></dt><dd><p>The characteristic distance.</p>
+</dd>
+<dt>d0<span class="classifier">float, optional</span></dt><dd><p>Offset for the distance. Default is 0.0</p>
+</dd>
+<dt>n<span class="classifier">int, optional</span></dt><dd><p>The power to which the distance is raised in the numerator.
+Default is 6.</p>
+</dd>
+<dt>m<span class="classifier">int, optional</span></dt><dd><p>The power to which the distance is raised in the denominator.
+Default is 0, which is changed to 2 * n.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>The coordination number at distance r</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">colvar_parallel.contacts.</span></span><span class="sig-name descname"><span class="pre">Contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts" title="Permalink to this definition"></a></dt>
@@ -195,11 +231,6 @@ input weights dataframe, if provided.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._get_atomgroup">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_atomgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updating</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts._get_atomgroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts._get_atomgroup" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._job_block">
 <span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#colvar_parallel.contacts.Contacts._job_block" title="Permalink to this definition"></a></dt>
 <dd><p>Helper function to actually setup the Dask tasks</p>
@@ -226,41 +257,6 @@ the run() method.</p>
 <dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._reduce">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#colvar_parallel.contacts.Contacts._reduce" title="Permalink to this definition"></a></dt>
 <dd><p>‘append’ action for a time series</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._single_frame">
-<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts._single_frame" title="Permalink to this definition"></a></dt>
-<dd><p>Analyze a single frame in the trajectory.</p>
-<dl class="simple">
-<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
-pair distances at the current frame.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts.figures">
-<span class="sig-name descname"><span class="pre">figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts.figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts.figures" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the radial distribution function and the potential of mean
-force. The figures are saved to the <cite>figures</cite> directory in the
-<cite>dir_out</cite> directory. This is a wrapper for all plotting methods.</p>
-<p>This method should only be called after the analysis has been
-run.</p>
-<dl class="simple">
-<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plots.</p>
-</dd>
-<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figures. Default is “png”.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figures and axes of the plots.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -360,42 +356,46 @@ results are saved to the directory specified in the
 </dl>
 </dd></dl>
 
-</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._get_atomgroup">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_atomgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updating</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts._get_atomgroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts._get_atomgroup" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="colvar_parallel.contacts.coordination_rational">
-<span class="sig-prename descclassname"><span class="pre">colvar_parallel.contacts.</span></span><span class="sig-name descname"><span class="pre">coordination_rational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">r0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#coordination_rational"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.coordination_rational" title="Permalink to this definition"></a></dt>
-<dd><blockquote>
-<div><p>Calculate the coordination number for a given distance r, with
-characteristic distance r0, using a rational switching function.
-The function is defined as:
-.. math:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">=</span> \<span class="n">frac</span><span class="p">{</span><span class="mi">1</span> <span class="o">-</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>rac{r - d_0}{r_0})^n}{1 -
-rac{r - d_0}{r_0})^m}</p>
-<blockquote>
-<div><dl class="simple">
-<dt>r<span class="classifier">float</span></dt><dd><p>The distance at which to calculate the coordination number</p>
-</dd>
-<dt>r0<span class="classifier">float</span></dt><dd><p>The characteristic distance.</p>
-</dd>
-<dt>d0<span class="classifier">float, optional</span></dt><dd><p>Offset for the distance. Default is 0.0</p>
-</dd>
-<dt>n<span class="classifier">int, optional</span></dt><dd><p>The power to which the distance is raised in the numerator.
-Default is 6.</p>
-</dd>
-<dt>m<span class="classifier">int, optional</span></dt><dd><p>The power to which the distance is raised in the denominator.
-Default is 0, which is changed to 2 * n.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts._single_frame">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts._single_frame" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>float</dt><dd><p>The coordination number at distance r</p>
+<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
+pair distances at the current frame.</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.contacts.Contacts.figures">
+<span class="sig-name descname"><span class="pre">figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar_parallel/contacts.html#Contacts.figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.contacts.Contacts.figures" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the radial distribution function and the potential of mean
+force. The figures are saved to the <cite>figures</cite> directory in the
+<cite>dir_out</cite> directory. This is a wrapper for all plotting methods.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<dl class="simple">
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plots.</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figures. Default is “png”.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figures and axes of the plots.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

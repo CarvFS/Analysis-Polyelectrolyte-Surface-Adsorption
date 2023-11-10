@@ -164,12 +164,73 @@ None.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF._single_frame">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF._single_frame" title="Permalink to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
+pair distances at the current frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF._conclude">
 <span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF._conclude" title="Permalink to this definition"></a></dt>
 <dd><p>Finalize the results of the calculation. This is called once
 after the analysis is finished inside the run() method. The method
 concatenates the results from the single frame analysis and
 normalizes the histograms.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.cdf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdf</span></span><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.cdf" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the cumulative distribution functions (CDF).
+Note that this is the actual count within a given radius, i.e.,
+<span class="math notranslate nohighlight">\(N(r)\)</span>.
+Returns
+——-</p>
+<blockquote>
+<div><dl class="simple">
+<dt>cdf<span class="classifier">numpy array</span></dt><dd><p>a numpy array with the same structure as <code class="xref py py-attr docutils literal notranslate"><span class="pre">rdf</span></code></p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.3.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF._reduce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF._reduce" title="Permalink to this definition"></a></dt>
+<dd><p>‘add’ action for an accumulator</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.figures">
+<span class="sig-name descname"><span class="pre">figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF.figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.figures" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the radial distribution function and the potential of mean
+force. The figures are saved to the <cite>figures</cite> directory in the
+<cite>dir_out</cite> directory. This is a wrapper for the <cite>plt_rdf</cite> and
+<cite>plt_pmf</cite> methods.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<dl class="simple">
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plots.</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figures. Default is “png”.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figures and axes of the plots.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -196,67 +257,6 @@ the run() method.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF._reduce">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF._reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF._reduce" title="Permalink to this definition"></a></dt>
-<dd><p>‘add’ action for an accumulator</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF._single_frame">
-<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF._single_frame" title="Permalink to this definition"></a></dt>
-<dd><p>Analyze a single frame in the trajectory.</p>
-<dl class="simple">
-<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
-pair distances at the current frame.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.cdf">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdf</span></span><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.cdf" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the cumulative distribution functions (CDF).
-Note that this is the actual count within a given radius, i.e.,
-<span class="math notranslate nohighlight">\(N(r)\)</span>.
-Returns
-——-</p>
-<blockquote>
-<div><dl class="simple">
-<dt>cdf<span class="classifier">numpy array</span></dt><dd><p>a numpy array with the same structure as <code class="xref py py-attr docutils literal notranslate"><span class="pre">rdf</span></code></p>
-</dd>
-</dl>
-</div></blockquote>
-<div class="versionadded">
-<p><span class="versionmodified added">New in version 0.3.0.</span></p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.figures">
-<span class="sig-name descname"><span class="pre">figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF.figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.figures" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the radial distribution function and the potential of mean
-force. The figures are saved to the <cite>figures</cite> directory in the
-<cite>dir_out</cite> directory. This is a wrapper for the <cite>plt_rdf</cite> and
-<cite>plt_pmf</cite> methods.</p>
-<p>This method should only be called after the analysis has been
-run.</p>
-<dl class="simple">
-<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plots.</p>
-</dd>
-<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figures. Default is “png”.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figures and axes of the plots.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.merge_external_data">
 <span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.merge_external_data" title="Permalink to this definition"></a></dt>
 <dd><p>Merge external data with the results of the analysis</p>
@@ -274,25 +274,6 @@ run.</p>
 <dt>ValueError</dt><dd><p>If no results are present</p>
 </dd>
 <dt>ValueError</dt><dd><p>If no data is merged</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.plt_pmf">
-<span class="sig-name descname"><span class="pre">plt_pmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF.plt_pmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.plt_pmf" title="Permalink to this definition"></a></dt>
-<dd><p>Plot the potential of mean force. The figure is saved to the
-<cite>figures</cite> directory in the <cite>dir_out</cite> directory.</p>
-<p>This method should only be called after the analysis has been
-run.</p>
-<dl class="simple">
-<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plot.</p>
-</dd>
-<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figure. Default is “png”.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -387,6 +368,25 @@ results are saved to the directory specified in the
 <dt>ValueError</dt><dd><p>If no filename is found.</p>
 </dd>
 <dt>ValueError</dt><dd><p>If no output directory is specified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar_parallel.rdf.InterRDF.plt_pmf">
+<span class="sig-name descname"><span class="pre">plt_pmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar_parallel/rdf.html#InterRDF.plt_pmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar_parallel.rdf.InterRDF.plt_pmf" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the potential of mean force. The figure is saved to the
+<cite>figures</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<dl class="simple">
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The title of the plot.</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>The file extension of the saved figure. Default is “png”.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
 </dd>
 </dl>
 </dd></dl>

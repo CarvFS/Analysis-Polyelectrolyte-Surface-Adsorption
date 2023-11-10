@@ -18,6 +18,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - pip
   # parallelization
   - dask>=2023.0.0
   - tqdm
@@ -56,4 +57,9 @@ dependencies:
   # documentation
   - sphinx
   - sphinx_rtd_theme
+  - sphinx-copybutton
+  - sphinx-togglebutton
   - nbsphinx
+  # pip installs
+  - pip:
+    - myst_nb
