@@ -5,12 +5,12 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_equal
+from numpy.testing import assert_almost_equal
 import pytest
 
 from dask.distributed import Client, LocalCluster
 import MDAnalysis as mda
-from MDAnalysisTests.datafiles import GRO, XTC, DihedralArray, DihedralsArray
+from MDAnalysisTests.datafiles import GRO, XTC, DihedralArray
 
 # add local src directory to path
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))

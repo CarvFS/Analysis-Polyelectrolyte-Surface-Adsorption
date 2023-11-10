@@ -134,8 +134,10 @@ class Contacts(ParallelAnalysisBase):
         select : tuple(AtomGroup, AtomGroup) | tuple(string, string)
             two contacting groups that change over time
         method : string | callable (optional)
-            Can either be one of ``["hard_cut" , "soft_cut", "radius_cut", "rational", "6_12"]``
-            or a callable with call signature ``func(r, r0, **kwargs)`` (the "Contacts API").
+            Can either be one of
+            ``["hard_cut" , "soft_cut", "radius_cut", "rational", "6_12"]``
+            or a callable with call signature ``func(r, r0, **kwargs)``
+            (the "Contacts API").
         radius : float, optional (4.5 Angstroms)
             radius within which contacts exist in refgroup
         label : str, optional
@@ -184,7 +186,7 @@ class Contacts(ParallelAnalysisBase):
         self._radius = radius
 
         # output data
-        self._dir_out: Path = Path(f"./mdanalysis_contacts")
+        self._dir_out: Path = Path("./mdanalysis_contacts")
         self._df_filename = f"contact_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df = None
@@ -230,7 +232,7 @@ class Contacts(ParallelAnalysisBase):
         ts = self._universe.trajectory[idx_frame]
         ag1, ag2 = self._atomgroups
 
-        n1, n2 = ag1.n_atoms, ag2.n_atoms
+        _, n2 = ag1.n_atoms, ag2.n_atoms
         func = np.vectorize(self._fraction_contacts)
         cutoff = self._radius
 
@@ -243,7 +245,8 @@ class Contacts(ParallelAnalysisBase):
         results[1] = ag1.universe.trajectory.time
 
         # compute distance array for a frame
-        # Note: rows are group 1 (coordinating) atoms, columns are group 2 (reference) atoms
+        # Note: rows are group 1 (coordinating) atoms, columns are group 2
+        # (reference) atoms
         dists = distance_array(
             ag1.positions,
             ag2.positions,

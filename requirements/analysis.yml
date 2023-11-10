@@ -47,6 +47,7 @@ dependencies:
   - pytest
   - pytest-cov
   - coverage
+  - pre-commit
   # formatting
   - autopep8
   - black

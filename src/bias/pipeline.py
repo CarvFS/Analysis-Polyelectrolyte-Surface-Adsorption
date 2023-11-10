@@ -1,10 +1,15 @@
 """
 Author: Alec Glisman (GitHub: @alec-glisman)
 Date: 2023-11-08
-Description: Module for a pipeline to load, clean, and analyze data from the 
+Description: Module for a pipeline to load, clean, and analyze data from the
 molecular dynamics simulation.
 
-This module defines a class `DataPipeline` that provides methods to load and process data from molecular dynamics simulations. The class takes a base directory containing the simulation data and optional parameters such as temperature, file extensions, and verbosity. The class provides methods to load plumed collective variables, molecular dynamics universe, and statistical weights. 
+This module defines a class `DataPipeline` that provides methods to load and
+process data from molecular dynamics simulations. The class takes a base
+directory containing the simulation data and optional parameters such as
+temperature, file extensions, and verbosity. The class provides methods to
+load plumed collective variables, molecular dynamics universe, and
+statistical weights.
 
 Attributes:
     tag (str): The name of the simulation data directory.
@@ -16,7 +21,13 @@ Attributes:
     traj_files (list of Path): The paths to the trajectory files.
     energy_files (list of Path): The paths to the energy files.
     plumed_files (list of Path): The paths to the plumed files.
-    data_files (dict of dict of list of Path): A dictionary of data files where the key is the sampling method.
+    data_files (dict of dict):
+        A dictionary containing the paths to the simulation data files.
+        The keys are the names of the sampling methods and the values are
+        dictionaries containing the paths to the topology, trajectory, energy,
+        and plumed files.
+    _kb (float):
+        The Boltzmann constant in kJ/mol/K.
     _kb (float): The Boltzmann constant in kJ/mol/K.
     _beta (float): The inverse temperature in 1/kJ/mol.
     _verbose (bool): Whether to print verbose logging messages.
@@ -30,8 +41,10 @@ Attributes:
 Methods:
     load_plumed_colvar(method: str) -> pd.DataFrame:
         Load the plumed collective variables for a given sampling method.
-    save_plumed_colvar(method: str = None, file: Path = None, directory: Path = None) -> Path:
-        Save the plumed collective variables for all or a specific sampling method.
+    save_plumed_colvar(
+    method: str = None, file: Path = None, directory: Path = None) -> Path:
+        Save the plumed collective variables for all or a specific sampling
+        method.
     load_universe(method: str, **kwargs) -> mda.Universe:
         Load the molecular dynamics universe for a given sampling method.
     _statistical_weight(df: pd.DataFrame) -> pd.DataFrame:
@@ -154,9 +167,10 @@ class DataPipeline:
         """
         Initializes the logger for the pipeline.
 
-        The logger is initialized with a StreamHandler that outputs to stdout. If the logger already has a handler, the
-        existing handler is used instead. The logging level is set to DEBUG if the pipeline is in verbose mode, and to
-        WARNING otherwise.
+        The logger is initialized with a StreamHandler that outputs to stdout.
+        If the logger already has a handler, the existing handler is used
+        instead. The logging level is set to DEBUG if the pipeline is in
+        verbose mode, and to WARNING otherwise.
 
         Parameters
         ----------
@@ -192,8 +206,10 @@ class DataPipeline:
 
     def _find_data_files(self) -> None:
         """
-        Find all data files for each sampling method and create a dictionary of data files where the key is the sampling method.
-        Check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path.
+        Find all data files for each sampling method and create a dictionary of
+        data files where the key is the sampling method. Check that there are
+        no duplicate sampling methods and all sampling methods have a
+        corresponding sampling path.
 
         Parameters
         ----------
@@ -208,7 +224,8 @@ class DataPipeline:
         ValueError
             If there are duplicate sampling methods.
         ValueError
-            If the number of sampling methods does not match the number of sampling paths.
+            If the number of sampling methods does not match the number of sampling
+            paths.
         ValueError
             If a sampling path does not exist.
         ValueError
@@ -223,7 +240,8 @@ class DataPipeline:
             If there is more than one plumed file for a sampling method.
         """
 
-        # find all sampling methods: subdirectories of the data path starting with "3-sampling-"
+        # find all sampling methods: subdirectories of the data path starting with
+        # "3-sampling-"
         self.sampling_paths = [
             x
             for x in self.data_path_base.iterdir()
@@ -235,10 +253,12 @@ class DataPipeline:
             for x in self.sampling_paths
             if "eqbm" not in x.name
         ]
-        # if sampling method has multiple replicas (subdirectories of the sampling method directory of the form "replica-#")
-        # then append the replica number to the sampling method name (e.g. "hremd" -> "hremd-1") for each replica
+        # if sampling method has multiple replicas (subdirectories of the sampling
+        # method directory of the form "replica-#") then append the replica number
+        # to the sampling method name (e.g. "hremd" -> "hremd-1") for each replica
         self._log.debug(
-            f"Found {len(self.sampling_methods)} sampling methods: {self.sampling_methods}"
+            f"Found {len(self.sampling_methods)} "
+            + f"sampling methods: {self.sampling_methods}"
         )
         orig_sampling_methods = self.sampling_methods.copy()
         for method in orig_sampling_methods:
@@ -251,10 +271,12 @@ class DataPipeline:
             ]
             self._log.debug(f"Found {len(replicas)} replicas for method {method}")
             if len(replicas) > 0:
-                # remove the sampling method name from the list of sampling methods and add the sampling method name with the replica number
+                # remove the sampling method name from the list of sampling methods and
+                # add the sampling method name with the replica number
                 self.sampling_methods.remove(method)
                 self.sampling_methods += [f"{method}-{x.name}" for x in replicas]
-                # remove the sampling method directory from the list of sampling paths and add the replica directories
+                # remove the sampling method directory from the list of sampling paths
+                # and add the replica directories
                 repl_base = self.data_path_base / f"{self._sampling_prefix}{method}"
                 repl_paths = [repl_base / x.name for x in replicas]
                 self.sampling_paths.remove(repl_base)
@@ -266,7 +288,8 @@ class DataPipeline:
                 *sorted(zip(self.sampling_methods, self.sampling_paths))
             )
 
-        # check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path
+        # check that there are no duplicate sampling methods and all sampling methods
+        # have a corresponding sampling path
         if len(self.sampling_methods) != len(set(self.sampling_methods)):
             raise ValueError("Found duplicate sampling methods")
         if len(self.sampling_methods) != len(self.sampling_paths):
@@ -319,30 +342,47 @@ class DataPipeline:
 
             # log the number of files found for this sampling method
             self._log.debug(
-                f"Found {len(self.data_files[method]['top'])} topology files for method {method}"
+                "Found "
+                + str(len(self.data_files[method]["top"]))
+                + " topology files for method "
+                + str(method)
             )
             self._log.debug(
-                f"Found {len(self.data_files[method]['traj'])} trajectory files for method {method}"
+                "Found "
+                + str(len(self.data_files[method]["traj"]))
+                + " trajectory files for method "
+                + str(method)
             )
             self._log.debug(
-                f"Found {len(self.data_files[method]['energy'])} energy files for method {method}"
+                "Found "
+                + str(len(self.data_files[method]["energy"]))
+                + " energy files for method "
+                + str(method)
             )
+
             self._log.debug(
-                f"Found {len(self.data_files[method]['plumed'])} plumed files for method {method}"
+                "Found "
+                + str(len(self.data_files[method]["plumed"]))
+                + " plumed files for method "
+                + str(method)
             )
 
             if len(self.data_files[method]["top"]) == 0:
                 raise ValueError(
-                    f"No topology files found for sampling method {method} in path {path}"
+                    f"No topology files found for sampling method {method} "
+                    + f"in path {path}"
                 )
             elif len(self.data_files[method]["top"]) > 1:
                 raise ValueError(
-                    f"Found {len(self.data_files[method]['top'])} topology files for sampling method {method}, expected 1, in path {path}. Found files: {self.data_files[method]['top']}"
+                    f"Found {len(self.data_files[method]['top'])} topology files "
+                    + f"for sampling method {method}, expected 1, in path {path}. "
+                    + f"Found files: {self.data_files[method]['top']}"
                 )
 
             if len(self.data_files[method]["traj"]) == 0:
                 raise ValueError(
-                    f"No trajectory files found for sampling method {method} in path {path}"
+                    f"No trajectory files found for sampling method {method} "
+                    + f"in path {path}"
                 )
 
             if len(self.data_files[method]["plumed"]) == 0:
@@ -351,12 +391,15 @@ class DataPipeline:
                 )
             elif len(self.data_files[method]["plumed"]) > 1:
                 raise ValueError(
-                    f"Found {len(self.data_files[method]['plumed'])} plumed files for sampling method {method}, expected 1 in path {path}. Found files: {self.data_files[method]['plumed']}"
+                    f"Found {len(self.data_files[method]['plumed'])} plumed files "
+                    + f"for sampling method {method}, expected 1 in path {path}. "
+                    + f"Found files: {self.data_files[method]['plumed']}"
                 )
 
     def _statistical_weight(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Calculates the statistical weight of each sample in the input DataFrame based on the bias values.
+        Calculates the statistical weight of each sample in the input DataFrame based
+        on the bias values.
         The statistical weight is calculated as exp(-beta * (bias - max(bias))).
         The statistical weight is normalized so that the sum of all weights is 1.
 
@@ -400,7 +443,8 @@ class DataPipeline:
 
     def load_plumed_colvar(self, method: str) -> pd.DataFrame:
         """
-        Load the collective variables (colvar) data from the plumed file associated with the given method.
+        Load the collective variables (colvar) data from the plumed file associated
+        with the given method.
 
         Parameters
         ----------
@@ -421,7 +465,8 @@ class DataPipeline:
         # check that there is only one plumed file for this method
         if len(self.data_files[method]["plumed"]) != 1:
             raise ValueError(
-                f"Found {len(self.data_files[method]['plumed'])} plumed files for method {method}, expected 1"
+                f"Found {len(self.data_files[method]['plumed'])} plumed files "
+                + f"for method {method}, expected 1"
             )
 
         file = self.data_files[method]["plumed"][0]
@@ -456,7 +501,8 @@ class DataPipeline:
         self, method: str = None, file: Path = None, directory: Path = None
     ) -> Path:
         """
-        Save the collective variables (colvar) data to a parquet file for a given sampling method or all sampling methods.
+        Save the collective variables (colvar) data to a parquet file for a given
+        sampling method or all sampling methods.
 
         Parameters
         ----------
@@ -527,9 +573,11 @@ class DataPipeline:
         self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
 
         # check that there is only one topology file for this method
-        if len(self.data_files[method]["top"]) != 1:
+        num_top_files = len(self.data_files[method]["top"])
+        if num_top_files != 1:
             raise ValueError(
-                f"Found {len(self.data_files[method]['top'])} topology files for method {method}, expected 1"
+                f"Expected 1 topology file for method {method}. "
+                + f"Found {num_top_files} topology files."
             )
 
         self.universe = mda.Universe(

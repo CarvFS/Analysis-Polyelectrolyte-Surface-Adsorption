@@ -2,11 +2,10 @@
 import numpy as np
 from pathlib import Path
 import pytest
-from scipy import stats
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
-from bias.free_energy import fes_1d, diff_fes_1d
+from bias.free_energy import fes_1d, diff_fes_1d  # noqa: E402
 
 
 # Tests for fes_1d

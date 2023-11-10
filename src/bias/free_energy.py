@@ -2,15 +2,18 @@
 Author: Alec Glisman (GitHub: @alec-glisman)
 Date: 2023-11-08
 Description: This module provides functions to calculate the free energy
-surface for a given distance collective variable and to calculate the 
+surface for a given distance collective variable and to calculate the
 difference in free energy between two wells.
 
 Functions
 ---------
-fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None, d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None, n_grid: int = 300) -> tuple[np.ndarray, np.ndarray]:
+fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None,
+d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None,
+n_grid: int = 300) -> tuple[np.ndarray, np.ndarray]:
     Calculate the free energy surface for a given distance collective variable.
 
-diff_fes_1d(cv: np.ndarray, pmf: np.ndarray, lower_well: tuple[float, float], upper_well: tuple[float, float]) -> float:
+diff_fes_1d(cv: np.ndarray, pmf: np.ndarray, lower_well: tuple[float, float],
+upper_well: tuple[float, float]) -> float:
     Calculate the difference in free energy between the two wells.
 
 Raises
@@ -48,11 +51,13 @@ def fes_1d(
     bandwidth : float, optional
         Bandwidth for kernel density estimation, by default None
     d3_coord : bool, optional
-        Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by default False
+        Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by
+        default False
     x_grid : np.ndarray, optional
         Array of grid points to use for KDE, by default None
     domain : tuple[float, float], optional
-        Tuple of (min, max) values for the domain of the free energy surface, by default None
+        Tuple of (min, max) values for the domain of the free energy surface, by
+        default None
     n_grid : int, optional
         Number of grid points to use for KDE, by default 300
 
@@ -115,7 +120,8 @@ def diff_fes_1d(
     cv : np.ndarray
         Array of collective variable values.
     pmf : np.ndarray
-        Array of free energies as a function of collective variable, assumed to be unitless.
+        Array of free energies as a function of collective variable, assumed to be
+        unitless.
     lower_well : tuple[float, float]
         Tuple of (min, max) values for the lower well.
     upper_well : tuple[float, float]

@@ -11,15 +11,8 @@ from MDAnalysis.analysis.distances import distance_array
 from MDAnalysisTests.datafiles import (
     PSF,
     DCD,
-    contacts_villin_folded,
-    contacts_villin_unfolded,
 )
 import numpy as np
-from numpy.testing import (
-    assert_almost_equal,
-    assert_array_equal,
-    assert_array_almost_equal,
-)
 import pytest
 
 # add local src directory to path

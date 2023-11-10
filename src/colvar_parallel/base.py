@@ -32,14 +32,16 @@ try:
     import dask
 
     FOUND_DASK = True
-except:
+
+except ImportError:
     FOUND_DASK = False
 
 try:
     import joblib
 
     FOUND_JOBLIB = True
-except:
+
+except ImportError:
     FOUND_JOBLIB = False
 
 

@@ -256,7 +256,7 @@ class HydrogenBondAnalysis(ParallelAnalysisBase):
             self.between_ags = None
 
         # output data
-        self._dir_out: Path = Path(f"./mdanalysis_hbonds")
+        self._dir_out: Path = Path("./mdanalysis_hbonds")
         self._df_filename = f"hbond_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df: pd.DataFrame = None
@@ -374,11 +374,8 @@ class HydrogenBondAnalysis(ParallelAnalysisBase):
         hydrogens_ag = u.select_atoms(hydrogens_sel)
 
         ag = hydrogens_ag.residues.atoms.select_atoms(
-            "({donors_sel}) and (around {d_h_cutoff} {hydrogens_sel}) and (around 10 not resname SOL)".format(
-                donors_sel=selection,
-                d_h_cutoff=self._d_h_cutoff,
-                hydrogens_sel=hydrogens_sel,
-            )
+            f"({selection}) and (around {self._d_h_cutoff} {hydrogens_sel}) and "
+            + "(around 10 not resname SOL)"
         )
         donors_ag = ag[ag.charges < max_charge]
         donors_list = np.unique(

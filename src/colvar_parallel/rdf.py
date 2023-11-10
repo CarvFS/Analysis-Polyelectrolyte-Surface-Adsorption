@@ -124,7 +124,7 @@ class InterRDF(ParallelAnalysisBase):
         self._logger.debug(f"weighted: {self._weighted}")
 
         # output data
-        self._dir_out: Path = Path(f"./mdanalysis_rdf")
+        self._dir_out: Path = Path("./mdanalysis_rdf")
         self._df_filename = f"rdf_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df = None

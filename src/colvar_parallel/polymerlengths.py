@@ -78,7 +78,7 @@ class PolymerLengths(ParallelAnalysisBase):
         self._logger = setup_logging(verbose=verbose, log_file=f"logs/{__name__}.log")
 
         # output data
-        self._dir_out: Path = Path(f"./mdanalysis_polymer_lengths")
+        self._dir_out: Path = Path("./mdanalysis_polymer_lengths")
         self._df_filename = f"pl_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df: pd.DataFrame = None
@@ -168,7 +168,7 @@ class PolymerLengths(ParallelAnalysisBase):
         # get eigenvalues of the tensor
         rg_sq_lambda, rg_sq_vector = np.linalg.eig(rg_sq_tensor)
         results[12:15] = rg_sq_lambda
-        
+
         # output eigenvector of largest eigenvalue
         results[15:18] = rg_sq_vector[:, np.argmax(rg_sq_lambda)]
 
@@ -243,7 +243,7 @@ class PolymerLengths(ParallelAnalysisBase):
 
     def plt_rg_dyn(self, title: str = None, ext: str = "png"):
         self._logger.info(f"Plotting Rg dynamics for {self._tag}")
-        d = self._dir_out / f"figures"
+        d = self._dir_out / "figures"
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
@@ -263,7 +263,7 @@ class PolymerLengths(ParallelAnalysisBase):
 
     def plt_rg_fes(self, title: str = None, ext: str = "png"):
         self._logger.info(f"Plotting Rg free energy surface for {self._tag}")
-        d = self._dir_out / f"figures"
+        d = self._dir_out / "figures"
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
@@ -338,7 +338,7 @@ class PolymerLengths(ParallelAnalysisBase):
 
     def plt_ree_kde(self, title: str = None, ext: str = "png"):
         self._logger.info(f"Plotting Ree distribution for {self._tag}")
-        d = self._dir_out / f"figures"
+        d = self._dir_out / "figures"
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)

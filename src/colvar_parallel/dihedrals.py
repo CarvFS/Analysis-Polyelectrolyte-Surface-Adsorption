@@ -136,7 +136,7 @@ class Dihedral(ParallelAnalysisBase):
         self._n_psi = len(self.ag5)
 
         # output data
-        self._dir_out: Path = Path(f"./mdanalysis_dihedrals")
+        self._dir_out: Path = Path("./mdanalysis_dihedrals")
         self._df_filename = f"dihedral_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df: pd.DataFrame = None

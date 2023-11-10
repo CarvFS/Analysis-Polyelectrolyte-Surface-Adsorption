@@ -7,7 +7,7 @@ import shutil
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
-from bias.pipeline import DataPipeline
+from bias.pipeline import DataPipeline  # noqa: E402
 
 
 class TestPipeline(object):
@@ -15,7 +15,10 @@ class TestPipeline(object):
     @pytest.fixture(scope="module")
     def data_path(self):
         return Path(
-            f"/media/aglisman/Linux_Overflow/home/aglisman/VSCodeProjects/Polyelectrolyte-Surface-Adsorption/data/completed/sjobid_0-calcite-104surface-5nm_surface-8nm_vertical-1chain-PAcr-8mer-0Crb-0Ca-8Na-0Cl-300K-1bar-NVT"
+            "/media/aglisman/Linux_Overflow/home/aglisman/VSCodeProjects"
+            + "/Polyelectrolyte-Surface-Adsorption/data/completed"
+            + "/sjobid_0-calcite-104surface-5nm_surface-8nm_vertical-1chain"
+            + "-PAcr-8mer-0Crb-0Ca-8Na-0Cl-300K-1bar-NVT"
         )
 
     @pytest.fixture(scope="module")
@@ -41,15 +44,15 @@ class TestPipeline(object):
         assert pipeline._beta == pytest.approx(
             1.0 / (pipeline._kb * pipeline.temperature)
         )
-        assert pipeline._verbose == False
+        assert pipeline._verbose is False
         assert pipeline._ext_top == "tpr"
         assert pipeline._ext_traj == "xtc"
         assert pipeline._ext_energy == "edr"
         assert pipeline._ext_plumed == "data"
         assert pipeline._sampling_prefix == "3-sampling-"
         assert pipeline._repl_prefix == "replica_"
-        assert pipeline.universe == None
-        assert pipeline.energy == None
+        assert pipeline.universe is None
+        assert pipeline.energy is None
 
     def test_find_data_files(self, pipeline, data_path):
         pipeline._find_data_files()
