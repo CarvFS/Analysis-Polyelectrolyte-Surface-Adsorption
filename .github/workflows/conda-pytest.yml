@@ -21,6 +21,9 @@ jobs:
       - name: Remove archived code before testing
         run: rm -rf /github/workspace/src/archive
       
+      - name: Remove DDPM submodule before testing
+        run: rm -rf /github/workspace/ddpm/examples
+      
       - name: Fetch actions (v2)
         uses: actions/checkout@v2
 
@@ -46,12 +49,12 @@ jobs:
           # is 127 chars wide
           flake8 . --count --exit-zero
 
-    #   - name: Test with pytest
-    #     run: |
-    #       conda activate test
-    #       pytest --cov-config=.coveragerc \
-    #           --cov=src --cov-report xml \
-    #           src/
+      - name: Test with pytest
+        run: |
+          conda activate test
+          pytest --cov-config=.coveragerc \
+              --cov=src --cov-report xml \
+              src/
         
     #   - name: Upload coverage to Codecov
     #     uses: codecov/codecov-action@v3
