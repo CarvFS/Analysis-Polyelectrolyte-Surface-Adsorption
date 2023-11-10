@@ -1,3 +1,7 @@
+# To use pre-commit hooks, run `pre-commit install` in the root of your repository
+# To run pre-commit hooks on all files, run `pre-commit run --all-files` in the root of your repository
+# To run pre-commit hooks on staged files, run `pre-commit run` in the root of your repository
+# To run pre-commit hooks on a specific file, run `pre-commit run <hook_id> --files <path/to/file>` in the root of your repository
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
@@ -16,3 +20,23 @@ repos:
       - id: build-docs
         args: ['--cache-dir', 'docs/build/doctrees', '--html-dir', 'docs/build/html', '--source-dir', 'docs/source']
         language_version: python3.10
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: trailing-whitespace
+      exclude: '^docs/|README.md'
+
+  - repo: local
+    hooks:
+      - id: pytest-with-coverage
+        name: pytest with coverage
+        entry: coverage
+        language: system
+        types: [python]
+        args: ['run', '-m', 'pytest', 'src']
+      - id: coverage-report
+        name: coverage report
+        entry: coverage
+        language: system
+        types: [python]
+        args: ['report', '--show-missing', '--fail-under=50']

@@ -20,10 +20,10 @@ jobs:
 
       - name: Remove archived code before testing
         run: rm -rf /github/workspace/src/archive
-      
+
       - name: Remove DDPM submodule before testing
         run: rm -rf /github/workspace/ddpm/examples
-      
+
       - name: Fetch actions (v2)
         uses: actions/checkout@v2
 
@@ -33,7 +33,7 @@ jobs:
           environment-file: requirements/testing.yml
           activate-environment: test
           auto-activate-base: false
-          
+
       - name: Conda info
         run: |
           conda info
@@ -45,7 +45,7 @@ jobs:
           conda activate test
           # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor 
+          # exit-zero treats all errors as warnings. The GitHub editor
           # is 127 chars wide
           flake8 . --count --exit-zero
 
@@ -55,7 +55,7 @@ jobs:
           pytest --cov-config=.coveragerc \
               --cov=src --cov-report xml \
               src/
-        
+
     #   - name: Upload coverage to Codecov
     #     uses: codecov/codecov-action@v3
     #     with:

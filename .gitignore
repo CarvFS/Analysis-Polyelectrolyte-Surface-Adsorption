@@ -66,6 +66,7 @@ analysis/**/data-clean/*
 *.csv
 *.npz
 *.parquet
+.coverage
 
 # slurm
 *.err
@@ -82,3 +83,6 @@ analysis/**/data-clean/*
 
 # Keep all sample images
 !**/images/*
+
+# Keep all exported notebooks
+**/completed/*

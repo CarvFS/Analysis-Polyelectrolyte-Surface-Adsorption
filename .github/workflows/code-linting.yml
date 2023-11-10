@@ -19,7 +19,7 @@ jobs:
 
       - name: Remove tutorials before linting
         run: rm -rf tutorials
-      
+
       - name: Remove archived code before linting
         run: rm -rf src/archive
 

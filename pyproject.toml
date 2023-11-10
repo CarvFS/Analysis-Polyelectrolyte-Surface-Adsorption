@@ -17,3 +17,6 @@ exclude = '''
   | tests/data
 )/
 '''
+
+[pytest]
+norecursedirs = 'docs'

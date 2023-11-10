@@ -5,7 +5,7 @@
 # Create environment with: $ conda env create -f analysis.yml
 # Update environment with: $ conda env update --prune -f analysis.yml
 # Remove environment with: $ conda env remove -n analysis-surface
-# 
+#
 # Notes:
 # - We recommend using mamba instead of conda as the solver for faster
 #  environment creation. To do this, run:
@@ -19,10 +19,10 @@ channels:
   - defaults
 dependencies:
   # parallelization
-  - dask>=2023.10.0
+  - dask>=2023.0.0
   - tqdm
   # data analysis
-  - numpy>=1.23.0
+  - numpy>=1.22.4
   - scipy>=1.11.0
   - scikit-learn>=1.2.0
   - pandas>=2.0.0

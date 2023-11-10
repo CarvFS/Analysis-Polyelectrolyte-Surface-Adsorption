@@ -1,10 +1,10 @@
 # Surface Data Analysis Repository
 
-**Project Description:** Data analysis scripts and notebooks for interfacial polyelectrolyte molecular dynamics simulations using Gromacs.  
-**Authors:** [Alec Glisman](https://github.com/alec-glisman)  
-**Technologies Used:** Python, Gromacs, Jupyter, Sphinx, Pytorch, Scikit-learn, RDKit  
+**Project Description:** Data analysis scripts and notebooks for interfacial polyelectrolyte molecular dynamics simulations using Gromacs.
+**Authors:** [Alec Glisman](https://github.com/alec-glisman)
+**Technologies Used:** Python, Gromacs, Jupyter, Sphinx, Pytorch, Scikit-learn, RDKit
 
-[![Pytest](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml) 
+[![Pytest](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml)
 [![Linting](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/code-linting.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/code-linting.yml)
 [![Close Stale Issues and PRs](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/close-stale-issues-pr.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/close-stale-issues-pr.yml)
 [![wakatime](https://wakatime.com/badge/user/0415a834-884a-4442-8748-eadcc49ca5e1/project/1fbd0bd3-15bf-4f97-ba55-8cf29e0496ce.svg)](https://wakatime.com/badge/user/0415a834-884a-4442-8748-eadcc49ca5e1/project/1fbd0bd3-15bf-4f97-ba55-8cf29e0496ce)

@@ -5,7 +5,7 @@
 # Create environment with: $ conda env create -f ml.yml
 # Update environment with: $ conda env update -f ml.yml
 # Remove environment with: $ conda env remove -n ml-diffusion
-# 
+#
 # Notes:
 # - We recommend using mamba instead of conda as the solver for faster
 #  environment creation. To do this, run:
@@ -21,12 +21,12 @@ channels:
   - defaults
 dependencies:
   # pytorch
-  - pytorch 
-  - torchvision 
-  - torchaudio 
+  - pytorch
+  - torchvision
+  - torchaudio
   - pytorch-cuda=12.1
   # diffusion model
-  - einops 
+  - einops
   - datasets
   # data analysis
   - numpy

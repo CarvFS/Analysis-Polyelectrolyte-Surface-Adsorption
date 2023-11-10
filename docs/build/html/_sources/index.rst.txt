@@ -9,11 +9,11 @@ Welcome to Gromacs Data Analysis's documentation!
 
 This is the documentation for the Gromacs Data Analysis package. It is
 designed to be used with outputs from Gromacs simulations, but can be used
-with any data that is formatted in a similar way and allows for Plumed 
+with any data that is formatted in a similar way and allows for Plumed
 integration into the MD engine.
 
 The analysis_helpers module contains a number of helper functions to
-load and process simulation trajectory files. The mda module will 
+load and process simulation trajectory files. The mda module will
 load a trajectory into a MDAnalysis Universe object and unwrap the
 periodic boundary conditions as well as return two dictionaries
 with useful selection commands and information about the system.
@@ -31,7 +31,7 @@ The figures module contains a function that sets the default figure
 plotting formatting for matplotlib. These settings are publication
 quality.
 
-The molywood module extends the publicly available 
+The molywood module extends the publicly available
 `molywood <https://gitlab.com/KomBioMol/molywood>`_ package
 and allows for GPU accelerated VMD frame rendering. Documentation
 on its use can be found `here <http://mmb.irbbarcelona.org/molywoodl>`_.
@@ -55,7 +55,7 @@ Please feel free to contact me if you have any questions or suggestions.
    colvar_parallel
    stats
    utils
-.. 
+..
 
 .. toctree::
    :maxdepth: 1
