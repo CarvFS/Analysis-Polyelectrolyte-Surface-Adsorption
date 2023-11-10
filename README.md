@@ -1,8 +1,8 @@
 # Surface Data Analysis Repository
 
-**Project Description:** Data analysis scripts and notebooks for interfacial polyelectrolyte molecular dynamics simulations using Gromacs.
-**Authors:** [Alec Glisman](https://github.com/alec-glisman)
-**Technologies Used:** Python, Gromacs, Jupyter, Sphinx, Pytorch, Scikit-learn, RDKit
+**Project Description:** Data analysis scripts and notebooks for interfacial polyelectrolyte molecular dynamics simulations using Gromacs.  
+**Authors:** [Alec Glisman](https://github.com/alec-glisman)  
+**Technologies Used:** Python, Gromacs, Jupyter, Sphinx, Pytorch, Scikit-learn, RDKit  
 
 [![Pytest](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/conda-pytest.yml)
 [![Linting](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/code-linting.yml/badge.svg)](https://github.com/alec-glisman/Analysis-Polyelectrolyte-Surface-Adsorption/actions/workflows/code-linting.yml)
