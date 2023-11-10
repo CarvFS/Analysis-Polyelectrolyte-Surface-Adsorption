@@ -50,10 +50,12 @@ Please feel free to contact me if you have any questions or suggestions.
    :maxdepth: 1
    :caption: Contents:
 
-   bias
+   modules
+.. bias
    colvar_parallel
    stats
    utils
+.. 
 
 .. toctree::
    :maxdepth: 1

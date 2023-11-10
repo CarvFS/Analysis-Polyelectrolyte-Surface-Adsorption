@@ -1,0 +1,18 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/ambv/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3.10
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.0.0
+    hooks:
+      - id: flake8
+  - repo: https://github.com/thclark/pre-commit-sphinx
+    rev: 0.0.1
+    hooks:
+      - id: build-docs
+        args: ['--cache-dir', 'docs/build/doctrees', '--html-dir', 'docs/build/html', '--source-dir', 'docs/source']
+        language_version: python3.10

@@ -9,7 +9,6 @@ Submodules
 
    utils.figure_style
    utils.logs
-   utils.parsers
    utils.system
 
 Module contents

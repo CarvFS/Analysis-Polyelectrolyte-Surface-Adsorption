@@ -11,8 +11,9 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -89,15 +90,18 @@
 <span class="sd">Author: Alec Glisman (GitHub: @alec-glisman)</span>
 <span class="sd">Date: 2023-11-08</span>
 <span class="sd">Description: This module provides functions to calculate the free energy</span>
-<span class="sd">surface for a given distance collective variable and to calculate the </span>
+<span class="sd">surface for a given distance collective variable and to calculate the</span>
 <span class="sd">difference in free energy between two wells.</span>
 
 <span class="sd">Functions</span>
 <span class="sd">---------</span>
-<span class="sd">fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None, d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None, n_grid: int = 300) -&gt; tuple[np.ndarray, np.ndarray]:</span>
+<span class="sd">fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None,</span>
+<span class="sd">d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None,</span>
+<span class="sd">n_grid: int = 300) -&gt; tuple[np.ndarray, np.ndarray]:</span>
 <span class="sd">    Calculate the free energy surface for a given distance collective variable.</span>
 
-<span class="sd">diff_fes_1d(cv: np.ndarray, pmf: np.ndarray, lower_well: tuple[float, float], upper_well: tuple[float, float]) -&gt; float:</span>
+<span class="sd">diff_fes_1d(cv: np.ndarray, pmf: np.ndarray, lower_well: tuple[float, float],</span>
+<span class="sd">upper_well: tuple[float, float]) -&gt; float:</span>
 <span class="sd">    Calculate the difference in free energy between the two wells.</span>
 
 <span class="sd">Raises</span>
@@ -135,11 +139,13 @@
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Bandwidth for kernel density estimation, by default None</span>
 <span class="sd">    d3_coord : bool, optional</span>
-<span class="sd">        Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by default False</span>
+<span class="sd">        Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by</span>
+<span class="sd">        default False</span>
 <span class="sd">    x_grid : np.ndarray, optional</span>
 <span class="sd">        Array of grid points to use for KDE, by default None</span>
 <span class="sd">    domain : tuple[float, float], optional</span>
-<span class="sd">        Tuple of (min, max) values for the domain of the free energy surface, by default None</span>
+<span class="sd">        Tuple of (min, max) values for the domain of the free energy surface, by</span>
+<span class="sd">        default None</span>
 <span class="sd">    n_grid : int, optional</span>
 <span class="sd">        Number of grid points to use for KDE, by default 300</span>
 
@@ -202,7 +208,8 @@
 <span class="sd">    cv : np.ndarray</span>
 <span class="sd">        Array of collective variable values.</span>
 <span class="sd">    pmf : np.ndarray</span>
-<span class="sd">        Array of free energies as a function of collective variable, assumed to be unitless.</span>
+<span class="sd">        Array of free energies as a function of collective variable, assumed to be</span>
+<span class="sd">        unitless.</span>
 <span class="sd">    lower_well : tuple[float, float]</span>
 <span class="sd">        Tuple of (min, max) values for the lower well.</span>
 <span class="sd">    upper_well : tuple[float, float]</span>

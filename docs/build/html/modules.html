@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>src &mdash; Gromacs Data Analysis v2.0.0 documentation</title>
+  <title>src &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,8 +12,9 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -28,7 +29,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            Gromacs Data Analysis
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -67,7 +68,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Gromacs Data Analysis</a>
+          <a href="index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,7 +87,7 @@
            <div itemprop="articleBody">
              
   <section id="src">
-<h1>src<a class="headerlink" href="#src" title="Permalink to this heading"></a></h1>
+<h1>src<a class="headerlink" href="#src" title="Permalink to this headline"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="bias.html">bias package</a><ul>
@@ -94,33 +95,9 @@
 <li class="toctree-l3"><a class="reference internal" href="bias.free_energy.html">bias.free_energy module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="bias.free_energy.html#functions">Functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="bias.free_energy.html#raises">Raises</a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.free_energy.html#bias.free_energy.diff_fes_1d"><code class="docutils literal notranslate"><span class="pre">diff_fes_1d()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.free_energy.html#bias.free_energy.fes_1d"><code class="docutils literal notranslate"><span class="pre">fes_1d()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html">bias.pipeline module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.tag"><code class="docutils literal notranslate"><span class="pre">tag</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.data_path_base"><code class="docutils literal notranslate"><span class="pre">data_path_base</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.temperature"><code class="docutils literal notranslate"><span class="pre">temperature</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.sampling_methods"><code class="docutils literal notranslate"><span class="pre">sampling_methods</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.sampling_paths"><code class="docutils literal notranslate"><span class="pre">sampling_paths</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.top_files"><code class="docutils literal notranslate"><span class="pre">top_files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.traj_files"><code class="docutils literal notranslate"><span class="pre">traj_files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.energy_files"><code class="docutils literal notranslate"><span class="pre">energy_files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.plumed_files"><code class="docutils literal notranslate"><span class="pre">plumed_files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.data_files"><code class="docutils literal notranslate"><span class="pre">data_files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._kb"><code class="docutils literal notranslate"><span class="pre">_kb</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._beta"><code class="docutils literal notranslate"><span class="pre">_beta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._verbose"><code class="docutils literal notranslate"><span class="pre">_verbose</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_top"><code class="docutils literal notranslate"><span class="pre">_ext_top</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_traj"><code class="docutils literal notranslate"><span class="pre">_ext_traj</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_energy"><code class="docutils literal notranslate"><span class="pre">_ext_energy</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_plumed"><code class="docutils literal notranslate"><span class="pre">_ext_plumed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._sampling_prefix"><code class="docutils literal notranslate"><span class="pre">_sampling_prefix</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._repl_prefix"><code class="docutils literal notranslate"><span class="pre">_repl_prefix</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline"><code class="docutils literal notranslate"><span class="pre">DataPipeline</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html">bias.pipeline module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="bias.html#module-bias">Module contents</a></li>
@@ -128,33 +105,18 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="colvar_parallel.html">colvar_parallel package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="colvar_parallel.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.base.html">colvar_parallel.base module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.base.html#colvar_parallel.base.ParallelAnalysisBase"><code class="docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.contacts.html">colvar_parallel.contacts module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.contacts.html#colvar_parallel.contacts.Contacts"><code class="docutils literal notranslate"><span class="pre">Contacts</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.contacts.html#colvar_parallel.contacts.coordination_rational"><code class="docutils literal notranslate"><span class="pre">coordination_rational()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.base.html">colvar_parallel.base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.contacts.html">colvar_parallel.contacts module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="colvar_parallel.dihedrals.html">colvar_parallel.dihedrals module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="colvar_parallel.dihedrals.html#dihedral-angles-analysis-colvar-parallel-dihedrals">Dihedral angles analysis — <code class="xref py py-mod docutils literal notranslate"><span class="pre">colvar_parallel.dihedrals</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.dihedrals.html#colvar_parallel.dihedrals.Dihedral"><code class="docutils literal notranslate"><span class="pre">Dihedral</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="colvar_parallel.hbonds.html">colvar_parallel.hbonds module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="colvar_parallel.hbonds.html#hydrogen-bond-analysis-colvar-parallel-hbond-analysis">Hydrogen Bond Analysis — <code class="xref py py-mod docutils literal notranslate"><span class="pre">colvar_parallel.hbond_analysis</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.hbonds.html#id0"><code class="docutils literal notranslate"><span class="pre">HydrogenBondAnalysis</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.polymerlengths.html">colvar_parallel.polymerlengths module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.polymerlengths.html#colvar_parallel.polymerlengths.PolymerLengths"><code class="docutils literal notranslate"><span class="pre">PolymerLengths</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.rdf.html">colvar_parallel.rdf module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="colvar_parallel.rdf.html#colvar_parallel.rdf.InterRDF"><code class="docutils literal notranslate"><span class="pre">InterRDF</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.polymerlengths.html">colvar_parallel.polymerlengths module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="colvar_parallel.rdf.html">colvar_parallel.rdf module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="colvar_parallel.html#module-colvar_parallel">Module contents</a></li>
@@ -162,10 +124,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="stats.html">stats package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="stats.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="stats.block_error.html">stats.block_error module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="stats.block_error.html#stats.block_error.BlockError"><code class="docutils literal notranslate"><span class="pre">BlockError</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="stats.block_error.html">stats.block_error module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats">Module contents</a></li>
@@ -173,23 +132,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utils.figure_style.html">utils.figure_style module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="utils.figure_style.html#utils.figure_style.close_fig"><code class="docutils literal notranslate"><span class="pre">close_fig()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="utils.figure_style.html#utils.figure_style.set_style"><code class="docutils literal notranslate"><span class="pre">set_style()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.logs.html">utils.logs module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="utils.logs.html#utils.logs.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.parsers.html">utils.parsers module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="utils.parsers.html#utils.parsers.parse_tags"><code class="docutils literal notranslate"><span class="pre">parse_tags()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.system.html">utils.system module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="utils.system.html#utils.system.run_shell_cmd"><code class="docutils literal notranslate"><span class="pre">run_shell_cmd()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.figure_style.html">utils.figure_style module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.logs.html">utils.logs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.system.html">utils.system module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>

@@ -11,8 +11,9 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -343,7 +344,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">between_ags</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># output data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;./mdanalysis_hbonds&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./mdanalysis_hbonds&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;hbond_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
@@ -461,11 +462,8 @@
         <span class="n">hydrogens_ag</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span><span class="n">hydrogens_sel</span><span class="p">)</span>
 
         <span class="n">ag</span> <span class="o">=</span> <span class="n">hydrogens_ag</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span>
-            <span class="s2">&quot;(</span><span class="si">{donors_sel}</span><span class="s2">) and (around </span><span class="si">{d_h_cutoff}</span><span class="s2"> </span><span class="si">{hydrogens_sel}</span><span class="s2">) and (around 10 not resname SOL)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">donors_sel</span><span class="o">=</span><span class="n">selection</span><span class="p">,</span>
-                <span class="n">d_h_cutoff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_d_h_cutoff</span><span class="p">,</span>
-                <span class="n">hydrogens_sel</span><span class="o">=</span><span class="n">hydrogens_sel</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">selection</span><span class="si">}</span><span class="s2">) and (around </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_d_h_cutoff</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">hydrogens_sel</span><span class="si">}</span><span class="s2">) and &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;(around 10 not resname SOL)&quot;</span>
         <span class="p">)</span>
         <span class="n">donors_ag</span> <span class="o">=</span> <span class="n">ag</span><span class="p">[</span><span class="n">ag</span><span class="o">.</span><span class="n">charges</span> <span class="o">&lt;</span> <span class="n">max_charge</span><span class="p">]</span>
         <span class="n">donors_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>

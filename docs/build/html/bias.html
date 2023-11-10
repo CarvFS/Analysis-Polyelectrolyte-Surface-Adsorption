@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bias package &mdash; Gromacs Data Analysis v2.0.0 documentation</title>
+  <title>bias package &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,8 +12,9 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,7 +31,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            Gromacs Data Analysis
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -77,7 +78,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Gromacs Data Analysis</a>
+          <a href="index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -96,55 +97,22 @@
            <div itemprop="articleBody">
              
   <section id="bias-package">
-<h1>bias package<a class="headerlink" href="#bias-package" title="Permalink to this heading"></a></h1>
+<h1>bias package<a class="headerlink" href="#bias-package" title="Permalink to this headline"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="bias.free_energy.html">bias.free_energy module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bias.free_energy.html#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bias.free_energy.html#raises">Raises</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.free_energy.html#bias.free_energy.diff_fes_1d"><code class="docutils literal notranslate"><span class="pre">diff_fes_1d()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.free_energy.html#bias.free_energy.fes_1d"><code class="docutils literal notranslate"><span class="pre">fes_1d()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bias.pipeline.html">bias.pipeline module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.tag"><code class="docutils literal notranslate"><span class="pre">tag</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.data_path_base"><code class="docutils literal notranslate"><span class="pre">data_path_base</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.temperature"><code class="docutils literal notranslate"><span class="pre">temperature</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.sampling_methods"><code class="docutils literal notranslate"><span class="pre">sampling_methods</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.sampling_paths"><code class="docutils literal notranslate"><span class="pre">sampling_paths</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.top_files"><code class="docutils literal notranslate"><span class="pre">top_files</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.traj_files"><code class="docutils literal notranslate"><span class="pre">traj_files</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.energy_files"><code class="docutils literal notranslate"><span class="pre">energy_files</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.plumed_files"><code class="docutils literal notranslate"><span class="pre">plumed_files</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.data_files"><code class="docutils literal notranslate"><span class="pre">data_files</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._kb"><code class="docutils literal notranslate"><span class="pre">_kb</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._beta"><code class="docutils literal notranslate"><span class="pre">_beta</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._verbose"><code class="docutils literal notranslate"><span class="pre">_verbose</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_top"><code class="docutils literal notranslate"><span class="pre">_ext_top</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_traj"><code class="docutils literal notranslate"><span class="pre">_ext_traj</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_energy"><code class="docutils literal notranslate"><span class="pre">_ext_energy</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._ext_plumed"><code class="docutils literal notranslate"><span class="pre">_ext_plumed</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._sampling_prefix"><code class="docutils literal notranslate"><span class="pre">_sampling_prefix</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline._repl_prefix"><code class="docutils literal notranslate"><span class="pre">_repl_prefix</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline"><code class="docutils literal notranslate"><span class="pre">DataPipeline</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline._find_data_files"><code class="docutils literal notranslate"><span class="pre">DataPipeline._find_data_files()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline._init_log"><code class="docutils literal notranslate"><span class="pre">DataPipeline._init_log()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline._statistical_weight"><code class="docutils literal notranslate"><span class="pre">DataPipeline._statistical_weight()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline.load_energy"><code class="docutils literal notranslate"><span class="pre">DataPipeline.load_energy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline.load_plumed_colvar"><code class="docutils literal notranslate"><span class="pre">DataPipeline.load_plumed_colvar()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline.load_universe"><code class="docutils literal notranslate"><span class="pre">DataPipeline.load_universe()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="bias.pipeline.html#bias.pipeline.DataPipeline.save_plumed_colvar"><code class="docutils literal notranslate"><span class="pre">DataPipeline.save_plumed_colvar()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="bias.pipeline.html">bias.pipeline module</a></li>
 </ul>
 </div>
 </section>
 <section id="module-bias">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bias" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bias" title="Permalink to this headline"></a></h2>
 </section>
 </section>
 

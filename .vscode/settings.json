@@ -177,4 +177,5 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "GitHooks.hooksDirectory": "/media/aglisman/Linux_Overflow/home/aglisman/VSCodeProjects/Data-Analysis-Surface/.git/hooks",
 }

@@ -11,8 +11,9 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -211,7 +212,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weighted: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_weighted</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># output data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;./mdanalysis_rdf&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./mdanalysis_rdf&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rdf_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="kc">None</span>

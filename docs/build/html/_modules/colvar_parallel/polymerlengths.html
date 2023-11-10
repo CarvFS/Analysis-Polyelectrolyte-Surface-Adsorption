@@ -11,8 +11,9 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -165,7 +166,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">setup_logging</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;logs/</span><span class="si">{</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="p">)</span>
 
         <span class="c1"># output data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;./mdanalysis_polymer_lengths&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./mdanalysis_polymer_lengths&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;pl_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
@@ -255,7 +256,7 @@
         <span class="c1"># get eigenvalues of the tensor</span>
         <span class="n">rg_sq_lambda</span><span class="p">,</span> <span class="n">rg_sq_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">rg_sq_tensor</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="n">rg_sq_lambda</span>
-        
+
         <span class="c1"># output eigenvector of largest eigenvalue</span>
         <span class="n">results</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">18</span><span class="p">]</span> <span class="o">=</span> <span class="n">rg_sq_vector</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">rg_sq_lambda</span><span class="p">)]</span>
 
@@ -330,7 +331,7 @@
 
 <div class="viewcode-block" id="PolymerLengths.plt_rg_dyn"><a class="viewcode-back" href="../../colvar_parallel.polymerlengths.html#colvar_parallel.polymerlengths.PolymerLengths.plt_rg_dyn">[docs]</a>    <span class="k">def</span> <span class="nf">plt_rg_dyn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plotting Rg dynamics for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -350,7 +351,7 @@
 
 <div class="viewcode-block" id="PolymerLengths.plt_rg_fes"><a class="viewcode-back" href="../../colvar_parallel.polymerlengths.html#colvar_parallel.polymerlengths.PolymerLengths.plt_rg_fes">[docs]</a>    <span class="k">def</span> <span class="nf">plt_rg_fes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plotting Rg free energy surface for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -425,7 +426,7 @@
 
 <div class="viewcode-block" id="PolymerLengths.plt_ree_kde"><a class="viewcode-back" href="../../colvar_parallel.polymerlengths.html#colvar_parallel.polymerlengths.PolymerLengths.plt_ree_kde">[docs]</a>    <span class="k">def</span> <span class="nf">plt_ree_kde</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plotting Ree distribution for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
