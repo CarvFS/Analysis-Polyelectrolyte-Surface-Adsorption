@@ -79,3 +79,6 @@ analysis/**/data-clean/*
 
 # Keep gitignore files
 !**/.gitkeep
+
+# Keep all sample images
+!**/images/*
