@@ -34,7 +34,7 @@ def fes_1d(
     bandwidth: float = None,
     d3_coord: bool = False,
     x_grid: np.ndarray = None,
-    domain: tuple[float, float] = None,
+    domain: tuple[float, float] = (None, None),
     n_grid: int = 300,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the free energy surface for a given distance collective variable.
