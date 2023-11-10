@@ -1,0 +1,42 @@
+# Conda environment file for GitHub action testing of project
+# Author: Alec Glisman (GitHub: @alec-glisman)
+# Date: 2023-11-10
+
+name: testing
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  # parallelization
+  - dask>=2023.10.0
+  - tqdm
+  # data analysis
+  - numpy>=1.23.0
+  - scipy>=1.11.0
+  - scikit-learn>=1.2.0
+  - pandas>=2.0.0
+  - pyarrow
+  # MD packages
+  - mdanalysis>=2.6.0
+  - mdanalysistests
+  - panedr
+  # plotting
+  - matplotlib
+  - seaborn
+  - colorcet
+  - cmasher
+  # testing
+  - pytest
+  - pytest-cov
+  - coverage
+  - pre-commit
+  # formatting
+  - autopep8
+  - black
+  - flake8
+  - pylint
+  # documentation
+  - sphinx
+  - sphinx_rtd_theme
+  - nbsphinx
