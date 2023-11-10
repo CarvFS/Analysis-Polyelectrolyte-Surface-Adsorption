@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bias.pipeline &mdash; Gromacs Data Analysis v2.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Gromacs Data Analysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../bias.html">bias package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.html">colvar_parallel package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../stats.html">stats package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">utils package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.base.html">colvar_parallel.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Gromacs Data Analysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">bias.pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for bias.pipeline</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Alec Glisman (GitHub: @alec-glisman)</span>
+<span class="sd">Date: 2023-11-08</span>
+<span class="sd">Description: Module for a pipeline to load, clean, and analyze data from the </span>
+<span class="sd">molecular dynamics simulation.</span>
+
+<span class="sd">This module defines a class `DataPipeline` that provides methods to load and process data from molecular dynamics simulations. The class takes a base directory containing the simulation data and optional parameters such as temperature, file extensions, and verbosity. The class provides methods to load plumed collective variables, molecular dynamics universe, and statistical weights. </span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    tag (str): The name of the simulation data directory.</span>
+<span class="sd">    data_path_base (Path): The base directory containing the simulation data.</span>
+<span class="sd">    temperature (float): The temperature of the simulation in Kelvin.</span>
+<span class="sd">    sampling_methods (list of str): The names of the sampling methods.</span>
+<span class="sd">    sampling_paths (list of Path): The paths to the sampling method directories.</span>
+<span class="sd">    top_files (list of Path): The paths to the topology files.</span>
+<span class="sd">    traj_files (list of Path): The paths to the trajectory files.</span>
+<span class="sd">    energy_files (list of Path): The paths to the energy files.</span>
+<span class="sd">    plumed_files (list of Path): The paths to the plumed files.</span>
+<span class="sd">    data_files (dict of dict of list of Path): A dictionary of data files where the key is the sampling method.</span>
+<span class="sd">    _kb (float): The Boltzmann constant in kJ/mol/K.</span>
+<span class="sd">    _beta (float): The inverse temperature in 1/kJ/mol.</span>
+<span class="sd">    _verbose (bool): Whether to print verbose logging messages.</span>
+<span class="sd">    _ext_top (str): The file extension for topology files.</span>
+<span class="sd">    _ext_traj (str): The file extension for trajectory files.</span>
+<span class="sd">    _ext_energy (str): The file extension for energy files.</span>
+<span class="sd">    _ext_plumed (str): The file extension for plumed files.</span>
+<span class="sd">    _sampling_prefix (str): The prefix for sampling method directories.</span>
+<span class="sd">    _repl_prefix (str): The prefix for replica directories.</span>
+
+<span class="sd">Methods:</span>
+<span class="sd">    load_plumed_colvar(method: str) -&gt; pd.DataFrame:</span>
+<span class="sd">        Load the plumed collective variables for a given sampling method.</span>
+<span class="sd">    save_plumed_colvar(method: str = None, file: Path = None, directory: Path = None) -&gt; Path:</span>
+<span class="sd">        Save the plumed collective variables for all or a specific sampling method.</span>
+<span class="sd">    load_universe(method: str, **kwargs) -&gt; mda.Universe:</span>
+<span class="sd">        Load the molecular dynamics universe for a given sampling method.</span>
+<span class="sd">    _statistical_weight(df: pd.DataFrame) -&gt; pd.DataFrame:</span>
+<span class="sd">        Calculate the statistical weight of each frame in the trajectory.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># standard library</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># third party</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">mda</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">panedr</span> <span class="k">as</span> <span class="nn">edr</span>
+
+
+<div class="viewcode-block" id="DataPipeline"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline">[docs]</a><span class="k">class</span> <span class="nc">DataPipeline</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_path_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ext_top</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tpr&quot;</span><span class="p">,</span>
+        <span class="n">ext_traj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;xtc&quot;</span><span class="p">,</span>
+        <span class="n">ext_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;edr&quot;</span><span class="p">,</span>
+        <span class="n">ext_plumed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a Pipeline object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_path_base : Path</span>
+<span class="sd">            The base directory containing the simulation data.</span>
+<span class="sd">        temperature : float, optional</span>
+<span class="sd">            The temperature of the simulation in Kelvin, by default 300.0.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            Whether to print verbose logging messages, by default False.</span>
+<span class="sd">        ext_top : str, optional</span>
+<span class="sd">            The file extension for topology files, by default &quot;tpr&quot;.</span>
+<span class="sd">        ext_traj : str, optional</span>
+<span class="sd">            The file extension for trajectory files, by default &quot;xtc&quot;.</span>
+<span class="sd">        ext_energy : str, optional</span>
+<span class="sd">            The file extension for energy files, by default &quot;edr&quot;.</span>
+<span class="sd">        ext_plumed : str, optional</span>
+<span class="sd">            The file extension for plumed files, by default &quot;data&quot;.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tag : str</span>
+<span class="sd">            The name of the directory containing the simulation data.</span>
+<span class="sd">        data_path_base : Path</span>
+<span class="sd">            The base directory containing the simulation data.</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            The temperature of the simulation in Kelvin.</span>
+<span class="sd">        sampling_methods : list of str</span>
+<span class="sd">            The names of the sampling methods used in the simulation.</span>
+<span class="sd">        sampling_paths : list of Path</span>
+<span class="sd">            The paths to the directories containing the sampling data.</span>
+<span class="sd">        top_files : list of Path</span>
+<span class="sd">            The paths to the topology files.</span>
+<span class="sd">        traj_files : list of Path</span>
+<span class="sd">            The paths to the trajectory files.</span>
+<span class="sd">        energy_files : list of Path</span>
+<span class="sd">            The paths to the energy files.</span>
+<span class="sd">        plumed_files : list of Path</span>
+<span class="sd">            The paths to the plumed files.</span>
+<span class="sd">        data_files : dict</span>
+<span class="sd">            A dictionary containing the data files for each sampling method.</span>
+<span class="sd">        _kb : float</span>
+<span class="sd">            The Boltzmann constant in kJ/mol/K.</span>
+<span class="sd">        _beta : float</span>
+<span class="sd">            The inverse temperature in 1/kJ/mol.</span>
+<span class="sd">        _verbose : bool</span>
+<span class="sd">            Whether to print verbose logging messages.</span>
+<span class="sd">        _ext_top : str</span>
+<span class="sd">            The file extension for topology files.</span>
+<span class="sd">        _ext_traj : str</span>
+<span class="sd">            The file extension for trajectory files.</span>
+<span class="sd">        _ext_energy : str</span>
+<span class="sd">            The file extension for energy files.</span>
+<span class="sd">        _ext_plumed : str</span>
+<span class="sd">            The file extension for plumed files.</span>
+<span class="sd">        _sampling_prefix : str</span>
+<span class="sd">            The prefix for directories containing sampling data.</span>
+<span class="sd">        _repl_prefix : str</span>
+<span class="sd">            The prefix for directories containing replica data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># external parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">data_path_base</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span> <span class="o">=</span> <span class="n">data_path_base</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+
+        <span class="c1"># internal parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kb</span> <span class="o">=</span> <span class="mf">8.314462618e-3</span>  <span class="c1"># [kJ/mol/K]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kb</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ext_top</span> <span class="o">=</span> <span class="n">ext_top</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ext_traj</span> <span class="o">=</span> <span class="n">ext_traj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ext_energy</span> <span class="o">=</span> <span class="n">ext_energy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ext_plumed</span> <span class="o">=</span> <span class="n">ext_plumed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sampling_prefix</span> <span class="o">=</span> <span class="s2">&quot;3-sampling-&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repl_prefix</span> <span class="o">=</span> <span class="s2">&quot;replica_&quot;</span>
+
+        <span class="c1"># loaded data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">universe</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># setup class object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_log</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Initializing data pipeline with data path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_data_files</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DataPipeline._init_log"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline._init_log">[docs]</a>    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the logger for the pipeline.</span>
+
+<span class="sd">        The logger is initialized with a StreamHandler that outputs to stdout. If the logger already has a handler, the</span>
+<span class="sd">        existing handler is used instead. The logging level is set to DEBUG if the pipeline is in verbose mode, and to</span>
+<span class="sd">        WARNING otherwise.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="c1"># add handler if not already present to stdout</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">hasHandlers</span><span class="p">():</span>
+            <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+            <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+                <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> : </span><span class="si">%(levelname)s</span><span class="s2"> : </span><span class="si">%(module)s</span><span class="s2"> : </span><span class="si">%(funcName)s</span><span class="s2"> : &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%(lineno)d</span><span class="s2"> : Log : </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %I:%M:%S&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+        <span class="c1"># set logging level of logger and handler</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to set logging level: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataPipeline._find_data_files"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline._find_data_files">[docs]</a>    <span class="k">def</span> <span class="nf">_find_data_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find all data files for each sampling method and create a dictionary of data files where the key is the sampling method.</span>
+<span class="sd">        Check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are duplicate sampling methods.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the number of sampling methods does not match the number of sampling paths.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If a sampling path does not exist.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are no topology files for a sampling method.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are no trajectory files for a sampling method.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are no plumed files for a sampling method.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there is more than one topology file for a sampling method.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there is more than one plumed file for a sampling method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># find all sampling methods: subdirectories of the data path starting with &quot;3-sampling-&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sampling_prefix</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="c1"># remove prefix from sampling method names and remove &quot;eqbm&quot; sampling methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sampling_prefix</span><span class="p">)</span> <span class="p">:]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span>
+            <span class="k">if</span> <span class="s2">&quot;eqbm&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">]</span>
+        <span class="c1"># if sampling method has multiple replicas (subdirectories of the sampling method directory of the form &quot;replica-#&quot;)</span>
+        <span class="c1"># then append the replica number to the sampling method name (e.g. &quot;hremd&quot; -&gt; &quot;hremd-1&quot;) for each replica</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span><span class="si">}</span><span class="s2"> sampling methods: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">orig_sampling_methods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">orig_sampling_methods</span><span class="p">:</span>
+            <span class="n">replicas</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sampling_prefix</span><span class="si">}{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repl_prefix</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">replicas</span><span class="p">)</span><span class="si">}</span><span class="s2"> replicas for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">replicas</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># remove the sampling method name from the list of sampling methods and add the sampling method name with the replica number</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">replicas</span><span class="p">]</span>
+                <span class="c1"># remove the sampling method directory from the list of sampling paths and add the replica directories</span>
+                <span class="n">repl_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sampling_prefix</span><span class="si">}{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">repl_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">repl_base</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">replicas</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">repl_base</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span> <span class="o">+=</span> <span class="n">repl_paths</span>
+
+        <span class="c1"># sort sampling methods and paths by sampling method name in ascending order</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="c1"># check that there are no duplicate sampling methods and all sampling methods have a corresponding sampling path</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found duplicate sampling methods&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Number of sampling methods does not match number of sampling paths&quot;</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sampling path </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;All sampling methods and paths are valid&quot;</span><span class="p">)</span>
+
+        <span class="c1"># find all data files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_top</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_traj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plumed_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;COLVAR*.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_plumed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># drop any files that are not in a sampling method directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj_files</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_files</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plumed_files</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plumed_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span>
+        <span class="p">]</span>
+
+        <span class="c1"># create a dictionary of data files where the key is the sampling method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">method</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># find all files for this sampling method and add them to the dictionary</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">path</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;traj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">path</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">path</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plumed_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">path</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># log the number of files found for this sampling method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;top&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> topology files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;traj&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> trajectory files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> energy files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> plumed files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No topology files found for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> in path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;top&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> topology files for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">, expected 1, in path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Found files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;traj&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No trajectory files found for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> in path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No plumed files found for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> in path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> plumed files for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">, expected 1 in path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Found files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataPipeline._statistical_weight"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline._statistical_weight">[docs]</a>    <span class="k">def</span> <span class="nf">_statistical_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the statistical weight of each sample in the input DataFrame based on the bias values.</span>
+<span class="sd">        The statistical weight is calculated as exp(-beta * (bias - max(bias))).</span>
+<span class="sd">        The statistical weight is normalized so that the sum of all weights is 1.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pd.DataFrame</span>
+<span class="sd">            The input DataFrame containing the bias values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            The input DataFrame with the statistical weight added as a column.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input DataFrame does not contain any bias columns.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If all statistical weights are zero.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get all columns ending in &quot;.bias&quot;</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.bias&quot;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="s2">&quot;metad.bias&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s2">&quot;metad.rbias&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">cols</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;metad.bias&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;metad.rbias&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;metad.rbias&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found bias columns: </span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No bias columns found in DataFrame&quot;</span><span class="p">)</span>
+
+        <span class="c1"># calculate statistical weight</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;bias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float128</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;bias_nondim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;bias&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;bias&quot;</span><span class="p">]))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;bias_nondim&quot;</span><span class="p">])</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># check if all weights are zero</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All weights are zero&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataPipeline.load_plumed_colvar"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline.load_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">load_plumed_colvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the collective variables (colvar) data from the plumed file associated with the given method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            The name of the sampling method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            The collective variables data.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there is not exactly one plumed file for the given method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># check that there is only one plumed file for this method</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> plumed files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">, expected 1&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading plumed file for method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># first line of file contains column names</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>  <span class="c1"># remove &quot;#!&quot; FIELDS</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">n_cols</span><span class="si">}</span><span class="s2"> columns in plumed file&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Columns: </span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># read in data</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">),</span>
+            <span class="n">names</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+            <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span>
+            <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_cols</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># if duplicate &quot;time&quot; rows, keep only the last one</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statistical_weight</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of rows in plumed file: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DataPipeline.save_plumed_colvar"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline.save_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">save_plumed_colvar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the collective variables (colvar) data to a parquet file for a given sampling method or all sampling methods.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str, optional</span>
+<span class="sd">            The name of the sampling method, by default None</span>
+<span class="sd">        file : Path, optional</span>
+<span class="sd">            The name of the output file, by default None</span>
+<span class="sd">        directory : Path, optional</span>
+<span class="sd">            The directory to save the output file, by default None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Path</span>
+<span class="sd">            The path to the output file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span> <span class="o">/</span> <span class="s2">&quot;analysis&quot;</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;colvar_</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving plumed colvar file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_plumed_colvar</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">file</span>
+
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;colvar_</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving plumed colvar file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_plumed_colvar</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">files</span></div>
+
+<div class="viewcode-block" id="DataPipeline.load_universe"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline.load_universe">[docs]</a>    <span class="k">def</span> <span class="nf">load_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the MDAnalysis universe for a given sampling method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            The name of the sampling method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mda.Universe</span>
+<span class="sd">            The MDAnalysis universe.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there is not exactly one topology file for the given method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading universe for method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;traj&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> trajectory files&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trajectory files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;traj&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># check that there is only one topology file for this method</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;top&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> topology files for method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">, expected 1&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">universe</span> <span class="o">=</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;traj&quot;</span><span class="p">],</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">universe</span></div>
+
+<div class="viewcode-block" id="DataPipeline.load_energy"><a class="viewcode-back" href="../../bias.pipeline.html#bias.pipeline.DataPipeline.load_energy">[docs]</a>    <span class="k">def</span> <span class="nf">load_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the energy data for a given sampling method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            The name of the sampling method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            The energy data.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are no energy files for the given method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading energy files for method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> energy files&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Energy files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;energy&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No energy files found for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># iterate over all energy files</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">]:</span>
+            <span class="n">energy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edr</span><span class="o">.</span><span class="n">edr_to_df</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+        <span class="c1"># concatenate all energy files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

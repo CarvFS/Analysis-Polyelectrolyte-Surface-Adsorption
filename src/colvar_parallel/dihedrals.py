@@ -43,7 +43,7 @@ the test data files::
    R = Dihedral(ags).run()
 
 
-.. autoclass:: dihedrals
+.. autoclass:: Dihedral
     :members:
     :inherited-members:
 

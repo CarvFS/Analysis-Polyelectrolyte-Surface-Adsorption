@@ -2,8 +2,8 @@
 Author: Alec Glisman (GitHub: @alec-glisman)
 Date: 2023-11-08
 Description: This module provides functions to calculate the free energy
-    surface for a given distance collective variable and to calculate the 
-    difference in free energy between two wells.
+surface for a given distance collective variable and to calculate the 
+difference in free energy between two wells.
 
 Functions
 ---------

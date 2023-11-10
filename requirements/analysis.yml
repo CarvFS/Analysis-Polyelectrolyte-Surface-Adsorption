@@ -22,10 +22,10 @@ dependencies:
   - dask>=2023.10.0
   - tqdm
   # data analysis
-  - numpy>=1.24.0
+  - numpy>=1.23.0
   - scipy>=1.11.0
   - scikit-learn>=1.2.0
-  - pandas>=2.1.0
+  - pandas>=2.0.0
   - pyarrow
   # MD packages
   - mdanalysis>=2.6.0
@@ -46,6 +46,7 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - coverage
   # formatting
   - autopep8
   - black

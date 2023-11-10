@@ -2,7 +2,7 @@
 Author: Alec Glisman (GitHub: @alec-glisman)
 Date: 2023-11-08
 Description: Module for a pipeline to load, clean, and analyze data from the 
-    molecular dynamics simulation.
+molecular dynamics simulation.
 
 This module defines a class `DataPipeline` that provides methods to load and process data from molecular dynamics simulations. The class takes a base directory containing the simulation data and optional parameters such as temperature, file extensions, and verbosity. The class provides methods to load plumed collective variables, molecular dynamics universe, and statistical weights. 
 
