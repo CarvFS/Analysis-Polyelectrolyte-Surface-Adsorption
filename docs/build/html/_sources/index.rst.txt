@@ -51,11 +51,6 @@ Please feel free to contact me if you have any questions or suggestions.
    :caption: Contents:
 
    modules
-.. bias
-   colvar_parallel
-   stats
-   utils
-..
 
 .. toctree::
    :maxdepth: 1

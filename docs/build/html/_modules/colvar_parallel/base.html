@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>colvar_parallel.base &mdash; Gromacs Data Analysis v2.0.0 documentation</title>
+  <title>colvar_parallel.base &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            Gromacs Data Analysis
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -40,10 +40,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../bias.html">bias package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.html">colvar_parallel package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../stats.html">stats package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
@@ -67,7 +64,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Gromacs Data Analysis</a>
+          <a href="../../index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -256,7 +253,7 @@
         <span class="n">frames</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dask&quot;</span><span class="p">,</span>
+        <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;joblib&quot;</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -284,18 +281,14 @@
 <span class="sd">            number of jobs to start, if `-1` use number of logical cpu cores.</span>
 <span class="sd">            This argument will be ignored when the distributed scheduler is</span>
 <span class="sd">            used</span>
-<span class="sd">            .. versionadded:: PERSONAL-COPY</span>
 <span class="sd">        module : str, optional</span>
 <span class="sd">            Parallelization module to use. Default: ``&quot;multiprocessing&quot;``.</span>
-<span class="sd">            .. versionadded:: PERSONAL-COPY</span>
 <span class="sd">        method : str, optional</span>
 <span class="sd">            Parallelization method to use. This is the Dask scheduler,</span>
 <span class="sd">            Joblib backend, or the multiprocessing method. Default: ``None``.</span>
-<span class="sd">            .. versionadded:: PERSONAL-COPY</span>
 <span class="sd">        n_blocks : int, optional</span>
 <span class="sd">            number of blocks to divide trajectory into. If ``None`` set equal</span>
 <span class="sd">            to n_jobs or number of available workers in scheduler.</span>
-<span class="sd">            .. versionadded:: PERSONAL-COPY</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            Other keyword arguments passed to :func:`dask.base.compute`.</span>
 <span class="sd">        .. versionchanged:: 2.2.0</span>
@@ -423,7 +416,6 @@
                 <span class="k">for</span> <span class="n">indices</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
                     <span class="n">block_indices</span><span class="p">,</span>
                     <span class="n">total</span><span class="o">=</span><span class="n">n_blocks</span><span class="p">,</span>
-                    <span class="n">colour</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
                     <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span>
                     <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span><span class="p">,</span>
                     <span class="n">mininterval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -457,7 +449,6 @@
                     <span class="n">tqdm</span><span class="p">(</span>
                         <span class="n">p</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job_block</span><span class="p">),</span> <span class="n">block_indices</span><span class="p">),</span>
                         <span class="n">total</span><span class="o">=</span><span class="n">n_blocks</span><span class="p">,</span>
-                        <span class="n">colour</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
                         <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span>
                         <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Analysis&quot;</span><span class="p">,</span>
                         <span class="n">mininterval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>

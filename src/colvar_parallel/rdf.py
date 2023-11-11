@@ -382,8 +382,6 @@ class InterRDF(ParallelAnalysisBase):
         ax.set_ylabel("$g{(r)}$")
         if title is not None:
             ax.set_title(title, y=1.05)
-        else:
-            ax.set_title(self.label_system, y=1.05)
 
         self._logger.debug(f"Saving figure to {d}/plt_rdf_{self._tag}.{ext}.")
         Path(d).mkdir(parents=True, exist_ok=True)
@@ -434,8 +432,6 @@ class InterRDF(ParallelAnalysisBase):
         ax.set_ylabel(r"$\Delta F_\mathrm{PMF}$ [$k_B T$]")
         if title is not None:
             ax.set_title(title, y=1.05)
-        else:
-            ax.set_title(self.label_system, y=1.05)
 
         self._logger.debug(f"Saving figure to {d}/plt_rdf_pmf_{self._tag}.{ext}.")
         Path(d).mkdir(parents=True, exist_ok=True)

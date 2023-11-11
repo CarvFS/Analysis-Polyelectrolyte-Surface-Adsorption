@@ -17,7 +17,7 @@ def set_style():
     # Pyplot parameters
     plt.rcParams["axes.axisbelow"] = True
     plt.rcParams["agg.path.chunksize"] = 10000
-    plt.style.use(["seaborn-colorblind"])
+    plt.style.use(["seaborn-v0_8-colorblind"])
 
     # Matplotlib parameters
     # mpl.use("TKAgg")

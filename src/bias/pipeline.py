@@ -432,7 +432,7 @@ class DataPipeline:
             raise ValueError("No bias columns found in DataFrame")
 
         # calculate statistical weight
-        df["bias"] = df[cols].sum(axis=1).astype(np.float128)
+        df["bias"] = df[cols].sum(axis=1)
         df["bias_nondim"] = (df["bias"] - np.nanmax(df["bias"])) * self._beta
         df["weight"] = np.exp(df["bias_nondim"])
         df["weight"] /= df["weight"].sum()
@@ -492,7 +492,7 @@ class DataPipeline:
 
         # if duplicate "time" rows, keep only the last one
         df = df.drop_duplicates(subset="time", keep="last")
-        df = self._statistical_weight(df)
+        self._statistical_weight(df)
         self.data_files[method]["colvar"] = df.copy()
         self._log.debug(f"Number of rows in plumed file: {len(df)}")
         return df.copy()
@@ -521,6 +521,7 @@ class DataPipeline:
 
         if directory is None:
             directory = self.data_path_base / "analysis"
+        directory.mkdir(parents=True, exist_ok=True)
 
         if method is not None:
             if file is None:

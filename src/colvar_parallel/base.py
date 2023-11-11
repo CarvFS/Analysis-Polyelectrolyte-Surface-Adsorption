@@ -168,7 +168,7 @@ class ParallelAnalysisBase(AnalysisBase):
         frames: np.array = None,
         verbose: bool = None,
         n_jobs: int = 1,
-        module: str = "dask",
+        module: str = "joblib",
         method: str = None,
         n_blocks: int = None,
         **kwargs,
@@ -196,18 +196,14 @@ class ParallelAnalysisBase(AnalysisBase):
             number of jobs to start, if `-1` use number of logical cpu cores.
             This argument will be ignored when the distributed scheduler is
             used
-            .. versionadded:: PERSONAL-COPY
         module : str, optional
             Parallelization module to use. Default: ``"multiprocessing"``.
-            .. versionadded:: PERSONAL-COPY
         method : str, optional
             Parallelization method to use. This is the Dask scheduler,
             Joblib backend, or the multiprocessing method. Default: ``None``.
-            .. versionadded:: PERSONAL-COPY
         n_blocks : int, optional
             number of blocks to divide trajectory into. If ``None`` set equal
             to n_jobs or number of available workers in scheduler.
-            .. versionadded:: PERSONAL-COPY
         **kwargs
             Other keyword arguments passed to :func:`dask.base.compute`.
         .. versionchanged:: 2.2.0
@@ -335,7 +331,6 @@ class ParallelAnalysisBase(AnalysisBase):
                 for indices in tqdm(
                     block_indices,
                     total=n_blocks,
-                    colour="green",
                     unit="block",
                     desc="Analysis",
                     mininterval=1,
@@ -369,7 +364,6 @@ class ParallelAnalysisBase(AnalysisBase):
                     tqdm(
                         p.imap(partial(self._job_block), block_indices),
                         total=n_blocks,
-                        colour="green",
                         unit="block",
                         desc="Analysis",
                         mininterval=1,
