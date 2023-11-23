@@ -10,3 +10,6 @@
 [submodule "ddpm/examples/e3_diffusion_for_molecules"]
 	path = ddpm/examples/e3_diffusion_for_molecules
 	url = https://github.com/ehoogeboom/e3_diffusion_for_molecules.git
+[submodule "ddpm/examples/ddim"]
+	path = ddpm/examples/ddim
+	url = https://github.com/ermongroup/ddim.git
