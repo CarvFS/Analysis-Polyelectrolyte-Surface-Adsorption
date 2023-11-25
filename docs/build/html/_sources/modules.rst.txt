@@ -4,7 +4,8 @@ src
 .. toctree::
    :maxdepth: 4
 
-   bias
-   colvar_parallel
+   colvar
+   data
+   render
    stats
    utils

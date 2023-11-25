@@ -21,7 +21,7 @@ with useful selection commands and information about the system.
 The colvar module contains a number of functions to calculate collective
 variables from a trajectory using standard MDAnalysis data structures.
 
-The colvar_parallel module contains updated versions of the functions
+The colvar module contains updated versions of the functions
 in the colvar module. These analyses use Dask to parallelize the
 calculations and are therefore much faster than the original functions.
 It also includes an inherited version of MDAnalysis analysis base class
@@ -56,7 +56,7 @@ Please feel free to contact me if you have any questions or suggestions.
    :maxdepth: 1
    :caption: Key files:
 
-   colvar_parallel.base
+   colvar.base
    stats.block_error
 
 .. toctree::

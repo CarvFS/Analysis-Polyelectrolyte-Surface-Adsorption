@@ -1,7 +1,7 @@
 colvar\_parallel.contacts module
 ================================
 
-.. automodule:: colvar_parallel.contacts
+.. automodule:: colvar.contacts
    :members:
    :undoc-members:
    :show-inheritance:

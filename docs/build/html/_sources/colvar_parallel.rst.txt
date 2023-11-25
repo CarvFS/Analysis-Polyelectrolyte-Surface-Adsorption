@@ -7,17 +7,17 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   colvar_parallel.base
-   colvar_parallel.contacts
-   colvar_parallel.dihedrals
-   colvar_parallel.hbonds
-   colvar_parallel.polymerlengths
-   colvar_parallel.rdf
+   colvar.base
+   colvar.contacts
+   colvar.dihedrals
+   colvar.hbonds
+   colvar.polymerlengths
+   colvar.rdf
 
 Module contents
 ---------------
 
-.. automodule:: colvar_parallel
+.. automodule:: colvar
    :members:
    :undoc-members:
    :show-inheritance:

@@ -17,9 +17,7 @@
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="bias.pipeline module" href="bias.pipeline.html" />
-    <link rel="prev" title="bias package" href="bias.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,22 +40,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="bias.html">bias package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="bias.html#submodules">Submodules</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">bias.free_energy module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="bias.pipeline.html">bias.pipeline module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="bias.html#module-bias">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="colvar_parallel.html">colvar_parallel package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html">stats package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
@@ -89,8 +73,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
-          <li class="breadcrumb-item"><a href="bias.html">bias package</a></li>
       <li class="breadcrumb-item active">bias.free_energy module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/bias.free_energy.rst.txt" rel="nofollow"> View page source</a>
@@ -101,106 +83,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-bias.free_energy">
-<span id="bias-free-energy-module"></span><h1>bias.free_energy module<a class="headerlink" href="#module-bias.free_energy" title="Permalink to this headline"></a></h1>
-<p>Author: Alec Glisman (GitHub: &#64;alec-glisman)
-Date: 2023-11-08
-Description: This module provides functions to calculate the free energy
-surface for a given distance collective variable and to calculate the
-difference in free energy between two wells.</p>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
-<p>fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None,
-d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None,
-n_grid: int = 300) -&gt; tuple[np.ndarray, np.ndarray]:</p>
-<blockquote>
-<div><p>Calculate the free energy surface for a given distance collective variable.</p>
-</div></blockquote>
-<p>diff_fes_1d(cv: np.ndarray, pmf: np.ndarray, lower_well: tuple[float, float],
-upper_well: tuple[float, float]) -&gt; float:</p>
-<blockquote>
-<div><p>Calculate the difference in free energy between the two wells.</p>
-</div></blockquote>
-</section>
-<section id="raises">
-<h2>Raises<a class="headerlink" href="#raises" title="Permalink to this headline"></a></h2>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If <cite>min_val</cite> is not less than <cite>max_val</cite>.</p>
-</dd>
-<dt>AssertionError</dt><dd><p>If the lower or upper well domains do not have upper and lower bounds.</p>
-</dd>
-<dt>AssertionError</dt><dd><p>If the PMF and CV do not have the same size.</p>
-</dd>
-</dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="bias.free_energy.fes_1d">
-<span class="sig-prename descclassname"><span class="pre">bias.free_energy.</span></span><span class="sig-name descname"><span class="pre">fes_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bandwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d3_coord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/bias/free_energy.html#fes_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.free_energy.fes_1d" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the free energy surface for a given distance collective variable.</p>
-<dl class="simple">
-<dt>x<span class="classifier">np.ndarray</span></dt><dd><p>Array of collective variable values.</p>
-</dd>
-<dt>weights<span class="classifier">np.ndarray, optional</span></dt><dd><p>Array of weights for each collective variable value, by default None</p>
-</dd>
-<dt>bandwidth<span class="classifier">float, optional</span></dt><dd><p>Bandwidth for kernel density estimation, by default None</p>
-</dd>
-<dt>d3_coord<span class="classifier">bool, optional</span></dt><dd><p>Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by
-default False</p>
-</dd>
-<dt>x_grid<span class="classifier">np.ndarray, optional</span></dt><dd><p>Array of grid points to use for KDE, by default None</p>
-</dd>
-<dt>domain<span class="classifier">tuple[float, float], optional</span></dt><dd><p>Tuple of (min, max) values for the domain of the free energy surface, by
-default None</p>
-</dd>
-<dt>n_grid<span class="classifier">int, optional</span></dt><dd><p>Number of grid points to use for KDE, by default 300</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>tuple[np.ndarray, np.ndarray]</dt><dd><p>Tuple of arrays of distances and free energies.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If <cite>min_val</cite> is not less than <cite>max_val</cite>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bias.free_energy.diff_fes_1d">
-<span class="sig-prename descclassname"><span class="pre">bias.free_energy.</span></span><span class="sig-name descname"><span class="pre">diff_fes_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/bias/free_energy.html#diff_fes_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bias.free_energy.diff_fes_1d" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the difference in free energy between the two wells.</p>
-<dl class="simple">
-<dt>cv<span class="classifier">np.ndarray</span></dt><dd><p>Array of collective variable values.</p>
-</dd>
-<dt>pmf<span class="classifier">np.ndarray</span></dt><dd><p>Array of free energies as a function of collective variable, assumed to be
-unitless.</p>
-</dd>
-<dt>lower_well<span class="classifier">tuple[float, float]</span></dt><dd><p>Tuple of (min, max) values for the lower well.</p>
-</dd>
-<dt>upper_well<span class="classifier">tuple[float, float]</span></dt><dd><p>Tuple of (min, max) values for the upper well.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>float</dt><dd><p>Difference in free energy between the two wells. Unitless.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>AssertionError</dt><dd><p>If the lower or upper well domains do not have upper and lower bounds.</p>
-</dd>
-<dt>AssertionError</dt><dd><p>If the PMF and CV do not have the same size.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
+  <section id="bias-free-energy-module">
+<h1>bias.free_energy module<a class="headerlink" href="#bias-free-energy-module" title="Permalink to this headline"></a></h1>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="bias.html" class="btn btn-neutral float-left" title="bias package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="bias.pipeline.html" class="btn btn-neutral float-right" title="bias.pipeline module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

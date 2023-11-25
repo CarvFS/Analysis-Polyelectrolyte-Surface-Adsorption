@@ -7,7 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   utils.figure_style
+   utils.dask
    utils.logs
    utils.system
 

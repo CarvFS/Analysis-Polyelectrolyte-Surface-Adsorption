@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data.pipeline module &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="render package" href="render.html" />
+    <link rel="prev" title="data.free_energy module" href="data.free_energy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="colvar.html">colvar package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="data.html">data package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="data.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="data.free_energy.html">data.free_energy module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">data.pipeline module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="render.html">render package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.html">stats package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="colvar.base.html">colvar.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="data.html">data package</a></li>
+      <li class="breadcrumb-item active">data.pipeline module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data.pipeline.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-data.pipeline">
+<span id="data-pipeline-module"></span><h1>data.pipeline module<a class="headerlink" href="#module-data.pipeline" title="Permalink to this headline"></a></h1>
+<div class="line-block">
+<div class="line">Author: Alec Glisman (GitHub: &#64;alec-glisman)</div>
+<div class="line">Date: 2023-11-08</div>
+<div class="line">Description: Module for a pipeline to load, clean, and analyze data from the</div>
+<div class="line">molecular dynamics simulation.</div>
+</div>
+<p>This module defines a class <cite>DataPipeline</cite> that provides methods to load and
+process data from molecular dynamics simulations. The class takes a base
+directory containing the simulation data and optional parameters such as
+temperature, file extensions, and verbosity. The class provides methods to
+load plumed collective variables, molecular dynamics universe, and
+statistical weights.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.tag">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">tag</span></span><a class="headerlink" href="#data.pipeline.tag" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the simulation data directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.data_path_base">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">data_path_base</span></span><a class="headerlink" href="#data.pipeline.data_path_base" title="Permalink to this definition"></a></dt>
+<dd><p>The base directory containing the simulation data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.temperature">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">temperature</span></span><a class="headerlink" href="#data.pipeline.temperature" title="Permalink to this definition"></a></dt>
+<dd><p>The temperature of the simulation in Kelvin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.sampling_methods">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">sampling_methods</span></span><a class="headerlink" href="#data.pipeline.sampling_methods" title="Permalink to this definition"></a></dt>
+<dd><p>The names of the sampling methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.sampling_paths">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">sampling_paths</span></span><a class="headerlink" href="#data.pipeline.sampling_paths" title="Permalink to this definition"></a></dt>
+<dd><p>The paths to the sampling method directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.top_files">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">top_files</span></span><a class="headerlink" href="#data.pipeline.top_files" title="Permalink to this definition"></a></dt>
+<dd><p>The paths to the topology files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.traj_files">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">traj_files</span></span><a class="headerlink" href="#data.pipeline.traj_files" title="Permalink to this definition"></a></dt>
+<dd><p>The paths to the trajectory files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.energy_files">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">energy_files</span></span><a class="headerlink" href="#data.pipeline.energy_files" title="Permalink to this definition"></a></dt>
+<dd><p>The paths to the energy files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.plumed_files">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">plumed_files</span></span><a class="headerlink" href="#data.pipeline.plumed_files" title="Permalink to this definition"></a></dt>
+<dd><p>The paths to the plumed files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline.data_files">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">data_files</span></span><a class="headerlink" href="#data.pipeline.data_files" title="Permalink to this definition"></a></dt>
+<dd><p>A dictionary containing the paths to the simulation data files.
+The keys are the names of the sampling methods and the values are
+dictionaries containing the paths to the topology, trajectory, energy,
+and plumed files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._kb">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_kb</span></span><a class="headerlink" href="#data.pipeline._kb" title="Permalink to this definition"></a></dt>
+<dd><p>The Boltzmann constant in kJ/mol/K.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_kb</span></span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>The Boltzmann constant in kJ/mol/K.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._beta">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_beta</span></span><a class="headerlink" href="#data.pipeline._beta" title="Permalink to this definition"></a></dt>
+<dd><p>The inverse temperature in 1/kJ/mol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._verbose">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_verbose</span></span><a class="headerlink" href="#data.pipeline._verbose" title="Permalink to this definition"></a></dt>
+<dd><p>Whether to print verbose logging messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._ext_top">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_ext_top</span></span><a class="headerlink" href="#data.pipeline._ext_top" title="Permalink to this definition"></a></dt>
+<dd><p>The file extension for topology files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._ext_traj">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_ext_traj</span></span><a class="headerlink" href="#data.pipeline._ext_traj" title="Permalink to this definition"></a></dt>
+<dd><p>The file extension for trajectory files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._ext_energy">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_ext_energy</span></span><a class="headerlink" href="#data.pipeline._ext_energy" title="Permalink to this definition"></a></dt>
+<dd><p>The file extension for energy files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._ext_plumed">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_ext_plumed</span></span><a class="headerlink" href="#data.pipeline._ext_plumed" title="Permalink to this definition"></a></dt>
+<dd><p>The file extension for plumed files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._sampling_prefix">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_sampling_prefix</span></span><a class="headerlink" href="#data.pipeline._sampling_prefix" title="Permalink to this definition"></a></dt>
+<dd><p>The prefix for sampling method directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.pipeline._repl_prefix">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">_repl_prefix</span></span><a class="headerlink" href="#data.pipeline._repl_prefix" title="Permalink to this definition"></a></dt>
+<dd><p>The prefix for replica directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_plumed_colvar(method</span></span></dt>
+<dd><p>str) -&gt; pd.DataFrame:
+Load the plumed collective variables for a given sampling method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_plumed_colvar(</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.method">
+<span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">method</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.pipeline.method" title="Permalink to this definition"></a></dt>
+<dd><p>str = None, file: Path = None, directory: Path = None) -&gt; Path:
+Save the plumed collective variables for all or a specific sampling
+method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_universe(method</span></span></dt>
+<dd><p>str, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; mda.Universe:
+Load the molecular dynamics universe for a given sampling method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_statistical_weight(df</span></span></dt>
+<dd><p>pd.DataFrame) -&gt; pd.DataFrame:
+Calculate the statistical weight of each frame in the trajectory.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.pipeline.</span></span><span class="sig-name descname"><span class="pre">DataPipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_top</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tpr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xtc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'edr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_plumed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Initialize a Pipeline object.</p>
+<dl class="simple">
+<dt>data_path_base<span class="classifier">Path</span></dt><dd><p>The base directory containing the simulation data.</p>
+</dd>
+<dt>temperature<span class="classifier">float, optional</span></dt><dd><p>The temperature of the simulation in Kelvin, by default 300.0.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Whether to print verbose logging messages, by default False.</p>
+</dd>
+<dt>ext_top<span class="classifier">str, optional</span></dt><dd><p>The file extension for topology files, by default “tpr”.</p>
+</dd>
+<dt>ext_traj<span class="classifier">str, optional</span></dt><dd><p>The file extension for trajectory files, by default “xtc”.</p>
+</dd>
+<dt>ext_energy<span class="classifier">str, optional</span></dt><dd><p>The file extension for energy files, by default “edr”.</p>
+</dd>
+<dt>ext_plumed<span class="classifier">str, optional</span></dt><dd><p>The file extension for plumed files, by default “data”.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>tag<span class="classifier">str</span></dt><dd><p>The name of the directory containing the simulation data.</p>
+</dd>
+<dt>data_path_base<span class="classifier">Path</span></dt><dd><p>The base directory containing the simulation data.</p>
+</dd>
+<dt>temperature<span class="classifier">float</span></dt><dd><p>The temperature of the simulation in Kelvin.</p>
+</dd>
+<dt>sampling_methods<span class="classifier">list of str</span></dt><dd><p>The names of the sampling methods used in the simulation.</p>
+</dd>
+<dt>sampling_paths<span class="classifier">list of Path</span></dt><dd><p>The paths to the directories containing the sampling data.</p>
+</dd>
+<dt>top_files<span class="classifier">list of Path</span></dt><dd><p>The paths to the topology files.</p>
+</dd>
+<dt>traj_files<span class="classifier">list of Path</span></dt><dd><p>The paths to the trajectory files.</p>
+</dd>
+<dt>energy_files<span class="classifier">list of Path</span></dt><dd><p>The paths to the energy files.</p>
+</dd>
+<dt>plumed_files<span class="classifier">list of Path</span></dt><dd><p>The paths to the plumed files.</p>
+</dd>
+<dt>data_files<span class="classifier">dict</span></dt><dd><p>A dictionary containing the data files for each sampling method.</p>
+</dd>
+<dt>_kb<span class="classifier">float</span></dt><dd><p>The Boltzmann constant in kJ/mol/K.</p>
+</dd>
+<dt>_beta<span class="classifier">float</span></dt><dd><p>The inverse temperature in 1/kJ/mol.</p>
+</dd>
+<dt>_verbose<span class="classifier">bool</span></dt><dd><p>Whether to print verbose logging messages.</p>
+</dd>
+<dt>_ext_top<span class="classifier">str</span></dt><dd><p>The file extension for topology files.</p>
+</dd>
+<dt>_ext_traj<span class="classifier">str</span></dt><dd><p>The file extension for trajectory files.</p>
+</dd>
+<dt>_ext_energy<span class="classifier">str</span></dt><dd><p>The file extension for energy files.</p>
+</dd>
+<dt>_ext_plumed<span class="classifier">str</span></dt><dd><p>The file extension for plumed files.</p>
+</dd>
+<dt>_sampling_prefix<span class="classifier">str</span></dt><dd><p>The prefix for directories containing sampling data.</p>
+</dd>
+<dt>_repl_prefix<span class="classifier">str</span></dt><dd><p>The prefix for directories containing replica data.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline._init_log">
+<span class="sig-name descname"><span class="pre">_init_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline._init_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline._init_log" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the logger for the pipeline.</p>
+<p>The logger is initialized with a StreamHandler that outputs to stdout.
+If the logger already has a handler, the existing handler is used
+instead. The logging level is set to DEBUG if the pipeline is in
+verbose mode, and to WARNING otherwise.</p>
+<p>None</p>
+<p>None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline._find_data_files">
+<span class="sig-name descname"><span class="pre">_find_data_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline._find_data_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline._find_data_files" title="Permalink to this definition"></a></dt>
+<dd><p>Find all data files for each sampling method and create a dictionary of
+data files where the key is the sampling method. Check that there are
+no duplicate sampling methods and all sampling methods have a
+corresponding sampling path.</p>
+<p>None</p>
+<p>None</p>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are duplicate sampling methods.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the number of sampling methods does not match the number of sampling
+paths.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If a sampling path does not exist.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there are no topology files for a sampling method.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there are no trajectory files for a sampling method.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there are no plumed files for a sampling method.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there is more than one topology file for a sampling method.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there is more than one plumed file for a sampling method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline._statistical_weight">
+<span class="sig-name descname"><span class="pre">_statistical_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline._statistical_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline._statistical_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the statistical weight of each sample in the input DataFrame based
+on the bias values.
+The statistical weight is calculated as exp(-beta * (bias - max(bias))).
+The statistical weight is normalized so that the sum of all weights is 1.</p>
+<dl class="simple">
+<dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>The input DataFrame containing the bias values.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The input DataFrame with the statistical weight added as a column.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the input DataFrame does not contain any bias columns.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If all statistical weights are zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline.load_plumed_colvar">
+<span class="sig-name descname"><span class="pre">load_plumed_colvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline.load_plumed_colvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline.load_plumed_colvar" title="Permalink to this definition"></a></dt>
+<dd><p>Load the collective variables (colvar) data from the plumed file associated
+with the given method.</p>
+<dl class="simple">
+<dt>method<span class="classifier">str</span></dt><dd><p>The name of the sampling method.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The collective variables data.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there is not exactly one plumed file for the given method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline.save_plumed_colvar">
+<span class="sig-name descname"><span class="pre">save_plumed_colvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline.save_plumed_colvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline.save_plumed_colvar" title="Permalink to this definition"></a></dt>
+<dd><p>Save the collective variables (colvar) data to a parquet file for a given
+sampling method or all sampling methods.</p>
+<dl class="simple">
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>The name of the sampling method, by default None</p>
+</dd>
+<dt>file<span class="classifier">Path, optional</span></dt><dd><p>The name of the output file, by default None</p>
+</dd>
+<dt>directory<span class="classifier">Path, optional</span></dt><dd><p>The directory to save the output file, by default None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Path</dt><dd><p>The path to the output file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline.load_universe">
+<span class="sig-name descname"><span class="pre">load_universe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.Universe</span></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline.load_universe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline.load_universe" title="Permalink to this definition"></a></dt>
+<dd><p>Load the MDAnalysis universe for a given sampling method.</p>
+<dl class="simple">
+<dt>method<span class="classifier">str</span></dt><dd><p>The name of the sampling method.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>mda.Universe</dt><dd><p>The MDAnalysis universe.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there is not exactly one topology file for the given method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.pipeline.DataPipeline.load_energy">
+<span class="sig-name descname"><span class="pre">load_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="reference internal" href="_modules/data/pipeline.html#DataPipeline.load_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data.pipeline.DataPipeline.load_energy" title="Permalink to this definition"></a></dt>
+<dd><p>Load the energy data for a given sampling method.</p>
+<dl class="simple">
+<dt>method<span class="classifier">str</span></dt><dd><p>The name of the sampling method.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The energy data.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are no energy files for the given method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data.free_energy.html" class="btn btn-neutral float-left" title="data.free_energy module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="render.html" class="btn btn-neutral float-right" title="render package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

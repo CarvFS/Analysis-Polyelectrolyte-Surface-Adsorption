@@ -37,9 +37,9 @@ import pandas as pd
 sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
-from bias.pipeline import DataPipeline  # noqa: E402
-from colvar_parallel.rdf import InterRDF  # noqa: E402
-from utils.figure_style import set_style  # noqa: E402
+from data.pipeline import DataPipeline  # noqa: E402
+from colvar.rdf import InterRDF  # noqa: E402
+from render.figure_style import set_style  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
 
 

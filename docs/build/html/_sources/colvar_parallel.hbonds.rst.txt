@@ -1,7 +1,7 @@
 colvar\_parallel.hbonds module
 ==============================
 
-.. automodule:: colvar_parallel.hbonds
+.. automodule:: colvar.hbonds
    :members:
    :undoc-members:
    :show-inheritance:

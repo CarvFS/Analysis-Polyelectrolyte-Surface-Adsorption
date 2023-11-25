@@ -1,7 +1,7 @@
 colvar\_parallel.polymerlengths module
 ======================================
 
-.. automodule:: colvar_parallel.polymerlengths
+.. automodule:: colvar.polymerlengths
    :members:
    :undoc-members:
    :show-inheritance:
