@@ -3,16 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>stats.block_error &mdash; Gromacs Data Analysis v2.0.0 documentation</title>
+  <title>stats.block_error &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +29,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            Gromacs Data Analysis
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -39,14 +41,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../bias.html">bias package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.html">colvar_parallel package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../stats.html">stats package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.base.html">colvar_parallel.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">External links:</span></p>
@@ -66,7 +65,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Gromacs Data Analysis</a>
+          <a href="../../index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -253,7 +252,9 @@
     <span class="k">return</span> <span class="n">hist</span><span class="p">,</span> <span class="n">norm</span>
 
 
-<div class="viewcode-block" id="BlockError"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError">[docs]</a><span class="k">class</span> <span class="nc">BlockError</span><span class="p">:</span>
+<div class="viewcode-block" id="BlockError">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError">[docs]</a>
+<span class="k">class</span> <span class="nc">BlockError</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Methods to perform block average analysis on input data. This allows for</span>
 <span class="sd">    better estimation of error bars on correlated data, which is extremely</span>
@@ -345,7 +346,9 @@
         <span class="c1"># ignore divide by zero warnings</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BlockError.x_val"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_val">[docs]</a>    <span class="k">def</span> <span class="nf">x_val</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]:</span>
+<div class="viewcode-block" id="BlockError.x_val">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_val">[docs]</a>
+    <span class="k">def</span> <span class="nf">x_val</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the block average and error of the value of the input</span>
 <span class="sd">        values of the x data.</span>
@@ -404,7 +407,10 @@
         <span class="c1"># return data</span>
         <span class="k">return</span> <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_err</span></div>
 
-<div class="viewcode-block" id="BlockError.x_kde"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_kde">[docs]</a>    <span class="k">def</span> <span class="nf">x_kde</span><span class="p">(</span>
+
+<div class="viewcode-block" id="BlockError.x_kde">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_kde">[docs]</a>
+    <span class="k">def</span> <span class="nf">x_kde</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">x_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -514,7 +520,10 @@
         <span class="c1"># return data</span>
         <span class="k">return</span> <span class="n">x_pts</span><span class="p">,</span> <span class="n">kde_mean</span><span class="p">,</span> <span class="n">kde_var</span><span class="p">,</span> <span class="n">kde_err</span></div>
 
-<div class="viewcode-block" id="BlockError.x_kde_fes"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_kde_fes">[docs]</a>    <span class="k">def</span> <span class="nf">x_kde_fes</span><span class="p">(</span>
+
+<div class="viewcode-block" id="BlockError.x_kde_fes">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_kde_fes">[docs]</a>
+    <span class="k">def</span> <span class="nf">x_kde_fes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">x_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -580,7 +589,10 @@
         <span class="c1"># return data</span>
         <span class="k">return</span> <span class="n">x_pts</span><span class="p">,</span> <span class="n">fes_mean</span><span class="p">,</span> <span class="n">fes_var</span><span class="p">,</span> <span class="n">fes_err</span></div>
 
-<div class="viewcode-block" id="BlockError.x_histo"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_histo">[docs]</a>    <span class="k">def</span> <span class="nf">x_histo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">return_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BlockError.x_histo">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_histo">[docs]</a>
+    <span class="k">def</span> <span class="nf">x_histo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">return_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the block average and error of the histogram of the input</span>
 <span class="sd">        distribution of the x data.</span>
@@ -677,7 +689,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">h_centers</span><span class="p">,</span> <span class="n">histo_mean</span><span class="p">,</span> <span class="n">histo_var</span><span class="p">,</span> <span class="n">histo_err</span></div>
 
-<div class="viewcode-block" id="BlockError.x_histo_fes"><a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_histo_fes">[docs]</a>    <span class="k">def</span> <span class="nf">x_histo_fes</span><span class="p">(</span>
+
+<div class="viewcode-block" id="BlockError.x_histo_fes">
+<a class="viewcode-back" href="../../stats.block_error.html#stats.block_error.BlockError.x_histo_fes">[docs]</a>
+    <span class="k">def</span> <span class="nf">x_histo_fes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">return_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -734,7 +749,9 @@
         <span class="k">if</span> <span class="n">return_edges</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">h_centers</span><span class="p">,</span> <span class="n">fes_mean</span><span class="p">,</span> <span class="n">fes_var</span><span class="p">,</span> <span class="n">fes_err</span><span class="p">,</span> <span class="n">h_edges</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">h_centers</span><span class="p">,</span> <span class="n">fes_mean</span><span class="p">,</span> <span class="n">fes_var</span><span class="p">,</span> <span class="n">fes_err</span></div></div>
+            <span class="k">return</span> <span class="n">h_centers</span><span class="p">,</span> <span class="n">fes_mean</span><span class="p">,</span> <span class="n">fes_var</span><span class="p">,</span> <span class="n">fes_err</span></div>
+</div>
+
 </pre></div>
 
            </div>

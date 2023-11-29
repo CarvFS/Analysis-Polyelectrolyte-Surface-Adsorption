@@ -51,8 +51,6 @@ class TestPipeline(object):
         assert pipeline._ext_plumed == "data"
         assert pipeline._sampling_prefix == "3-sampling-"
         assert pipeline._repl_prefix == "replica_"
-        assert pipeline.universe is None
-        assert pipeline.energy is None
 
     def test_find_data_files(self, pipeline, data_path):
         pipeline._find_data_files()

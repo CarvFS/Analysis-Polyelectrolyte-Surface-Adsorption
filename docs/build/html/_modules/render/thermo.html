@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>render.thermo &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">render.thermo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for render.thermo</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides functions to render figures and movies of the free energy surface</span>
+<span class="sd">and how it converges over time.</span>
+<span class="sd">| Author: Alec Glisman (GitHub: @alec-glisman)</span>
+<span class="sd">| Date: 2023-11-24</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">plt_pmf(cv_grid: np.ndarray, pmf: np.ndarray, ymax: float = None,</span>
+<span class="sd">dir_fig: str = &quot;figures&quot;, tag: str = None) -&gt; plt.Figure:</span>
+<span class="sd">    Render a figure of the free energy surface. This figure should be used to assess</span>
+<span class="sd">    the convergence of the free energy surface. The figure contains 1 subplot:</span>
+<span class="sd">    - PMF: curve should be smooth and converged</span>
+
+<span class="sd">plt_pmf_diff_conv(times: np.ndarray, differences: np.ndarray,</span>
+<span class="sd">lower_well: tuple[float, float], upper_well: tuple[float, float], tag: str = None,</span>
+<span class="sd">ymax: float = None) -&gt; plt.Figure:</span>
+<span class="sd">    Render a figure of the free energy difference between two wells. This figure should</span>
+<span class="sd">    be used to assess the convergence of the free energy surface. The figure contains</span>
+<span class="sd">    1 subplot:</span>
+<span class="sd">    - PMF difference: curve should be converged to a constant within an error of 1 kT</span>
+
+<span class="sd">mov_pmf_conv(times: np.ndarray, cv_grid: np.ndarray, pmfs: np.ndarray, tag: str = None,</span>
+<span class="sd">ymax: float = None, dir_fig: str = &quot;movies&quot;) -&gt; plt.Figure:</span>
+<span class="sd">    Render a movie of the free energy surface. This figure should be used to assess the</span>
+<span class="sd">    convergence of the free energy surface. The figure contains 1 subplot:</span>
+<span class="sd">    - PMF: curve should be smooth and converged</span>
+
+<span class="sd">Raises</span>
+<span class="sd">------</span>
+<span class="sd">AssertionError</span>
+<span class="sd">    If the PMF and CV do not have the same size.</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">This module requires the following columns in the DataFrame:</span>
+<span class="sd">- time: time in picoseconds</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># import modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="nn">animation</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># import local modules</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">save_fig</span>
+
+
+<div class="viewcode-block" id="plt_pmf">
+<a class="viewcode-back" href="../../render.thermo.html#render.thermo.plt_pmf">[docs]</a>
+<span class="k">def</span> <span class="nf">plt_pmf</span><span class="p">(</span>
+    <span class="n">cv_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pmf</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dir_fig</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;figures&quot;</span><span class="p">,</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a figure of the free energy surface. This figure should be used to</span>
+<span class="sd">    assess the convergence of the free energy surface. The figure contains 1</span>
+<span class="sd">    subplot:</span>
+<span class="sd">    - PMF: curve should be smooth and converged</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cv_grid : np.ndarray</span>
+<span class="sd">        Array of collective variable values.</span>
+<span class="sd">    pmf : np.ndarray</span>
+<span class="sd">        Array of free energies as a function of collective variable, assumed to be</span>
+<span class="sd">        unitless.</span>
+<span class="sd">    ymax : float, optional</span>
+<span class="sd">        Maximum value for the y-axis, by default None</span>
+<span class="sd">    dir_fig : str, optional</span>
+<span class="sd">        Directory to save the figure, by default &quot;figures&quot;</span>
+<span class="sd">    tag : str, optional</span>
+<span class="sd">        Tag to append to the figure name, by default None</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plt.Figure</span>
+<span class="sd">        Figure of the free energy surface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf&quot;</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+    <span class="c1"># PMF: curve should be smooth and converged</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Potential of Mean Force&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$z$ [nm]&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta F$ [$k_\mathrm</span><span class="si">{B}</span><span class="s2">T$]&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">,</span> <span class="n">pmf</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ymax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
+
+    <span class="c1"># save figure</span>
+    <span class="n">save_fig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">dir_fig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="plt_pmf_diff_conv">
+<a class="viewcode-back" href="../../render.thermo.html#render.thermo.plt_pmf_diff_conv">[docs]</a>
+<span class="k">def</span> <span class="nf">plt_pmf_diff_conv</span><span class="p">(</span>
+    <span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">differences</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">lower_well</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">upper_well</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a figure of the free energy difference between two wells. This figure</span>
+<span class="sd">    should be used to assess the convergence of the free energy surface. The</span>
+<span class="sd">    figure contains 1 subplot:</span>
+<span class="sd">    - PMF difference: curve should be converged to a constant within an error of</span>
+<span class="sd">      1 kT</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : np.ndarray</span>
+<span class="sd">        Array of times in ns.</span>
+<span class="sd">    differences : np.ndarray</span>
+<span class="sd">        Array of free energy differences in kT.</span>
+<span class="sd">    lower_well : tuple[float, float]</span>
+<span class="sd">        Tuple of (min, max) values for the lower well.</span>
+<span class="sd">    upper_well : tuple[float, float]</span>
+<span class="sd">        Tuple of (min, max) values for the upper well.</span>
+<span class="sd">    tag : str, optional</span>
+<span class="sd">        Tag to append to the figure name, by default None</span>
+<span class="sd">    ymax : float, optional</span>
+<span class="sd">        Maximum value for the y-axis, by default None</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plt.Figure</span>
+<span class="sd">        Figure of the free energy difference between two wells.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf&quot;</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+    <span class="c1"># PMF difference: curve should be converged to a constant within an error of 1 kT</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time [ns]&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta F$ [$k_\mathrm</span><span class="si">{B}</span><span class="s2"> T$]&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;$F(</span><span class="si">{</span><span class="n">lower_well</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot; \leq z \leq&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">lower_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">) - F(</span><span class="si">{</span><span class="n">upper_well</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot; \leq z \leq&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">upper_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># add horizontal lines that are delta_fes[-1] +- 0.5</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">differences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">differences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="c1"># fill in horizontal region between lines with opacity 0.2</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">],</span>
+        <span class="n">differences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">differences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># plot delta F</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="n">differences</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># set ylim top to ymax if it is greater than ymax</span>
+    <span class="k">if</span> <span class="n">ymax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">differences</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ymax</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="n">ymax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">differences</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">ymax</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=-</span><span class="n">ymax</span><span class="p">)</span>
+
+    <span class="c1"># save figure</span>
+    <span class="n">save_fig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="mov_pmf_conv">
+<a class="viewcode-back" href="../../render.thermo.html#render.thermo.mov_pmf_conv">[docs]</a>
+<span class="k">def</span> <span class="nf">mov_pmf_conv</span><span class="p">(</span>
+    <span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">cv_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pmfs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dir_fig</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;movies&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render a movie of the free energy surface. This figure should be used to</span>
+<span class="sd">    assess the convergence of the free energy surface. The figure contains 1</span>
+<span class="sd">    subplot:</span>
+<span class="sd">    - PMF: curve should be smooth and converged</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : np.ndarray</span>
+<span class="sd">        Array of times in ps.</span>
+<span class="sd">    cv_grid : np.ndarray</span>
+<span class="sd">        Array of collective variable values.</span>
+<span class="sd">    pmfs : np.ndarray</span>
+<span class="sd">        Array of free energies as a function of collective variable, assumed to be</span>
+<span class="sd">        unitless.</span>
+<span class="sd">    tag : str, optional</span>
+<span class="sd">        Tag to append to the figure name, by default None</span>
+<span class="sd">    ymax : float, optional</span>
+<span class="sd">        Maximum value for the y-axis, by default None</span>
+<span class="sd">    dir_fig : str, optional</span>
+<span class="sd">        Directory to save the figure, by default &quot;movies&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plt.Figure</span>
+<span class="sd">        Figure of the free energy surface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf_movie&quot;</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">Path</span><span class="p">(</span><span class="n">dir_fig</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+    <span class="c1"># setup figure</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$z$ [nm]&quot;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta F$ [$k_\mathrm</span><span class="si">{B}</span><span class="s2">T$]&quot;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Potential of Mean Force&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c1"># initialize plot elements</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">(</span><span class="n">curve</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="mf">0.5</span><span class="p">,</span>
+        <span class="mf">0.9</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;$t_f = $</span><span class="si">{</span><span class="n">times</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">/</span><span class="mf">1e3</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ns&quot;</span><span class="p">,</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">frame_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="n">fargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">frame_num</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">fargs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pmfs</span> <span class="o">=</span> <span class="n">fargs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="n">fargs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">curve</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">pmfs</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1e3</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$t_f = $ </span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> ns&quot;</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="c1"># animate</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">anim</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
+        <span class="n">fig</span><span class="p">,</span>
+        <span class="n">animate</span><span class="p">,</span>
+        <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">frames</span><span class="o">=</span><span class="n">n_frames</span><span class="p">,</span>
+        <span class="n">fargs</span><span class="o">=</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">pmfs</span><span class="p">,</span> <span class="n">curve</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># save animation as mp4 and output tqdm progress bar</span>
+    <span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dir_fig</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">.mp4&quot;</span><span class="p">,</span>
+        <span class="n">writer</span><span class="o">=</span><span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

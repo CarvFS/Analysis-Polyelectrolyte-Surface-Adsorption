@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>render.thermo module &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="render.util module" href="render.util.html" />
+    <link rel="prev" title="render.dynamics module" href="render.dynamics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="colvar.html">colvar package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="render.html">render package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="render.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="render.dynamics.html">render.dynamics module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">render.thermo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="render.util.html">render.util module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="render.html#module-render">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="stats.html">stats package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="colvar.base.html">colvar.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="render.html">render package</a></li>
+      <li class="breadcrumb-item active">render.thermo module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/render.thermo.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-render.thermo">
+<span id="render-thermo-module"></span><h1>render.thermo module<a class="headerlink" href="#module-render.thermo" title="Permalink to this headline"></a></h1>
+<p>This module provides functions to render figures and movies of the free energy surface
+and how it converges over time.
+| Author: Alec Glisman (GitHub: &#64;alec-glisman)
+| Date: 2023-11-24</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<p>plt_pmf(cv_grid: np.ndarray, pmf: np.ndarray, ymax: float = None,
+dir_fig: str = “figures”, tag: str = None) -&gt; plt.Figure:</p>
+<blockquote>
+<div><p>Render a figure of the free energy surface. This figure should be used to assess
+the convergence of the free energy surface. The figure contains 1 subplot:
+- PMF: curve should be smooth and converged</p>
+</div></blockquote>
+<p>plt_pmf_diff_conv(times: np.ndarray, differences: np.ndarray,
+lower_well: tuple[float, float], upper_well: tuple[float, float], tag: str = None,
+ymax: float = None) -&gt; plt.Figure:</p>
+<blockquote>
+<div><p>Render a figure of the free energy difference between two wells. This figure should
+be used to assess the convergence of the free energy surface. The figure contains
+1 subplot:
+- PMF difference: curve should be converged to a constant within an error of 1 kT</p>
+</div></blockquote>
+<p>mov_pmf_conv(times: np.ndarray, cv_grid: np.ndarray, pmfs: np.ndarray, tag: str = None,
+ymax: float = None, dir_fig: str = “movies”) -&gt; plt.Figure:</p>
+<blockquote>
+<div><p>Render a movie of the free energy surface. This figure should be used to assess the
+convergence of the free energy surface. The figure contains 1 subplot:
+- PMF: curve should be smooth and converged</p>
+</div></blockquote>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Permalink to this headline"></a></h2>
+<dl class="simple">
+<dt>AssertionError</dt><dd><p>If the PMF and CV do not have the same size.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<p>This module requires the following columns in the DataFrame:
+- time: time in picoseconds</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="render.thermo.plt_pmf">
+<span class="sig-prename descclassname"><span class="pre">render.thermo.</span></span><span class="sig-name descname"><span class="pre">plt_pmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'figures'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.pyplot.Figure</span></span></span><a class="reference internal" href="_modules/render/thermo.html#plt_pmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#render.thermo.plt_pmf" title="Permalink to this definition"></a></dt>
+<dd><p>Render a figure of the free energy surface. This figure should be used to
+assess the convergence of the free energy surface. The figure contains 1
+subplot:
+- PMF: curve should be smooth and converged</p>
+<dl class="simple">
+<dt>cv_grid<span class="classifier">np.ndarray</span></dt><dd><p>Array of collective variable values.</p>
+</dd>
+<dt>pmf<span class="classifier">np.ndarray</span></dt><dd><p>Array of free energies as a function of collective variable, assumed to be
+unitless.</p>
+</dd>
+<dt>ymax<span class="classifier">float, optional</span></dt><dd><p>Maximum value for the y-axis, by default None</p>
+</dd>
+<dt>dir_fig<span class="classifier">str, optional</span></dt><dd><p>Directory to save the figure, by default “figures”</p>
+</dd>
+<dt>tag<span class="classifier">str, optional</span></dt><dd><p>Tag to append to the figure name, by default None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>plt.Figure</dt><dd><p>Figure of the free energy surface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="render.thermo.plt_pmf_diff_conv">
+<span class="sig-prename descclassname"><span class="pre">render.thermo.</span></span><span class="sig-name descname"><span class="pre">plt_pmf_diff_conv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">differences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.pyplot.Figure</span></span></span><a class="reference internal" href="_modules/render/thermo.html#plt_pmf_diff_conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#render.thermo.plt_pmf_diff_conv" title="Permalink to this definition"></a></dt>
+<dd><p>Render a figure of the free energy difference between two wells. This figure
+should be used to assess the convergence of the free energy surface. The
+figure contains 1 subplot:
+- PMF difference: curve should be converged to a constant within an error of</p>
+<blockquote>
+<div><p>1 kT</p>
+</div></blockquote>
+<dl class="simple">
+<dt>times<span class="classifier">np.ndarray</span></dt><dd><p>Array of times in ns.</p>
+</dd>
+<dt>differences<span class="classifier">np.ndarray</span></dt><dd><p>Array of free energy differences in kT.</p>
+</dd>
+<dt>lower_well<span class="classifier">tuple[float, float]</span></dt><dd><p>Tuple of (min, max) values for the lower well.</p>
+</dd>
+<dt>upper_well<span class="classifier">tuple[float, float]</span></dt><dd><p>Tuple of (min, max) values for the upper well.</p>
+</dd>
+<dt>tag<span class="classifier">str, optional</span></dt><dd><p>Tag to append to the figure name, by default None</p>
+</dd>
+<dt>ymax<span class="classifier">float, optional</span></dt><dd><p>Maximum value for the y-axis, by default None</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>plt.Figure</dt><dd><p>Figure of the free energy difference between two wells.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="render.thermo.mov_pmf_conv">
+<span class="sig-prename descclassname"><span class="pre">render.thermo.</span></span><span class="sig-name descname"><span class="pre">mov_pmf_conv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmfs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'movies'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.pyplot.Figure</span></span></span><a class="reference internal" href="_modules/render/thermo.html#mov_pmf_conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#render.thermo.mov_pmf_conv" title="Permalink to this definition"></a></dt>
+<dd><p>Render a movie of the free energy surface. This figure should be used to
+assess the convergence of the free energy surface. The figure contains 1
+subplot:
+- PMF: curve should be smooth and converged</p>
+<dl class="simple">
+<dt>times<span class="classifier">np.ndarray</span></dt><dd><p>Array of times in ps.</p>
+</dd>
+<dt>cv_grid<span class="classifier">np.ndarray</span></dt><dd><p>Array of collective variable values.</p>
+</dd>
+<dt>pmfs<span class="classifier">np.ndarray</span></dt><dd><p>Array of free energies as a function of collective variable, assumed to be
+unitless.</p>
+</dd>
+<dt>tag<span class="classifier">str, optional</span></dt><dd><p>Tag to append to the figure name, by default None</p>
+</dd>
+<dt>ymax<span class="classifier">float, optional</span></dt><dd><p>Maximum value for the y-axis, by default None</p>
+</dd>
+<dt>dir_fig<span class="classifier">str, optional</span></dt><dd><p>Directory to save the figure, by default “movies”</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>plt.Figure</dt><dd><p>Figure of the free energy surface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="render.dynamics.html" class="btn btn-neutral float-left" title="render.dynamics module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="render.util.html" class="btn btn-neutral float-right" title="render.util module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

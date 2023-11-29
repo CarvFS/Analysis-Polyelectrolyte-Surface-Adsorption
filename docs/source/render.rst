@@ -7,8 +7,9 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   render.figure_dynamics
-   render.figure_style
+   render.dynamics
+   render.thermo
+   render.util
 
 Module contents
 ---------------

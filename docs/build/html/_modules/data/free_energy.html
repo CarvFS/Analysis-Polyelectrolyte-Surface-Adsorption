@@ -10,6 +10,8 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="../../_static/documentation_options.js?v=2fea6348"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -23,11 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> Polyelectrolyte Interfacial Analysis Toolkit
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -39,7 +45,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.base.html">colvar_parallel.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">External links:</span></p>
@@ -66,7 +72,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">data.free_energy</li>
       <li class="wy-breadcrumbs-aside">
@@ -88,7 +94,7 @@
 <span class="sd">Functions</span>
 <span class="sd">---------</span>
 <span class="sd">fes_1d(x: np.ndarray, weights: np.ndarray = None, bandwidth: float = None,</span>
-<span class="sd">d3_coord: bool = False, x_grid: np.ndarray = None, domain: tuple[float, float] = None,</span>
+<span class="sd">d3_coord: bool = False, cv_grid: np.ndarray = None, domain: tuple[float, float] = None,</span>
 <span class="sd">n_grid: int = 300) -&gt; tuple[np.ndarray, np.ndarray]:</span>
 <span class="sd">    Calculate the free energy surface for a given distance collective variable.</span>
 
@@ -116,9 +122,11 @@
 <span class="k">def</span> <span class="nf">fes_1d</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">eqbm_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">final_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">bandwidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">d3_coord</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">x_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cv_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">domain</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="n">n_grid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
@@ -130,12 +138,17 @@
 <span class="sd">        Array of collective variable values.</span>
 <span class="sd">    weights : np.ndarray, optional</span>
 <span class="sd">        Array of weights for each collective variable value, by default None</span>
+<span class="sd">    eqbm_percent : float, optional</span>
+<span class="sd">        Percent of the simulation to use for equilibration, by default 0.1</span>
+<span class="sd">    final_percent : float, optional</span>
+<span class="sd">        Percent of the simulation to use for the final free energy surface, by default</span>
+<span class="sd">        1.0</span>
 <span class="sd">    bandwidth : float, optional</span>
 <span class="sd">        Bandwidth for kernel density estimation, by default None</span>
 <span class="sd">    d3_coord : bool, optional</span>
 <span class="sd">        Whether the distance is a 3D coordinate so that the 2 log(r) term is added, by</span>
 <span class="sd">        default False</span>
-<span class="sd">    x_grid : np.ndarray, optional</span>
+<span class="sd">    cv_grid : np.ndarray, optional</span>
 <span class="sd">        Array of grid points to use for KDE, by default None</span>
 <span class="sd">    domain : tuple[float, float], optional</span>
 <span class="sd">        Tuple of (min, max) values for the domain of the free energy surface, by</span>
@@ -161,9 +174,15 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
 
+    <span class="c1"># drop equilibration data</span>
+    <span class="n">idx_eqbm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">eqbm_percent</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">idx_final</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">final_percent</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()[</span><span class="n">idx_eqbm</span><span class="p">:</span><span class="n">idx_final</span><span class="p">]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">copy</span><span class="p">()[</span><span class="n">idx_eqbm</span><span class="p">:</span><span class="n">idx_final</span><span class="p">]</span>
+
     <span class="c1"># set kde domain</span>
     <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">=</span> <span class="n">domain</span>
-    <span class="k">if</span> <span class="n">x_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cv_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">min_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">min_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">max_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -172,27 +191,27 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;min_val (</span><span class="si">{</span><span class="n">min_val</span><span class="si">}</span><span class="s2">) must be less than max_val (</span><span class="si">{</span><span class="n">max_val</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="p">)</span>
-        <span class="n">x_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">)</span>
+        <span class="n">cv_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">)</span>
 
     <span class="c1"># calculate KDE of x weighted by weights</span>
     <span class="n">kde</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gaussian_kde</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">bw_method</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">)</span>
-    <span class="n">fes</span> <span class="o">=</span> <span class="o">-</span><span class="n">kde</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x_grid</span><span class="p">)</span>
+    <span class="n">fes</span> <span class="o">=</span> <span class="o">-</span><span class="n">kde</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">)</span>
 
     <span class="c1"># apply distance correction</span>
     <span class="k">if</span> <span class="n">d3_coord</span><span class="p">:</span>
-        <span class="n">fes</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x_grid</span><span class="p">)</span>
+        <span class="n">fes</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">)</span>
 
     <span class="c1"># set minimum to zero</span>
     <span class="n">fes</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">fes</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">x_grid</span><span class="p">,</span> <span class="n">fes</span></div>
+    <span class="k">return</span> <span class="n">cv_grid</span><span class="p">,</span> <span class="n">fes</span></div>
 
 
 
 <div class="viewcode-block" id="diff_fes_1d">
 <a class="viewcode-back" href="../../data.free_energy.html#data.free_energy.diff_fes_1d">[docs]</a>
 <span class="k">def</span> <span class="nf">diff_fes_1d</span><span class="p">(</span>
-    <span class="n">cv</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">cv_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">pmf</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">lower_well</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">upper_well</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -227,16 +246,16 @@
 
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower_well</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Lower well domain must have upper and lower bounds&quot;</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">upper_well</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Upper well domain must have upper and lower bounds&quot;</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pmf</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">cv</span><span class="p">),</span> <span class="s2">&quot;PMF and CV must have the same size&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pmf</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">cv_grid</span><span class="p">),</span> <span class="s2">&quot;PMF and CV must have the same size&quot;</span>
 
     <span class="c1"># get indices of lower and upper wells</span>
-    <span class="n">lower_well_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cv</span> <span class="o">&gt;</span> <span class="n">lower_well</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cv</span> <span class="o">&lt;</span> <span class="n">lower_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="n">upper_well_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cv</span> <span class="o">&gt;</span> <span class="n">upper_well</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cv</span> <span class="o">&lt;</span> <span class="n">upper_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">lower_well_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cv_grid</span> <span class="o">&gt;</span> <span class="n">lower_well</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cv_grid</span> <span class="o">&lt;</span> <span class="n">lower_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">upper_well_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">cv_grid</span> <span class="o">&gt;</span> <span class="n">upper_well</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cv_grid</span> <span class="o">&lt;</span> <span class="n">upper_well</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="c1"># integrate boltzmann factors of wells to get probabilities</span>
     <span class="n">boltzmann</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">pmf</span><span class="p">)</span>
-    <span class="n">prob_upper</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">boltzmann</span><span class="p">[</span><span class="n">upper_well_idx</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="n">cv</span><span class="p">[</span><span class="n">upper_well_idx</span><span class="p">])</span>
-    <span class="n">prob_lower</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">boltzmann</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="n">cv</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">])</span>
+    <span class="n">prob_upper</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">boltzmann</span><span class="p">[</span><span class="n">upper_well_idx</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="n">cv_grid</span><span class="p">[</span><span class="n">upper_well_idx</span><span class="p">])</span>
+    <span class="n">prob_lower</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">boltzmann</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="n">cv_grid</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">])</span>
 
     <span class="c1"># calculate free energy difference as log of ratio of probabilities</span>
     <span class="n">delta_fe</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prob_lower</span> <span class="o">/</span> <span class="n">prob_upper</span><span class="p">)</span>

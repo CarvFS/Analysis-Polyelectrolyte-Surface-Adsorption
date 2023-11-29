@@ -1,8 +1,23 @@
 """
+Dask utilities for parallel processing.
 | Author: Alec Glisman (GitHub: @alec-glisman)
 | Date: 2021-08-31
-| Description: This script generates data for the 2-chain system using MDAnalysis
-and Plumed.
+
+Functions
+---------
+get_client(n_workers: int, memory_limit: str = "60GB") -> Client:
+    Get a Dask client for parallel processing. If a client is already running,
+    return that client. Otherwise, start a new client.
+
+Raises
+------
+OSError
+    If a client is already running on port 8785.
+
+Notes
+-----
+This module requires the following packages:
+- dask
 """
 
 import dask

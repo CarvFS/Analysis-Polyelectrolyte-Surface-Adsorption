@@ -10,9 +10,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -23,11 +24,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> Polyelectrolyte Interfacial Analysis Toolkit
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -39,7 +44,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../colvar_parallel.base.html">colvar_parallel.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">External links:</span></p>
@@ -66,7 +71,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">data.pipeline</li>
       <li class="wy-breadcrumbs-aside">
@@ -79,10 +84,10 @@
              
   <h1>Source code for data.pipeline</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module for a pipeline to load, clean, and analyze data from the molecular</span>
+<span class="sd">dynamics simulation.</span>
 <span class="sd">| Author: Alec Glisman (GitHub: @alec-glisman)</span>
 <span class="sd">| Date: 2023-11-08</span>
-<span class="sd">| Description: Module for a pipeline to load, clean, and analyze data from the</span>
-<span class="sd">| molecular dynamics simulation.</span>
 
 <span class="sd">This module defines a class `DataPipeline` that provides methods to load and</span>
 <span class="sd">process data from molecular dynamics simulations. The class takes a base</span>
@@ -90,50 +95,12 @@
 <span class="sd">temperature, file extensions, and verbosity. The class provides methods to</span>
 <span class="sd">load plumed collective variables, molecular dynamics universe, and</span>
 <span class="sd">statistical weights.</span>
-
-<span class="sd">Attributes:</span>
-<span class="sd">    tag (str): The name of the simulation data directory.</span>
-<span class="sd">    data_path_base (Path): The base directory containing the simulation data.</span>
-<span class="sd">    temperature (float): The temperature of the simulation in Kelvin.</span>
-<span class="sd">    sampling_methods (list of str): The names of the sampling methods.</span>
-<span class="sd">    sampling_paths (list of Path): The paths to the sampling method directories.</span>
-<span class="sd">    top_files (list of Path): The paths to the topology files.</span>
-<span class="sd">    traj_files (list of Path): The paths to the trajectory files.</span>
-<span class="sd">    energy_files (list of Path): The paths to the energy files.</span>
-<span class="sd">    plumed_files (list of Path): The paths to the plumed files.</span>
-<span class="sd">    data_files (dict of dict):</span>
-<span class="sd">        A dictionary containing the paths to the simulation data files.</span>
-<span class="sd">        The keys are the names of the sampling methods and the values are</span>
-<span class="sd">        dictionaries containing the paths to the topology, trajectory, energy,</span>
-<span class="sd">        and plumed files.</span>
-<span class="sd">    _kb (float):</span>
-<span class="sd">        The Boltzmann constant in kJ/mol/K.</span>
-<span class="sd">    _kb (float): The Boltzmann constant in kJ/mol/K.</span>
-<span class="sd">    _beta (float): The inverse temperature in 1/kJ/mol.</span>
-<span class="sd">    _verbose (bool): Whether to print verbose logging messages.</span>
-<span class="sd">    _ext_top (str): The file extension for topology files.</span>
-<span class="sd">    _ext_traj (str): The file extension for trajectory files.</span>
-<span class="sd">    _ext_energy (str): The file extension for energy files.</span>
-<span class="sd">    _ext_plumed (str): The file extension for plumed files.</span>
-<span class="sd">    _sampling_prefix (str): The prefix for sampling method directories.</span>
-<span class="sd">    _repl_prefix (str): The prefix for replica directories.</span>
-
-<span class="sd">Methods:</span>
-<span class="sd">    load_plumed_colvar(method: str) -&gt; pd.DataFrame:</span>
-<span class="sd">        Load the plumed collective variables for a given sampling method.</span>
-<span class="sd">    save_plumed_colvar(</span>
-<span class="sd">    method: str = None, file: Path = None, directory: Path = None) -&gt; Path:</span>
-<span class="sd">        Save the plumed collective variables for all or a specific sampling</span>
-<span class="sd">        method.</span>
-<span class="sd">    load_universe(method: str, **kwargs) -&gt; mda.Universe:</span>
-<span class="sd">        Load the molecular dynamics universe for a given sampling method.</span>
-<span class="sd">    _statistical_weight(df: pd.DataFrame) -&gt; pd.DataFrame:</span>
-<span class="sd">        Calculate the statistical weight of each frame in the trajectory.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># standard library</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># third party</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -142,9 +109,16 @@
 <span class="kn">import</span> <span class="nn">panedr</span> <span class="k">as</span> <span class="nn">edr</span>
 
 
-<div class="viewcode-block" id="DataPipeline">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline">[docs]</a>
-<span class="k">class</span> <span class="nc">DataPipeline</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline">[docs]</a><span class="k">class</span> <span class="nc">DataPipeline</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to load, clean, and analyze data from molecular dynamics simulations.</span>
+
+<span class="sd">    The class takes a base directory containing the simulation data and optional</span>
+<span class="sd">    parameters such as temperature, file extensions, and verbosity. The class</span>
+<span class="sd">    provides methods to load plumed collective variables, molecular dynamics</span>
+<span class="sd">    universe, and statistical weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data_path_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -187,14 +161,6 @@
 <span class="sd">            The names of the sampling methods used in the simulation.</span>
 <span class="sd">        sampling_paths : list of Path</span>
 <span class="sd">            The paths to the directories containing the sampling data.</span>
-<span class="sd">        top_files : list of Path</span>
-<span class="sd">            The paths to the topology files.</span>
-<span class="sd">        traj_files : list of Path</span>
-<span class="sd">            The paths to the trajectory files.</span>
-<span class="sd">        energy_files : list of Path</span>
-<span class="sd">            The paths to the energy files.</span>
-<span class="sd">        plumed_files : list of Path</span>
-<span class="sd">            The paths to the plumed files.</span>
 <span class="sd">        data_files : dict</span>
 <span class="sd">            A dictionary containing the data files for each sampling method.</span>
 <span class="sd">        _kb : float</span>
@@ -235,8 +201,8 @@
 
         <span class="c1"># loaded data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">universe</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># setup class object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_log</span><span class="p">()</span>
@@ -245,9 +211,94 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_find_data_files</span><span class="p">()</span>
 
-<div class="viewcode-block" id="DataPipeline._init_log">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._init_log">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataPipeline&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an iterator over the sampling methods and data files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataPipeline</span>
+<span class="sd">            An iterator over the sampling methods and data files.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If sampling methods or data files are not initialized.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If sampling methods and data files do not have the same length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sampling methods or data files not initialized&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Sampling methods and data files must have the same length&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the next sampling method and data files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of str and dict</span>
+<span class="sd">            The next sampling method and data files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">):</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span><span class="p">]</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">files</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of the Pipeline object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representation of the Pipeline object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DataPipeline(data_path_base=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;temperature=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="si">}</span><span class="s2">, verbose=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;ext_top=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_top</span><span class="si">}</span><span class="s2">, ext_traj=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_traj</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;ext_energy=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_energy</span><span class="si">}</span><span class="s2">, ext_plumed=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_plumed</span><span class="si">}</span><span class="s2">), &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;sampling_methods=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of sampling methods.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of sampling methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataPipeline._init_log"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._init_log">[docs]</a>    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the logger for the pipeline.</span>
 
@@ -288,10 +339,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to set logging level: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline._find_data_files">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._find_data_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">_find_data_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline._find_data_files"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._find_data_files">[docs]</a>    <span class="k">def</span> <span class="nf">_find_data_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find all data files for each sampling method and create a dictionary of</span>
 <span class="sd">        data files where the key is the sampling method. Check that there are</span>
@@ -340,6 +388,7 @@
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_paths</span>
             <span class="k">if</span> <span class="s2">&quot;eqbm&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span>
         <span class="p">]</span>
+
         <span class="c1"># if sampling method has multiple replicas (subdirectories of the sampling</span>
         <span class="c1"># method directory of the form &quot;replica-#&quot;) then append the replica number</span>
         <span class="c1"># to the sampling method name (e.g. &quot;hremd&quot; -&gt; &quot;hremd-1&quot;) for each replica</span>
@@ -425,7 +474,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plumed_files</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">path</span>
             <span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;universe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="c1"># log the number of files found for this sampling method</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -483,10 +534,7 @@
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Found files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline._statistical_weight">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._statistical_weight">[docs]</a>
-    <span class="k">def</span> <span class="nf">_statistical_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline._statistical_weight"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._statistical_weight">[docs]</a>    <span class="k">def</span> <span class="nf">_statistical_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the statistical weight of each sample in the input DataFrame based</span>
 <span class="sd">        on the bias values.</span>
@@ -531,10 +579,7 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All weights are zero&quot;</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline.load_plumed_colvar">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_plumed_colvar">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_plumed_colvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline.load_plumed_colvar"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">load_plumed_colvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the collective variables (colvar) data from the plumed file associated</span>
 <span class="sd">        with the given method.</span>
@@ -565,6 +610,11 @@
         <span class="n">file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;plumed&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading plumed file for method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="c1"># check if file already loaded</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Plumed file already loaded&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
         <span class="c1"># first line of file contains column names</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -583,17 +633,17 @@
             <span class="n">usecols</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_cols</span><span class="p">)),</span>
         <span class="p">)</span>
 
+        <span class="c1"># sort by time</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+
         <span class="c1"># if duplicate &quot;time&quot; rows, keep only the last one</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_statistical_weight</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of rows in plumed file: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline.save_plumed_colvar">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.save_plumed_colvar">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_plumed_colvar</span><span class="p">(</span>
+<div class="viewcode-block" id="DataPipeline.save_plumed_colvar"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.save_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">save_plumed_colvar</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -603,7 +653,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        method : str, optional</span>
-<span class="sd">            The name of the sampling method, by default None</span>
+<span class="sd">            The name of the sampling method, by default None. If None, save the</span>
+<span class="sd">            collective variables for all sampling methods.</span>
 <span class="sd">        file : Path, optional</span>
 <span class="sd">            The name of the output file, by default None</span>
 <span class="sd">        directory : Path, optional</span>
@@ -614,21 +665,29 @@
 <span class="sd">        Path</span>
 <span class="sd">            The path to the output file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path_base</span> <span class="o">/</span> <span class="s2">&quot;analysis&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+        <span class="c1"># return colvar path of a single method</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;colvar_</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
             <span class="n">file</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">file</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving plumed colvar file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">load_plumed_colvar</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+            <span class="c1"># ignore FutureWarning about is_sparse</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
             <span class="k">return</span> <span class="n">file</span>
 
+        <span class="c1"># return colvar paths of all methods</span>
         <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -636,17 +695,19 @@
             <span class="n">file</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">file</span>
             <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving plumed colvar file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">load_plumed_colvar</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+                <span class="c1"># ignore FutureWarning about is_sparse</span>
+                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_colvar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
             <span class="n">file</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">return</span> <span class="n">files</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline.load_universe">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_universe">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline.load_universe"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_universe">[docs]</a>    <span class="k">def</span> <span class="nf">load_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the MDAnalysis universe for a given sampling method.</span>
 
@@ -680,18 +741,16 @@
                 <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">num_top_files</span><span class="si">}</span><span class="s2"> topology files.&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">universe</span> <span class="o">=</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span>
+        <span class="n">universe</span> <span class="o">=</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;traj&quot;</span><span class="p">],</span>
             <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">universe</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;universe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">universe</span>
+        <span class="k">return</span> <span class="n">universe</span></div>
 
-
-<div class="viewcode-block" id="DataPipeline.load_energy">
-<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_energy">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline.load_energy"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_energy">[docs]</a>    <span class="k">def</span> <span class="nf">load_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the energy data for a given sampling method.</span>
 
@@ -717,16 +776,18 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No energy files found for sampling method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="c1"># iterate over all energy files</span>
+        <span class="c1"># read in all energy files</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">]:</span>
             <span class="n">energy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edr</span><span class="o">.</span><span class="n">edr_to_df</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
 
         <span class="c1"># concatenate all energy files</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span></div>
-</div>
+        <span class="n">df_energy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
 
+        <span class="c1"># save energy data to internal dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_energy</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">df_energy</span></div></div>
 </pre></div>
 
            </div>
