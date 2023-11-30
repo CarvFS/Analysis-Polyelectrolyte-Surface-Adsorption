@@ -1,35 +1,32 @@
-Name                                             Stmts   Miss  Cover   Missing
-------------------------------------------------------------------------------
-analysis/2-sampling-testing/colvar_analysis.py      94     59    37%   94-104, 125-134, 165-186, 230-291, 305-328, 350-370
-analysis/2-sampling-testing/mda_data_gen.py         78     50    36%   95-150, 159-210
-src/colvar/__init__.py                               0      0   100%
-src/colvar/base.py                                 179     78    56%   36-37, 44-45, 161, 249-311, 317-318, 323-324, 344-363, 379-380, 383, 428-443, 522-549
-src/colvar/contacts.py                              87     16    82%   80-82, 167, 169, 171, 173, 207, 210, 214, 300-310
-src/colvar/dihedrals.py                            107     31    71%   124-129, 171, 199-240
-src/colvar/hbonds.py                               212     56    74%   240-254, 369-388, 496-514, 587-591, 656-689, 710-711, 744-745, 752-753, 789-790, 797-798, 818-825
-src/colvar/polymerlengths.py                       158    104    34%   146-149, 182-184, 220-242, 245-262, 265-303, 306-337, 340-369
-src/colvar/rdf.py                                  157     60    62%   119-120, 140, 228-233, 268-269, 334-348, 370-390, 412-440
-src/colvar/test/test_base.py                        70      0   100%
-src/colvar/test/test_contacts.py                    64     12    81%   46-67, 109
-src/colvar/test/test_dihedrals.py                   29      0   100%
-src/colvar/test/test_hbonds.py                     121      3    98%   146, 159-160
-src/colvar/test/test_polymerlengths.py              75      0   100%
-src/colvar/test/test_rdf.py                         84      0   100%
-src/data/__init__.py                                 0      0   100%
-src/data/free_energy.py                             41      4    90%   83, 87, 114, 171
-src/data/pipeline.py                               209    109    48%   153-161, 176-182, 197, 218, 241-248, 349, 351, 356, 433, 440, 446, 450, 481-499, 523-563, 587-627, 649-670, 691-709
-src/data/test/test_free_energy.py                   30      0   100%
-src/data/test/test_pipeline.py                      96      0   100%
-src/render/__init__.py                               0      0   100%
-src/render/dynamics.py                              99     93     6%   76-142, 177-225, 256-271
-src/render/thermo.py                                67     59    12%   82-99, 137-179, 217-274
-src/render/util.py                                  24     17    29%   36-40, 105-113, 127-133
-src/stats/__init__.py                                0      0   100%
-src/stats/block_error.py                           191    174     9%   85-116, 154-166, 236-259, 275-318, 358-428, 471-494, 525-591, 624-650
-src/utils/__init__.py                                0      0   100%
-src/utils/dask.py                                   10      0   100%
-src/utils/logs.py                                   25      0   100%
-src/utils/test/test_dask.py                         11      0   100%
-src/utils/test/test_logs.py                         29      0   100%
-------------------------------------------------------------------------------
-TOTAL                                             2347    925    61%
+Name                                              Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------------
+analysis/3-monomer-binding/combined_analysis.py      89     71    20%   60-71, 97-149, 153-175, 183-204
+src/colvar/__init__.py                                0      0   100%
+src/colvar/base.py                                  179     78    56%   36-37, 44-45, 161, 249-311, 317-318, 323-324, 344-363, 379-380, 383, 428-443, 522-549
+src/colvar/contacts.py                               87     16    82%   80-82, 167, 169, 171, 173, 207, 210, 214, 300-310
+src/colvar/dihedrals.py                             107     31    71%   124-129, 171, 199-240
+src/colvar/hbonds.py                                212     56    74%   240-254, 369-388, 496-514, 587-591, 656-689, 710-711, 744-745, 752-753, 789-790, 797-798, 818-825
+src/colvar/polymerlengths.py                        158    104    34%   146-149, 182-184, 220-242, 245-262, 265-303, 306-337, 340-369
+src/colvar/rdf.py                                   157     60    62%   119-120, 140, 228-233, 268-269, 334-348, 370-390, 412-440
+src/colvar/test/test_base.py                         70      0   100%
+src/colvar/test/test_contacts.py                     64     12    81%   46-67, 109
+src/colvar/test/test_dihedrals.py                    29      0   100%
+src/colvar/test/test_hbonds.py                      121      3    98%   146, 159-160
+src/colvar/test/test_polymerlengths.py               75      0   100%
+src/colvar/test/test_rdf.py                          84      0   100%
+src/data/__init__.py                                  0      0   100%
+src/data/free_energy.py                              41      4    90%   83, 87, 114, 171
+src/data/pipeline.py                                209    109    48%   153-161, 176-182, 197, 218, 241-248, 349, 351, 356, 433, 440, 446, 450, 481-499, 523-563, 587-627, 649-670, 691-709
+src/data/test/test_free_energy.py                    30      0   100%
+src/data/test/test_pipeline.py                       96      0   100%
+src/render/__init__.py                                0      0   100%
+src/render/util.py                                   24     17    29%   36-40, 105-113, 127-133
+src/stats/__init__.py                                 0      0   100%
+src/stats/block_error.py                            191    174     9%   85-116, 154-166, 236-259, 275-318, 358-428, 471-494, 525-591, 624-650
+src/utils/__init__.py                                 0      0   100%
+src/utils/dask.py                                    10      0   100%
+src/utils/logs.py                                    25      0   100%
+src/utils/test/test_dask.py                          11      0   100%
+src/utils/test/test_logs.py                          29      0   100%
+-------------------------------------------------------------------------------
+TOTAL                                              2098    735    65%

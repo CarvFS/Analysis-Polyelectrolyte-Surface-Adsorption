@@ -40,7 +40,7 @@ repos:
 
       - id: coverage-report
         name: coverage report
-        entry: bash -c -o pipefail 'coverage report --show-missing --fail-under=0 | tee coverage.log'
+        entry: bash -c -o pipefail 'coverage report --show-missing --fail-under=0 | tee coverage.log && git add coverage.log'
         language: system
         types: [python]
 
