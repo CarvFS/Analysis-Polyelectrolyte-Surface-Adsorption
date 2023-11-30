@@ -1,6 +1,5 @@
 # MacOSX
-.DS_Store
-*.DS_Store
+**/*.DS_Store
 
 # virtual environments
 env/**
@@ -83,6 +82,12 @@ analysis/**/data-clean/*
 
 # Keep all sample images
 !**/images/*
+
+# Keep coverage report
+!coverage.log
+
+# Keep all docs
+!docs/**
 
 # Keep all exported notebooks
 **/completed/*

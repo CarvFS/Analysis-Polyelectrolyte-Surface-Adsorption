@@ -53,7 +53,7 @@ repos:
 
       - id: remove-test-files
         name: remove test files
-        entry: rm
+        entry: bash -c -o pipefail 'rm .coverage test*.log || true'
         language: system
-        types: [shell]
-        args: ['test.log', 'test3.log', 'test4.log', '.coverage', '||', 'true']
+        types: [python]
+        always_run: true
