@@ -10,10 +10,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -104,12 +105,18 @@
 
 <span class="c1"># third party</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">mda</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">panedr</span> <span class="k">as</span> <span class="nn">edr</span>
 
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">mda</span>
 
-<div class="viewcode-block" id="DataPipeline"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline">[docs]</a><span class="k">class</span> <span class="nc">DataPipeline</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline">[docs]</a>
+<span class="k">class</span> <span class="nc">DataPipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to load, clean, and analyze data from molecular dynamics simulations.</span>
 
@@ -298,7 +305,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_methods</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DataPipeline._init_log"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._init_log">[docs]</a>    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DataPipeline._init_log">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._init_log">[docs]</a>
+    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the logger for the pipeline.</span>
 
@@ -339,7 +348,10 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to set logging level: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataPipeline._find_data_files"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._find_data_files">[docs]</a>    <span class="k">def</span> <span class="nf">_find_data_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline._find_data_files">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._find_data_files">[docs]</a>
+    <span class="k">def</span> <span class="nf">_find_data_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find all data files for each sampling method and create a dictionary of</span>
 <span class="sd">        data files where the key is the sampling method. Check that there are</span>
@@ -534,7 +546,10 @@
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Found files: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s1">&#39;plumed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataPipeline._statistical_weight"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._statistical_weight">[docs]</a>    <span class="k">def</span> <span class="nf">_statistical_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline._statistical_weight">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline._statistical_weight">[docs]</a>
+    <span class="k">def</span> <span class="nf">_statistical_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the statistical weight of each sample in the input DataFrame based</span>
 <span class="sd">        on the bias values.</span>
@@ -579,7 +594,10 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All weights are zero&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataPipeline.load_plumed_colvar"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">load_plumed_colvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline.load_plumed_colvar">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_plumed_colvar">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_plumed_colvar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the collective variables (colvar) data from the plumed file associated</span>
 <span class="sd">        with the given method.</span>
@@ -643,7 +661,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of rows in plumed file: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="DataPipeline.save_plumed_colvar"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.save_plumed_colvar">[docs]</a>    <span class="k">def</span> <span class="nf">save_plumed_colvar</span><span class="p">(</span>
+
+<div class="viewcode-block" id="DataPipeline.save_plumed_colvar">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.save_plumed_colvar">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_plumed_colvar</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -707,7 +728,10 @@
 
         <span class="k">return</span> <span class="n">files</span></div>
 
-<div class="viewcode-block" id="DataPipeline.load_universe"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_universe">[docs]</a>    <span class="k">def</span> <span class="nf">load_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline.load_universe">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_universe">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the MDAnalysis universe for a given sampling method.</span>
 
@@ -750,7 +774,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;universe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">universe</span>
         <span class="k">return</span> <span class="n">universe</span></div>
 
-<div class="viewcode-block" id="DataPipeline.load_energy"><a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_energy">[docs]</a>    <span class="k">def</span> <span class="nf">load_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+<div class="viewcode-block" id="DataPipeline.load_energy">
+<a class="viewcode-back" href="../../data.pipeline.html#data.pipeline.DataPipeline.load_energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the energy data for a given sampling method.</span>
 
@@ -787,7 +814,9 @@
         <span class="c1"># save energy data to internal dictionary</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">method</span><span class="p">][</span><span class="s2">&quot;df_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_energy</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">df_energy</span></div></div>
+        <span class="k">return</span> <span class="n">df_energy</span></div>
+</div>
+
 </pre></div>
 
            </div>

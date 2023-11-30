@@ -18,7 +18,6 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="utils.system module" href="utils.system.html" />
     <link rel="prev" title="utils.dask module" href="utils.dask.html" /> 
 </head>
 
@@ -52,7 +51,6 @@
 <li class="toctree-l3 current"><a class="reference internal" href="utils.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="utils.dask.html">utils.dask module</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">utils.logs module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="utils.system.html">utils.system module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>
@@ -110,7 +108,7 @@ Date: 2023-03-09
 Description: Utility functions to use in analysis scripts.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.logs.setup_logging">
-<span class="sig-prename descclassname"><span class="pre">utils.logs.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default.log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.12)"><span class="pre">logging.Logger</span></a></span></span><a class="reference internal" href="_modules/utils/logs.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.logs.setup_logging" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.logs.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default.log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.12)"><span class="pre">logging.Logger</span></a></span></span><a class="reference internal" href="_modules/utils/logs.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.logs.setup_logging" title="Permalink to this definition"></a></dt>
 <dd><p>Setup logging for the script.</p>
 <dl class="simple">
 <dt>log_file<span class="classifier">str, optional</span></dt><dd><p>Name of the log file, by default “default.log”</p>
@@ -118,6 +116,8 @@ Description: Utility functions to use in analysis scripts.</p>
 <dt>stream<span class="classifier">bool, optional</span></dt><dd><p>If True, log to the console, by default False</p>
 </dd>
 <dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>If True, the logging level is set to DEBUG, by default False</p>
+</dd>
+<dt>overwrite<span class="classifier">bool, optional</span></dt><dd><p>If True, overwrite the log file, by default False</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -133,7 +133,6 @@ Description: Utility functions to use in analysis scripts.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="utils.dask.html" class="btn btn-neutral float-left" title="utils.dask module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="utils.system.html" class="btn btn-neutral float-right" title="utils.system module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

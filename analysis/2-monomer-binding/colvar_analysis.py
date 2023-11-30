@@ -1,7 +1,6 @@
 # ########################################################################### #
 # Imports                                                                     #
 # ########################################################################### #
-
 # standard library
 from pathlib import Path
 import os
@@ -14,7 +13,6 @@ import pandas as pd
 
 # get absolute path to file's parent directory
 dir_proj_base = Path.cwd().resolve().parents[1]
-print(f"Project base directory: {dir_proj_base}")
 sys.path.insert(0, f"{dir_proj_base}/src")
 
 # Internal dependencies
@@ -35,7 +33,7 @@ from render.thermo import plt_pmf, plt_pmf_diff_conv, mov_pmf_conv  # noqa: E402
 
 # general
 VERBOSE: bool = False
-N_JOBS: int = -1
+N_JOBS: int = 4
 
 # data I/O
 CWDIR: Path = Path.cwd()
@@ -51,16 +49,16 @@ TEMPERATURE_K: float = 300  #: simulation temperature in Kelvin
 # calculate free energy surface at the end of the simulation
 CV: str = "dist_chain.z"
 EQBM_PERCENT: float = 0.10
-BANDWIDTH: float = 0.075
+BANDWIDTH: float = 0.08
 
 # calculate free energy difference between the two states
 CV_GRID: float = np.linspace(0.2, 2.25, 250)
-CV_LOWER_WELL: tuple[float, float] = (0.5, 0.9)
-CV_UPPER_WELL: tuple[float, float] = (1.6, 2.0)
+CV_LOWER_WELL: tuple[float, float] = (0.8, 1.0)
+CV_UPPER_WELL: tuple[float, float] = (1.9, 2.1)
 
 # plotting parameters
-N_TIMESTEP_RENDER: int = 100
-PMF_YMAX: float = 15
+N_TIMESTEP_RENDER: int = 200
+PMF_YMAX: float = 12
 
 
 # ########################################################################### #

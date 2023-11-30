@@ -19,9 +19,13 @@ import warnings
 
 # third party
 import numpy as np
-import MDAnalysis as mda
 import pandas as pd
 import panedr as edr
+
+with warnings.catch_warnings():
+    warnings.simplefilter(action="ignore", category=FutureWarning)
+    warnings.simplefilter(action="ignore", category=DeprecationWarning)
+    import MDAnalysis as mda
 
 
 class DataPipeline:

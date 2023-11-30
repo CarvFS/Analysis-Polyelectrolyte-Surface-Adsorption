@@ -258,7 +258,10 @@
     <span class="n">prob_lower</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">boltzmann</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="n">cv_grid</span><span class="p">[</span><span class="n">lower_well_idx</span><span class="p">])</span>
 
     <span class="c1"># calculate free energy difference as log of ratio of probabilities</span>
-    <span class="n">delta_fe</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prob_lower</span> <span class="o">/</span> <span class="n">prob_upper</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prob_upper</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">delta_fe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">delta_fe</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prob_lower</span> <span class="o">/</span> <span class="n">prob_upper</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">delta_fe</span></div>
 
 </pre></div>

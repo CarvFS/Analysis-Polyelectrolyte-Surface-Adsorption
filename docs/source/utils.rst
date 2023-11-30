@@ -9,7 +9,6 @@ Submodules
 
    utils.dask
    utils.logs
-   utils.system
 
 Module contents
 ---------------

@@ -167,5 +167,8 @@ def diff_fes_1d(
     prob_lower = integrate.simpson(boltzmann[lower_well_idx], x=cv_grid[lower_well_idx])
 
     # calculate free energy difference as log of ratio of probabilities
-    delta_fe = -np.log(prob_lower / prob_upper)
+    if prob_upper == 0:
+        delta_fe = np.inf
+    else:
+        delta_fe = -np.log(prob_lower / prob_upper)
     return delta_fe

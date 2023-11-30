@@ -225,7 +225,7 @@
 <span class="sd">    plt.Figure</span>
 <span class="sd">        Figure of the free energy difference between two wells.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf_diff_conv&quot;</span>
     <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -308,7 +308,7 @@
 <span class="sd">    plt.Figure</span>
 <span class="sd">        Figure of the free energy surface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf_movie&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;pmf_conv_movie&quot;</span>
     <span class="k">if</span> <span class="n">tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -361,8 +361,8 @@
     <span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dir_fig</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">.mp4&quot;</span><span class="p">,</span>
         <span class="n">writer</span><span class="o">=</span><span class="s2">&quot;ffmpeg&quot;</span><span class="p">,</span>
-        <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-        <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>

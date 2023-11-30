@@ -24,7 +24,7 @@ import dask
 from dask.distributed import Client, LocalCluster
 
 
-def get_client(n_workers: int, memory_limit: str = "60GB") -> Client:
+def get_client(n_workers: int, memory_limit: str = "60GB", timeout: int = 2) -> Client:
     """
     Get a Dask client for parallel processing. If a client is already running,
     return that client. Otherwise, start a new client.
@@ -41,9 +41,8 @@ def get_client(n_workers: int, memory_limit: str = "60GB") -> Client:
     Client
         Dask client for parallel processing.
     """
-
     try:
-        client = Client("tcp://localhost:8785", timeout=2)
+        client = Client("tcp://localhost:8785", timeout=timeout)
 
     except OSError:
         dask.config.set(

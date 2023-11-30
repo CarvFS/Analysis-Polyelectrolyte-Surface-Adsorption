@@ -12,6 +12,7 @@ def setup_logging(
     log_file: str = "default.log",
     stream: bool = False,
     verbose: bool = False,
+    overwrite: bool = False,
 ) -> logging.Logger:
     """
     Setup logging for the script.
@@ -24,6 +25,8 @@ def setup_logging(
         If True, log to the console, by default False
     verbose : bool, optional
         If True, the logging level is set to DEBUG, by default False
+    overwrite : bool, optional
+        If True, overwrite the log file, by default False
 
     Returns
     -------
@@ -32,9 +35,14 @@ def setup_logging(
     """
     log = logging.getLogger(__name__)
 
-    if log.hasHandlers():
+    if log.hasHandlers() and not overwrite:
         log.debug("Logger already initialized, returning log")
         return log
+
+    # remove existing handlers
+    if log.hasHandlers() and overwrite:
+        for handler in log.handlers[:]:
+            log.removeHandler(handler)
 
     # add formatter
     formatter = logging.Formatter(

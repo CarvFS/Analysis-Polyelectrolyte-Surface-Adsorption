@@ -134,7 +134,7 @@ def plt_pmf_diff_conv(
     plt.Figure
         Figure of the free energy difference between two wells.
     """
-    fname = "pmf"
+    fname = "pmf_diff_conv"
     if tag is not None:
         fname += f"_{tag}"
 
@@ -214,7 +214,7 @@ def mov_pmf_conv(
     plt.Figure
         Figure of the free energy surface.
     """
-    fname = "pmf_movie"
+    fname = "pmf_conv_movie"
     if tag is not None:
         fname += f"_{tag}"
 
@@ -267,8 +267,8 @@ def mov_pmf_conv(
     anim.save(
         f"{dir_fig}/{fname}.mp4",
         writer="ffmpeg",
-        fps=30,
-        dpi=600,
+        fps=20,
+        dpi=500,
     )
 
     return fig
