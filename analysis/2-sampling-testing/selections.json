@@ -1,0 +1,10 @@
+{
+    "C_carb": "resname LAI RAI ACI LAN RAN ACN and name CB",
+    "C_ace": "resname LAC RAC ACE and name CB",
+    "C_alpha": "resname LAI RAI ACI LAN RAN ACN LAC RAC ACE LAL RAL ALC and name CA",
+    "O_carb": "resname LAI RAI ACI LAN RAN ACN and name OB1 OB2",
+    "O_ace": "resname LAC RAC ACE and name OA OB",
+    "O_alc": "resname LAL RAL ALC and name OA",
+    "Ca_ion": "resname CA and name CA",
+    "O_water": "resname SOL and name OW"
+}

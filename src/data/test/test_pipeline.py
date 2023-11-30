@@ -16,7 +16,7 @@ class TestPipeline(object):
     def data_path(self):
         return Path(
             "/media/aglisman/Linux_Overflow/home/aglisman/VSCodeProjects"
-            + "/Polyelectrolyte-Surface-Adsorption/data/completed"
+            + "/Polyelectrolyte-Surface-Adsorption/data/completed/sampling_search"
             + "/sjobid_0-calcite-104surface-5nm_surface-8nm_vertical-1chain"
             + "-PAcr-8mer-0Crb-0Ca-8Na-0Cl-300K-1bar-NVT"
         )

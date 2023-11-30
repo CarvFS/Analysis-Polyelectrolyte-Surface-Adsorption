@@ -268,7 +268,7 @@ def mov_pmf_conv(
         f"{dir_fig}/{fname}.mp4",
         writer="ffmpeg",
         fps=20,
-        dpi=500,
+        dpi=300,
     )
 
     return fig

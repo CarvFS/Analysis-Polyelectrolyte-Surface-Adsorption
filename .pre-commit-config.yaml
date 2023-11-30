@@ -37,9 +37,23 @@ repos:
         language: system
         types: [python]
         args: ['run', '-m', 'pytest', 'src']
+
       - id: coverage-report
         name: coverage report
+        entry: bash -c -o pipefail 'coverage report --show-missing --fail-under=0 | tee coverage.log'
+        language: system
+        types: [python]
+
+      - id: coverage-generate-html
+        name: coverage generate html
         entry: coverage
         language: system
         types: [python]
-        args: ['report', '--show-missing', '--fail-under=0']
+        args: ['html', '-d', 'docs/build/coverage']
+
+      - id: remove-test-files
+        name: remove test files
+        entry: rm
+        language: system
+        types: [shell]
+        args: ['test.log', 'test3.log', 'test4.log', '.coverage', '||', 'true']
