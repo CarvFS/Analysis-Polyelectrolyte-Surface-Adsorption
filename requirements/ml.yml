@@ -16,9 +16,7 @@ name: ml-diffusion
 channels:
   - pytorch
   - nvidia
-  - anaconda
   - conda-forge
-  - defaults
 dependencies:
   # pytorch
   - pytorch
@@ -55,4 +53,3 @@ dependencies:
   - black
   - flake8
   - pylint
-

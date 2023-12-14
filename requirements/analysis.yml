@@ -14,9 +14,7 @@
 
 name: analysis-surface
 channels:
-  - anaconda
   - conda-forge
-  - defaults
 dependencies:
   - pip
   # parallelization
@@ -63,4 +61,4 @@ dependencies:
   - nbsphinx
   # pip installs
   - pip:
-    - myst_nb
+      - myst_nb
