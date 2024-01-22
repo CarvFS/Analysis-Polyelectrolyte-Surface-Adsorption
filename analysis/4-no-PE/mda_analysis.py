@@ -41,31 +41,7 @@ from data.pipeline import DataPipeline  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
-
-
-# #############################################################################
-# Globals
-# #############################################################################
-
-# ANCHOR: Script variables and setup
-# system information
-TEMPERATURE_K: float = 300  # [K] System temperature
-# File I/O
-FIG_EXT: str = "png"  # Figure file extension
-DEFAULT_PATH: Path = Path(
-    "/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/4_many_monomer_binding/4.2.0-calcite-104surface-9nm_surface-10nm_vertical-0chain-PAcr-0mer-0Crb-64Ca-0Na-128Cl-300K-1bar-NVT"
-)
-# MDAnalysis trajectory parameters
-START: int = 0  # First frame to read
-STOP: int = None  # Last frame to read
-STEP: int = 1  # Step between frames to read
-N_JOBS: int = 24  # Number of parallel jobs
-N_BLOCKS: int = 5 * N_JOBS  # Number of blocks to split trajectory into
-UNWRAP: bool = False  # Unwrap trajectory before analysis
-# Data processing parameters
-VERBOSE: bool = True  # Verbose output
-RELOAD_DATA: bool = False  # if True, remake all data
-REFRESH_OFFSETS: bool = False  # if True, remake all offsets on trajectory files
+from parameters.globals import *  # noqa: E402
 
 
 # #############################################################################
@@ -199,15 +175,16 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # #########################################################################
-    # Data processing
-    # #########################################################################
+    # I/O and parameters
     dir_out_base = Path(f"{os.getcwd()}/data")
     data_dir = Path(f"{args.dir}")
     set_style()
-    with open("selections.json", "r") as f:
+    with open("parameters/selections.json", "r") as f:
         sel = json.load(f)
 
+    # #########################################################################
+    # Data processing
+    # #########################################################################
     # load data pipeline
     pipeline = DataPipeline(
         data_path_base=data_dir, temperature=TEMPERATURE_K, verbose=VERBOSE

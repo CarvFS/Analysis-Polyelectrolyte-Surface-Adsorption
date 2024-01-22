@@ -720,6 +720,7 @@ class DataPipeline:
             **kwargs,
         )
         self._log.debug(f"Loaded MDA universe for method: {method}")
+        self._log.info(f"Number of frames in universe: {universe.trajectory.n_frames}")
         self.data_files[method]["universe"] = universe
         return universe
 

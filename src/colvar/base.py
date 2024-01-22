@@ -38,6 +38,7 @@ except ImportError:
 
 try:
     import joblib
+    from parallel import ParallelTqdm
 
     FOUND_JOBLIB = True
 
@@ -323,21 +324,11 @@ class ParallelAnalysisBase(AnalysisBase):
                 print(msg)
                 time_start = datetime.now()
 
-            block_results = joblib.Parallel(
+            block_results = ParallelTqdm(
                 n_jobs=n_jobs,
                 prefer=method,
-            )(
-                joblib.delayed(self._job_block)(indices)
-                for indices in tqdm(
-                    block_indices,
-                    total=n_blocks,
-                    unit="block",
-                    desc="Analysis",
-                    mininterval=1,
-                    dynamic_ncols=True,
-                    disable=(not self._verbose),
-                )
-            )
+                desc="Analysis",
+            )([joblib.delayed(self._job_block)(indices) for indices in block_indices])
 
         # multiprocessing
         else:
