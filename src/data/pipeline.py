@@ -20,11 +20,11 @@ import warnings
 # third party
 import numpy as np
 import pandas as pd
-import panedr as edr
 
 with warnings.catch_warnings():
     warnings.simplefilter(action="ignore", category=FutureWarning)
     warnings.simplefilter(action="ignore", category=DeprecationWarning)
+    import panedr as edr
     import MDAnalysis as mda
 
 
@@ -43,6 +43,7 @@ class DataPipeline:
         data_path_base: Path,
         temperature: float = 300.0,
         verbose: bool = False,
+        logger: logging.Logger = None,
         ext_top: str = "tpr",
         ext_traj: str = "xtc",
         ext_energy: str = "edr",
@@ -59,6 +60,8 @@ class DataPipeline:
             The temperature of the simulation in Kelvin, by default 300.0.
         verbose : bool, optional
             Whether to print verbose logging messages, by default False.
+        logger : logging.Logger, optional
+            A logger object for logging messages, by default None.
         ext_top : str, optional
             The file extension for topology files, by default "tpr".
         ext_traj : str, optional
@@ -124,7 +127,7 @@ class DataPipeline:
         self.data_files = None
 
         # setup class object
-        self._init_log()
+        self._init_log(logger=logger)
         self._log.info(
             f"Initializing data pipeline with data path: {self.data_path_base}"
         )
@@ -217,7 +220,7 @@ class DataPipeline:
         """
         return len(self.sampling_methods)
 
-    def _init_log(self) -> None:
+    def _init_log(self, logger: logging.Logger = None, log_file: Path = None) -> None:
         """
         Initializes the logger for the pipeline.
 
@@ -228,35 +231,70 @@ class DataPipeline:
 
         Parameters
         ----------
-        None
+        logger : logging.Logger
+            A logger object for logging messages, by default None.
+        log_file : Path
+            The path to a log file, by default None.
 
         Returns
         -------
         None
         """
-        self._log = logging.getLogger(__name__)
+        if logger is not None:
+            self._log = logger
+        else:
+            self._log = logging.getLogger(__name__)
 
-        # add handler if not already present to stdout
+        add_handler = False
         if not self._log.hasHandlers():
+            # add handler if not already present to stdout
             handler = logging.StreamHandler()
+            self._log.addHandler(handler)
+
+            # add file handler to log file
+            if log_file is None:
+                file = f"{self.data_path_base}/pipeline.log"
+            else:
+                file = log_file
+            fhandler = logging.FileHandler(filename=file, mode="w")
+            add_handler = True
+            self._log.addHandler(fhandler)
+
+            # set logging format
             formatter = logging.Formatter(
                 fmt="%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : "
                 + "%(lineno)d : Log : %(message)s",
                 datefmt="%Y-%m-%d %I:%M:%S",
             )
             handler.setFormatter(formatter)
-            self._log.addHandler(handler)
+            fhandler.setFormatter(formatter)
+
+        # if log already has handlers, modify write file handler to write to log_file
+        else:
+            for handler in self._log.handlers:
+                if isinstance(handler, logging.FileHandler):
+                    file = log_file
+                    handler.baseFilename = file
+                    handler.stream = open(file, "w")
+                    handler.acquire()
+                    add_handler = True
 
         # set logging level of logger and handler
         try:
             if self._verbose:
                 self._log.setLevel(logging.DEBUG)
-                self._log.handlers[0].setLevel(logging.DEBUG)
+                for handler in self._log.handlers:
+                    handler.setLevel(logging.DEBUG)
             else:
                 self._log.setLevel(logging.WARNING)
-                self._log.handlers[0].setLevel(logging.WARNING)
+                for handler in self._log.handlers:
+                    handler.setLevel(logging.WARNING)
         except Exception as e:
             self._log.error(f"Failed to set logging level: {e}")
+
+        # print log file path to stdout
+        if add_handler:
+            self._log.info(f"Logging to file: {self.data_path_base}/pipeline.log")
 
     def _find_data_files(self) -> None:
         """
@@ -442,8 +480,12 @@ class DataPipeline:
                     + f"in path {path}"
                 )
 
-            if len(self.data_files[method]["plumed"]) == 0:
+            if len(self.data_files[method]["plumed"]) == 0 and method != "md":
                 raise ValueError(
+                    f"No plumed files found for sampling method {method} in path {path}"
+                )
+            elif len(self.data_files[method]["plumed"]) == 0 and method == "md":
+                self._log.warning(
                     f"No plumed files found for sampling method {method} in path {path}"
                 )
             elif len(self.data_files[method]["plumed"]) > 1:
@@ -520,11 +562,18 @@ class DataPipeline:
         """
 
         # check that there is only one plumed file for this method
-        if len(self.data_files[method]["plumed"]) != 1:
+        if len(self.data_files[method]["plumed"]) == 0 and method != "md":
+            raise ValueError(f"No plumed files found for method {method}, expected 1")
+        elif len(self.data_files[method]["plumed"]) > 1:
             raise ValueError(
                 f"Found {len(self.data_files[method]['plumed'])} plumed files "
                 + f"for method {method}, expected 1"
             )
+
+        if method == "md" and len(self.data_files[method]["plumed"]) == 0:
+            self._log.warning(f"No plumed file for method: {method}")
+            self.data_files[method]["df_colvar"] = pd.DataFrame()
+            return self.data_files[method]["df_colvar"].copy()
 
         file = self.data_files[method]["plumed"][0]
         self._log.info(f"Loading plumed file for method: {method}")
@@ -660,12 +709,16 @@ class DataPipeline:
                 + f"Found {num_top_files} topology files."
             )
 
+        self._log.debug(f"Loading MDA universe for method: {method}")
+        self._log.debug(f"Topology file: {self.data_files[method]['top'][0]}")
+        self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
         universe = mda.Universe(
             self.data_files[method]["top"][0],
             self.data_files[method]["traj"],
             verbose=self._verbose,
             **kwargs,
         )
+        self._log.debug(f"Loaded MDA universe for method: {method}")
         self.data_files[method]["universe"] = universe
         return universe
 

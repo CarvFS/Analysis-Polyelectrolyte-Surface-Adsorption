@@ -54,6 +54,9 @@ from utils.logs import setup_logging  # noqa: E402
 TEMPERATURE_K: float = 300  # [K] System temperature
 # File I/O
 FIG_EXT: str = "png"  # Figure file extension
+DEFAULT_PATH: Path = Path(
+    "/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/4_many_monomer_binding/4.2.0-calcite-104surface-9nm_surface-10nm_vertical-0chain-PAcr-0mer-0Crb-64Ca-0Na-128Cl-300K-1bar-NVT"
+)
 # MDAnalysis trajectory parameters
 START: int = 0  # First frame to read
 STOP: int = None  # Last frame to read
@@ -77,6 +80,31 @@ def rdf_wrapper(
     df_weights: pd.DataFrame,
     sel_dict: dict,
 ) -> None:
+    """
+    Wrapper function for RDF calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - RDF(O_water, Ca_ion)
+
+    """
+
     # set output path and information for analysis section
     label_groups, label_references, updating, exclusions = [], [], [], []
     output_path = Path("mdanalysis_rdf/data")
@@ -87,8 +115,10 @@ def rdf_wrapper(
     updating.append((False, False))
     exclusions.append(None)
 
-    for group, reference, update, exclude in zip(
-        label_groups, label_references, updating, exclusions
+    for group, reference, update, exclude in tqdm(
+        zip(label_groups, label_references, updating, exclusions),
+        total=len(label_groups),
+        desc="RDF",
     ):
         log.info(f"Collective variable: RDF({group}, {reference})")
         label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
@@ -110,7 +140,7 @@ def rdf_wrapper(
                 domain=(0, 50),
                 exclusion_block=exclude,
                 label=label,
-                df_weights=df_weights,
+                df_weights=df_weights if df_weights is not None else None,
                 verbose=VERBOSE,
             )
             t_start = time.time()
@@ -167,7 +197,7 @@ if __name__ == "__main__":
         "--dir",
         type=str,
         help="Base directory for the input data",
-        default="/Volumes/ExFAT/md_data/4_many_monomer_binding/4.2_64Ca_128Cl",
+        default=DEFAULT_PATH,
     )
     args = parser.parse_args()
 
@@ -205,6 +235,7 @@ if __name__ == "__main__":
         dir_out.mkdir(parents=True, exist_ok=True)
         os.chdir(dir_out)
         log = setup_logging(log_file="mda_data_gen.log", verbose=VERBOSE, stream=True)
+        pipeline._init_log(log_file="data_pipeline.log")
 
         # load data for method
         df_plumed = pipeline.load_plumed_colvar(method)

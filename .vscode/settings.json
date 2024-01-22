@@ -58,6 +58,7 @@
         "expandtab",
         "fargs",
         "fastparquet",
+        "fhandler",
         "figsize",
         "fileencoding",
         "fixmath",
