@@ -195,8 +195,18 @@ class LinearDensity(ParallelAnalysisBase):
        and :attr:`results.x.charge_density_stddev` instead.
     """
 
-    def __init__(self, select, grouping="atoms", binsize=0.25, **kwargs):
-        super(LinearDensity, self).__init__(select.universe.trajectory, **kwargs)
+    def __init__(
+        self,
+        select,
+        grouping="atoms",
+        binsize=0.25,
+        label=None,
+        df_weights=None,
+        **kwargs,
+    ):
+        super().__init__(select.universe.trajectory, (select), label=label, **kwargs)
+        self._logger = setup_logging(log_file=f"logs/{__name__}.log")
+
         # allows use of run(parallel=True)
         self._ags = [select]
         self._universe = select.universe
@@ -242,36 +252,67 @@ class LinearDensity(ParallelAnalysisBase):
         self.charges = None
         self.totalmass = None
 
-    def _single_frame(self):
+        # dataframe containing weight of each frame from biasing potential
+        if df_weights is not None:
+            self._weighted: bool = True
+            self._df_weights = df_weights[["time", "weight"]].copy()
+        else:
+            self._weighted: bool = False
+            self._df_weights: pd.DataFrame = None
+
+        # output data
+        self._dir_out: Path = Path("./mdanalysis_lineardensity")
+        self._df_filename = f"rdf_{self._tag}.parquet"
+        self._logger.debug(f"df_filename: {self._df_filename}")
+        self._df = None
+        self._columns = ["frame", "time"]
+        for dim in self.results:
+            for key in self.keys:
+                for idx in range(self.nbins):
+                    self._columns.append(f"{dim}_{key}_{idx}")
+            for idx in range(self.nbins + 1):
+                self._columns.append(f"{dim}_hist_bin_edge_{idx}")
+
+        self._ncols = len(self._columns)
+
+    def _single_frame(self, idx_frame: int) -> None:
+        # get current frame
+        ts = self._universe.trajectory[idx_frame]
+        ag = self._ags[0]
+
+        # initialize result array
+        result = np.zeros(self._ncols)
+        result[0] = ts.frame
+        result[1] = ts.time
+        idx_start = 2
+
         # Get masses and charges for the selection
         if self.grouping == "atoms":
-            self.masses = self._ags[0].masses
-            self.charges = self._ags[0].charges
+            self.masses = ag.masses
+            self.charges = ag.charges
 
         elif self.grouping in ["residues", "segments", "fragments"]:
-            self.masses = self._ags[0].total_mass(compound=self.grouping)
-            self.charges = self._ags[0].total_charge(compound=self.grouping)
+            self.masses = ag.total_mass(compound=self.grouping)
+            self.charges = ag.total_charge(compound=self.grouping)
 
         else:
             raise AttributeError(f"{self.grouping} is not a valid value for grouping.")
 
         self.totalmass = np.sum(self.masses)
 
-        self.group = getattr(self._ags[0], self.grouping)
-        self._ags[0].wrap(compound=self.grouping)
+        self.group = getattr(ag, self.grouping)
+        ag.wrap(compound=self.grouping)
 
         # Find position of atom/group of atoms
         if self.grouping == "atoms":
-            positions = self._ags[0].positions  # faster for atoms
+            positions = ag.positions  # faster for atoms
         else:
             # Centre of mass for residues, segments, fragments
-            positions = self._ags[0].center_of_mass(compound=self.grouping)
+            positions = ag.center_of_mass(compound=self.grouping)
 
         for dim in ["x", "y", "z"]:
             idx = self.results[dim]["dim"]
 
-            key = "mass_density"
-            key_std = "mass_density_stddev"
             # histogram for positions weighted on masses
             hist, _ = np.histogram(
                 positions[:, idx],
@@ -279,12 +320,11 @@ class LinearDensity(ParallelAnalysisBase):
                 bins=self.nbins,
                 range=(0.0, max(self.dimensions)),
             )
+            result[idx_start : idx_start + self.nbins] = hist
+            idx_start += self.nbins
+            result[idx_start : idx_start + self.nbins] = np.square(hist)
+            idx_start += self.nbins
 
-            self.results[dim][key] += hist
-            self.results[dim][key_std] += np.square(hist)
-
-            key = "charge_density"
-            key_std = "charge_density_stddev"
             # histogram for positions weighted on charges
             hist, bin_edges = np.histogram(
                 positions[:, idx],
@@ -292,10 +332,16 @@ class LinearDensity(ParallelAnalysisBase):
                 bins=self.nbins,
                 range=(0.0, max(self.dimensions)),
             )
+            result[idx_start : idx_start + self.nbins] = hist
+            idx_start += self.nbins
+            result[idx_start : idx_start + self.nbins] = np.square(hist)
+            idx_start += self.nbins
 
-            self.results[dim][key] += hist
-            self.results[dim][key_std] += np.square(hist)
-            self.results[dim]["hist_bin_edges"] = bin_edges
+            # output bin edges
+            result[idx_start : idx_start + self.nbins + 1] = bin_edges
+            idx_start += self.nbins + 1
+
+        return result
 
     def _conclude(self):
         avogadro = constants["N_Avogadro"]  # unit: mol^{-1}
@@ -303,15 +349,53 @@ class LinearDensity(ParallelAnalysisBase):
         # divide result values by avogadro and convert from A3 to cm3
         k = avogadro * volume_conversion
 
-        # Average results over the number of configurations
+        # merge weights with results
+        if self._weighted:
+            self.merge_external_data(self._df_weights)
+            weights = self._df["weight"].values
+        else:
+            weights = np.ones(self.n_frames)
+
+        # output data from self._results to self.results
+        idx_start = 2
         for dim in ["x", "y", "z"]:
-            for key in [
-                "mass_density",
-                "mass_density_stddev",
-                "charge_density",
-                "charge_density_stddev",
-            ]:
-                self.results[dim][key] /= self.n_frames
+            # mass density
+            key = "mass_density"
+            key_std = "mass_density_stddev"
+            self.results[dim][key] = np.average(
+                self._results[:, idx_start : idx_start + self.nbins],
+                axis=1,
+                weights=weights,
+            )
+            idx_start += self.nbins
+            self.results[dim][key_std] = np.average(
+                self._results[:, idx_start : idx_start + self.nbins],
+                axis=1,
+                weights=weights,
+            )
+            idx_start += self.nbins
+
+            # charge density
+            key = "charge_density"
+            key_std = "charge_density_stddev"
+            self.results[dim][key] = np.average(
+                self._results[:, idx_start : idx_start + self.nbins],
+                axis=1,
+                weights=weights,
+            )
+            idx_start += self.nbins
+            self.results[dim][key_std] = np.average(
+                self._results[:, idx_start : idx_start + self.nbins],
+                axis=1,
+                weights=weights,
+            )
+            idx_start += self.nbins
+
+            # bin edges
+            self.results[dim]["hist_bin_edges"] = self._results[
+                :, idx_start : idx_start + self.nbins + 1
+            ][0]
+
             # Compute standard deviation for the error
             # For certain tests in testsuite, floating point imprecision
             # can lead to negative radicands of tiny magnitude (yielding nan).
