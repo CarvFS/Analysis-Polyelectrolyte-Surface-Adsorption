@@ -40,8 +40,6 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 from data.pipeline import DataPipeline  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
-
-# noqa: E402
 from utils.logs import setup_logging  # noqa: E402
 
 
@@ -60,9 +58,9 @@ DEFAULT_PATH: Path = Path(
 # MDAnalysis trajectory parameters
 START: int = 0  # First frame to read
 STOP: int = None  # Last frame to read
-STEP: int = 100  # Step between frames to read
-N_JOBS: int = 12  # Number of parallel jobs
-N_BLOCKS: int = 6 * N_JOBS  # Number of blocks to split trajectory into
+STEP: int = 1  # Step between frames to read
+N_JOBS: int = 24  # Number of parallel jobs
+N_BLOCKS: int = 5 * N_JOBS  # Number of blocks to split trajectory into
 UNWRAP: bool = False  # Unwrap trajectory before analysis
 # Data processing parameters
 VERBOSE: bool = True  # Verbose output
@@ -204,16 +202,9 @@ if __name__ == "__main__":
     # #########################################################################
     # Data processing
     # #########################################################################
-    t_script_start = time.time()
-    set_style()
-
-    # create subdirectory for data output
     dir_out_base = Path(f"{os.getcwd()}/data")
-
-    # set data I/O paths
     data_dir = Path(f"{args.dir}")
-
-    # load selection file
+    set_style()
     with open("selections.json", "r") as f:
         sel = json.load(f)
 
@@ -244,7 +235,3 @@ if __name__ == "__main__":
 
         # perform analysis
         universe_analysis(universe, df_plumed, sel)
-
-    # ANCHOR: End script
-    t_script_end = time.time()
-    log.info(f"Time to run script: {(t_script_end - t_script_start)/60:.2f} min")

@@ -572,8 +572,8 @@ class DataPipeline:
 
         if method == "md" and len(self.data_files[method]["plumed"]) == 0:
             self._log.warning(f"No plumed file for method: {method}")
-            self.data_files[method]["df_colvar"] = pd.DataFrame()
-            return self.data_files[method]["df_colvar"].copy()
+            self.data_files[method]["df_colvar"] = None
+            return None
 
         file = self.data_files[method]["plumed"][0]
         self._log.info(f"Loading plumed file for method: {method}")
@@ -648,10 +648,11 @@ class DataPipeline:
             if self.data_files[method]["df_colvar"] is None:
                 self.load_plumed_colvar(method)
 
-            # ignore FutureWarning about is_sparse
-            with warnings.catch_warnings():
-                warnings.simplefilter(action="ignore", category=FutureWarning)
-                self.data_files[method]["df_colvar"].to_parquet(file)
+            if self.data_files[method]["df_colvar"] is not None:
+                # ignore FutureWarning about is_sparse
+                with warnings.catch_warnings():
+                    warnings.simplefilter(action="ignore", category=FutureWarning)
+                    self.data_files[method]["df_colvar"].to_parquet(file)
 
             return file
 
