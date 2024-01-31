@@ -38,6 +38,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
 from data.pipeline import DataPipeline  # noqa: E402
+from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
@@ -49,7 +50,7 @@ from parameters.globals import *  # noqa: E402
 # #############################################################################
 
 
-def rdf_wrapper(
+def wrapper_rdf(
     uni: mda.Universe,
     df_weights: pd.DataFrame,
     sel_dict: dict,
@@ -76,9 +77,7 @@ def rdf_wrapper(
 
     The following collective variables are calculated:
     | - RDF(O_water, Ca_ion)
-
     """
-
     # set output path and information for analysis section
     label_groups, label_references, updating, exclusions = [], [], [], []
     output_path = Path("mdanalysis_rdf/data")
@@ -93,6 +92,7 @@ def rdf_wrapper(
         zip(label_groups, label_references, updating, exclusions),
         total=len(label_groups),
         desc="RDF",
+        dynamic_ncols=True,
     ):
         log.info(f"Collective variable: RDF({group}, {reference})")
         label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
@@ -139,6 +139,105 @@ def rdf_wrapper(
             plt.close("all")
 
 
+def wrapper_lineardensity(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    """
+    Wrapper function for linear density calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - LinearDensity of Ca_ion along z-axis
+    """
+    # set output path and information for analysis section
+    label_groups, groupings = [], []
+    output_path = Path("mdanalysis_lineardensity/data")
+    binsize_ang = 0.2
+
+    # Na_ion
+    label_groups.append(sel_dict["Na_ion"])
+    groupings.append("atoms")
+
+    # Ca_ion
+    label_groups.append(sel_dict["Ca_ion"])
+    groupings.append("atoms")
+
+    # Cl_ion
+    label_groups.append(sel_dict["Cl_ion"])
+    groupings.append("atoms")
+
+    # Carbonate C
+    label_groups.append(sel_dict["C_crb_ion"])
+    groupings.append("atoms")
+
+    # not solvent
+    label_groups.append(sel_dict["not_sol"])
+    groupings.append("atoms")
+
+    for group, grouping in tqdm(
+        zip(label_groups, groupings),
+        total=len(label_groups),
+        desc="LinearDensity",
+        dynamic_ncols=True,
+    ):
+        log.info(f"Collective variable: LinearDensity({group})")
+        label = f"{group.replace(' ', '_')}"
+        select = uni.select_atoms(group)
+        file_gr = f"lineardensity_{label}.parquet"
+        output_np = output_path / file_gr
+
+        if output_np.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+        elif len(select) == 0:
+            log.warning(f"No atoms found for group {group}")
+        else:
+            mda_ld = LinearDensity(
+                select=select,
+                grouping=grouping,
+                binsize=binsize_ang,
+                label=label,
+                df_weights=df_weights if df_weights is not None else None,
+                verbose=VERBOSE,
+            )
+            t_start = time.time()
+            mda_ld.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
+            )
+            t_end = time.time()
+            log.debug(f"LD with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min")
+            log.debug(
+                f"[frames, atoms, grouping] = [{mda_ld.n_frames}, "
+                + f"{select.n_atoms}, {grouping}]"
+            )
+            mda_ld.save()
+            mda_ld.figures(ext=FIG_EXT)
+            mda_ld = None
+            plt.close("all")
+
+
 def universe_analysis(
     uni: mda.Universe,
     df_weights: pd.DataFrame,
@@ -156,7 +255,8 @@ def universe_analysis(
     sel_dict : dict
         Dictionary of selection strings
     """
-    rdf_wrapper(uni, df_weights, sel_dict)
+    wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_lineardensity(uni, df_weights, sel_dict)
 
 
 # #############################################################################

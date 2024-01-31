@@ -130,6 +130,9 @@ class LinearDensity(ParallelAnalysisBase):
     results.x.hist_bin_edges : numpy.ndarray
            edges of histogram bins for mass/charge densities, useful for, e.g.,
            plotting of histogram data.
+    results.x.hist_bin_centers : numpy.ndarray
+            centers of histogram bins for mass/charge densities, useful for, e.g.,
+            plotting of histogram data.
     Note: These density units are likely to be changed in the future.
 
     Example
@@ -204,7 +207,7 @@ class LinearDensity(ParallelAnalysisBase):
         df_weights=None,
         **kwargs,
     ):
-        super().__init__(select.universe.trajectory, (select), label=label, **kwargs)
+        super().__init__(select.universe.trajectory, (select,), label=label, **kwargs)
         self._logger = setup_logging(log_file=f"logs/{__name__}.log")
 
         # allows use of run(parallel=True)
@@ -262,7 +265,7 @@ class LinearDensity(ParallelAnalysisBase):
 
         # output data
         self._dir_out: Path = Path("./mdanalysis_lineardensity")
-        self._df_filename = f"rdf_{self._tag}.parquet"
+        self._df_filename = f"lineardensity_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df = None
         self._columns = ["frame", "time"]
@@ -284,7 +287,6 @@ class LinearDensity(ParallelAnalysisBase):
         result = np.zeros(self._ncols)
         result[0] = ts.frame
         result[1] = ts.time
-        idx_start = 2
 
         # Get masses and charges for the selection
         if self.grouping == "atoms":
@@ -310,6 +312,7 @@ class LinearDensity(ParallelAnalysisBase):
             # Centre of mass for residues, segments, fragments
             positions = ag.center_of_mass(compound=self.grouping)
 
+        idx_start = 2  # skip frame and time columns
         for dim in ["x", "y", "z"]:
             idx = self.results[dim]["dim"]
 
@@ -341,6 +344,12 @@ class LinearDensity(ParallelAnalysisBase):
             result[idx_start : idx_start + self.nbins + 1] = bin_edges
             idx_start += self.nbins + 1
 
+        idx_final = idx_start
+        if idx_final != self._ncols:
+            msg = f"dim: {dim}, idx_final: {idx_final}, ncols: {self._ncols}"
+            self._logger.error(msg)
+            raise ValueError(msg)
+
         return result
 
     def _conclude(self):
@@ -351,26 +360,39 @@ class LinearDensity(ParallelAnalysisBase):
 
         # merge weights with results
         if self._weighted:
+            self._logger.debug("Merging weights with results")
             self.merge_external_data(self._df_weights)
-            weights = self._df["weight"].values
+            weights = self._df["weight"].to_numpy()
         else:
-            weights = np.ones(self.n_frames)
+            self._logger.debug("No weights provided")
+            weights = np.ones(len(self._results[:, 0]))
 
         # output data from self._results to self.results
-        idx_start = 2
+        # weighted average over all frames (rows of self._results)
+        idx_start = 2  # skip frame and time columns
         for dim in ["x", "y", "z"]:
             # mass density
             key = "mass_density"
             key_std = "mass_density_stddev"
-            self.results[dim][key] = np.average(
-                self._results[:, idx_start : idx_start + self.nbins],
-                axis=1,
-                weights=weights,
-            )
-            idx_start += self.nbins
+            try:
+                self.results[dim][key] = np.average(
+                    self._results[:, idx_start : (idx_start + self.nbins)],
+                    axis=0,
+                    weights=weights,
+                )
+                idx_start += self.nbins
+            except ValueError as e:
+                self._logger.error(f"Error in np.average for {key}: {e}")
+                self._logger.error(f"idx_start: {idx_start}, nbins: {self.nbins}")
+                self._logger.error(f"weights shape: {weights.shape}")
+                self._logger.error(
+                    f"results shape: {self._results[:, idx_start : (idx_start + self.nbins)].shape}"
+                )
+                raise e
+
             self.results[dim][key_std] = np.average(
-                self._results[:, idx_start : idx_start + self.nbins],
-                axis=1,
+                self._results[:, idx_start : (idx_start + self.nbins)],
+                axis=0,
                 weights=weights,
             )
             idx_start += self.nbins
@@ -379,43 +401,205 @@ class LinearDensity(ParallelAnalysisBase):
             key = "charge_density"
             key_std = "charge_density_stddev"
             self.results[dim][key] = np.average(
-                self._results[:, idx_start : idx_start + self.nbins],
-                axis=1,
+                self._results[:, idx_start : (idx_start + self.nbins)],
+                axis=0,
                 weights=weights,
             )
             idx_start += self.nbins
             self.results[dim][key_std] = np.average(
-                self._results[:, idx_start : idx_start + self.nbins],
-                axis=1,
+                self._results[:, idx_start : (idx_start + self.nbins)],
+                axis=0,
                 weights=weights,
             )
             idx_start += self.nbins
 
             # bin edges
             self.results[dim]["hist_bin_edges"] = self._results[
-                :, idx_start : idx_start + self.nbins + 1
+                :, idx_start : (idx_start + self.nbins + 1)
             ][0]
+            idx_start += self.nbins + 1
+            self.results[dim]["hist_bin_centers"] = (
+                self.results[dim]["hist_bin_edges"][:-1]
+                + self.results[dim]["hist_bin_edges"][1:]
+            ) / 2.0
 
-            # Compute standard deviation for the error
-            # For certain tests in testsuite, floating point imprecision
-            # can lead to negative radicands of tiny magnitude (yielding nan).
-            # radicand_mass and radicand_charge are therefore calculated first
-            # and negative values set to 0 before the square root
-            # is calculated.
-            radicand_mass = self.results[dim]["mass_density_stddev"] - np.square(
-                self.results[dim]["mass_density"]
-            )
-            radicand_mass[radicand_mass < 0] = 0
-            self.results[dim]["mass_density_stddev"] = np.sqrt(radicand_mass)
+        idx_final = idx_start
+        if idx_final != self._ncols:
+            msg = f"dim: {dim}, idx_final: {idx_final}, ncols: {self._ncols}"
+            self._logger.error(msg)
+            raise ValueError(msg)
 
-            radicand_charge = self.results[dim]["charge_density_stddev"] - np.square(
-                self.results[dim]["charge_density"]
-            )
-            radicand_charge[radicand_charge < 0] = 0
-            self.results[dim]["charge_density_stddev"] = np.sqrt(radicand_charge)
+        # Compute standard deviation for the error
+        # For certain tests in testsuite, floating point imprecision
+        # can lead to negative radicands of tiny magnitude (yielding nan).
+        # radicand_mass and radicand_charge are therefore calculated first
+        # and negative values set to 0 before the square root
+        # is calculated.
+        radicand_mass = self.results[dim]["mass_density_stddev"] - np.square(
+            self.results[dim]["mass_density"]
+        )
+        radicand_mass[radicand_mass < 0] = 0
+        self.results[dim]["mass_density_stddev"] = np.sqrt(radicand_mass)
+
+        radicand_charge = self.results[dim]["charge_density_stddev"] - np.square(
+            self.results[dim]["charge_density"]
+        )
+        radicand_charge[radicand_charge < 0] = 0
+        self.results[dim]["charge_density_stddev"] = np.sqrt(radicand_charge)
 
         for dim in ["x", "y", "z"]:
             # norming factor, units of mol^-1 cm^3
             norm = k * self.results[dim]["slice_volume"]
             for key in self.keys:
                 self.results[dim][key] /= norm
+
+    def save(self, dir_out: str = None) -> None:
+        """
+        Save the results of the analysis to a parquet file. The results
+        are saved to the `data` directory in the `dir_out` directory.
+
+        This method should only be called after the analysis has been
+        run.
+
+        Parameters
+        ----------
+        dir_out : str, optional
+            The directory to save the results to. If not specified, the
+            results are saved to the directory specified in the
+            `dir_out` attribute.
+        """
+        if dir_out is None:
+            dir_out = self._dir_out / "data"
+        Path(dir_out).mkdir(parents=True, exist_ok=True)
+
+        # save the dataframe to a file
+        self._df.to_parquet(dir_out / self._df_filename)
+
+        # save the results to a compressed numpy file
+        for dim in ["x", "y", "z"]:
+            np.savez_compressed(
+                dir_out / f"lineardensity_{dim}_{self._tag}.npz",
+                hist_bin_edges=self.results[dim]["hist_bin_edges"],
+                hist_bin_centers=self.results[dim]["hist_bin_centers"],
+                mass_density=self.results[dim]["mass_density"],
+                mass_density_stddev=self.results[dim]["mass_density_stddev"],
+                charge_density=self.results[dim]["charge_density"],
+                charge_density_stddev=self.results[dim]["charge_density_stddev"],
+            )
+
+    def figures(
+        self, dim: str = "z", title: str = "Linear Density", ext: str = "png"
+    ) -> tuple[plt.figure, plt.axes]:
+        """
+        Plot the mass and charge density profiles.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Axis to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figures and axes of the plots.
+        """
+        figs = []
+        axs = []
+
+        fig, ax = self.plt_mass_density(dim=dim, title=title, ext=ext)
+        figs.append(fig)
+        axs.append(ax)
+
+        fig, ax = self.plt_charge_density(dim=dim, title=title, ext=ext)
+        figs.append(fig)
+        axs.append(ax)
+
+        return figs, axs
+
+    def plt_mass_density(self, dim: str = "z", title: str = None, ext: str = "png"):
+        """
+        Plot the mass density profiles.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Dimension to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figure and axes of the plot.
+
+        Raises
+        ------
+        ValueError
+            If `dim` is not one of 'x', 'y', or 'z'.
+        """
+        if dim not in ["x", "y", "z"]:
+            raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
+        if title is None:
+            title = f"${dim}$-axis"
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            self.results[dim]["hist_bin_centers"] / 10,
+            self.results[dim]["mass_density"],
+            label=f"{dim}-axis",
+        )
+        ax.set_xlabel("Position [nm]")
+        ax.set_ylabel("Mass density [g/cm$^3$]")
+        ax.set_title(title, y=1.05)
+        fig.savefig(self._dir_out / f"mass_density_{dim}_{self._tag}.{ext}")
+
+        return fig, ax
+
+    def plt_charge_density(self, dim: str = "z", title: str = None, ext: str = "png"):
+        """
+        Plot the charge density profiles.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Dimension to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figure and axes of the plot.
+
+        Raises
+        ------
+        ValueError
+            If `dim` is not one of 'x', 'y', or 'z'.
+        """
+        if dim not in ["x", "y", "z"]:
+            raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
+        if title is None:
+            title = f"${dim}$-axis"
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            self.results[dim]["hist_bin_centers"] / 10,
+            self.results[dim]["charge_density"],
+            label=f"{dim}-axis",
+        )
+        ax.set_xlabel("Position [nm]")
+        ax.set_ylabel("Charge density [e$\cdot$mol/cm$^3$]")
+        ax.set_title(title, y=1.05)
+        fig.savefig(self._dir_out / f"charge_density_{dim}_{self._tag}.{ext}")
+
+        return fig, ax

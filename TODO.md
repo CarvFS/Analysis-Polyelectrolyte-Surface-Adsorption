@@ -1,4 +1,4 @@
-# TODOs for the project
+# TO-Do's for the project
 
 ## Water + Calcite System
 

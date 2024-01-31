@@ -38,7 +38,6 @@ except ImportError:
 
 try:
     import joblib
-    from parallel import ParallelTqdm
 
     FOUND_JOBLIB = True
 
@@ -56,6 +55,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
 from utils.logs import setup_logging  # noqa: E402
+from colvar.parallel import ParallelTqdm
 
 
 class ParallelAnalysisBase(AnalysisBase):
@@ -198,7 +198,7 @@ class ParallelAnalysisBase(AnalysisBase):
             This argument will be ignored when the distributed scheduler is
             used
         module : str, optional
-            Parallelization module to use. Default: ``"multiprocessing"``.
+            Parallelization module to use. Default: ``"joblib"``.
         method : str, optional
             Parallelization method to use. This is the Dask scheduler,
             Joblib backend, or the multiprocessing method. Default: ``None``.

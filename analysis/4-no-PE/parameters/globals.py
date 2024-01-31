@@ -12,8 +12,8 @@ from pathlib import Path
 # MDAnalysis trajectory parameters
 START: int = 0  # First frame to read
 STOP: int = None  # Last frame to read
-STEP: int = 100  # Step between frames to read
-N_JOBS: int = 24  # Number of parallel jobs
+STEP: int = 1  # Step between frames to read
+N_JOBS: int = 30  # Number of parallel jobs
 N_BLOCKS: int = 5 * N_JOBS  # Number of blocks to split trajectory into
 UNWRAP: bool = False  # Unwrap trajectory before analysis
 
