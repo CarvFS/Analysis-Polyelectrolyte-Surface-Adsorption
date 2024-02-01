@@ -82,11 +82,11 @@ def wrapper_rdf(
     label_groups, label_references, updating, exclusions = [], [], [], []
     output_path = Path("mdanalysis_rdf/data")
 
-    # {O_water, Ca_ion}
-    label_references.append(sel_dict["O_water"])
+    # {Ca_ion, Ca_ion}
+    label_references.append(sel_dict["Ca_ion"])
     label_groups.append(sel_dict["Ca_ion"])
     updating.append((False, False))
-    exclusions.append(None)
+    exclusions.append((1, 1))
 
     for group, reference, update, exclude in tqdm(
         zip(label_groups, label_references, updating, exclusions),
