@@ -225,6 +225,10 @@ def wrapper_lineardensity(
     label_groups.append(sel_dict["H_water"])
     groupings.append("atoms")
 
+    # all atoms
+    label_groups.append("all")
+    groupings.append("atoms")
+
     for group, grouping in tqdm(
         zip(label_groups, groupings),
         total=len(label_groups),
@@ -408,7 +412,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # I/O and parameters
-    dir_out_base = Path(f"{os.getcwd()}/data")
+    dir_out_base = Path(f"{os.getcwd()}/data-START_{START}-STOP_{STOP}-STEP_{STEP}")
     data_dir = Path(f"{args.dir}")
     set_style()
     with open("parameters/selections.json", "r") as f:

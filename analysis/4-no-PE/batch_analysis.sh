@@ -28,19 +28,16 @@ dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-
 
 # dir sims is all subdirectories in the base directory
 mapfile -t dir_sims < <(find "${dir_sims_base}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
+n_sims="${#dir_sims[@]}"
 
 echo "Found ${#dir_sims[@]} simulations in ${dir_sims_base}"
 for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${dir_sims[${i}]}"
 done
 
-n_sims="${#dir_sims[@]}"
-mkdir -p "output"
-
 # run analysis script
+mkdir -p "output"
 if [[ "${single_analysis}" != "1" ]]; then
-
-    # for loop through all simulations
     for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do
         echo "- Analysis on index $((sim_idx + 1))/${n_sims}..."
         echo "python3 ${python_script} --dir ${dir_sims_base}/${dir_sims[${sim_idx}]}"
