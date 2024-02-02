@@ -10,11 +10,11 @@ Description: This script contains global parameters for the analysis scripts.
 from pathlib import Path
 
 # MDAnalysis trajectory parameters
-START: int = 0  # First frame to read
-STOP: int = None  # Last frame to read
+START: int = int(1e3)  # First frame to read
+STOP: int = int(20e3)  # Last frame to read
 STEP: int = 1  # Step between frames to read
 N_JOBS: int = 30  # Number of parallel jobs
-N_BLOCKS: int = 5 * N_JOBS  # Number of blocks to split trajectory into
+N_BLOCKS: int = int(200)  # Number of blocks to split trajectory into
 UNWRAP: bool = False  # Unwrap trajectory before analysis
 
 # Data processing parameters

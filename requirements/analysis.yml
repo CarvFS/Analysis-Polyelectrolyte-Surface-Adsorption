@@ -20,6 +20,7 @@ dependencies:
   # parallelization
   - dask>=2023.0.0
   - joblib
+  - numba
   - tqdm
   # data analysis
   - numpy>=1.22.4

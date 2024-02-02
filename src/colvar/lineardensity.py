@@ -237,6 +237,8 @@ class LinearDensity(ParallelAnalysisBase):
         slices_vol = self.volume / bins
 
         self.keys = [
+            "number_density",
+            "number_density_stddev",
             "mass_density",
             "mass_density_stddev",
             "charge_density",
@@ -316,6 +318,17 @@ class LinearDensity(ParallelAnalysisBase):
         for dim in ["x", "y", "z"]:
             idx = self.results[dim]["dim"]
 
+            # histogram for positions
+            hist, _ = np.histogram(
+                positions[:, idx],
+                bins=self.nbins,
+                range=(0.0, max(self.dimensions)),
+            )
+            result[idx_start : idx_start + self.nbins] = hist
+            idx_start += self.nbins
+            result[idx_start : idx_start + self.nbins] = np.square(hist)
+            idx_start += self.nbins
+
             # histogram for positions weighted on masses
             hist, _ = np.histogram(
                 positions[:, idx],
@@ -371,9 +384,9 @@ class LinearDensity(ParallelAnalysisBase):
         # weighted average over all frames (rows of self._results)
         idx_start = 2  # skip frame and time columns
         for dim in ["x", "y", "z"]:
-            # mass density
-            key = "mass_density"
-            key_std = "mass_density_stddev"
+            # number density
+            key = "number_density"
+            key_std = "number_density_stddev"
             try:
                 self.results[dim][key] = np.average(
                     self._results[:, idx_start : (idx_start + self.nbins)],
@@ -390,6 +403,22 @@ class LinearDensity(ParallelAnalysisBase):
                 )
                 raise e
 
+            self.results[dim][key_std] = np.average(
+                self._results[:, idx_start : (idx_start + self.nbins)],
+                axis=0,
+                weights=weights,
+            )
+            idx_start += self.nbins
+
+            # mass density
+            key = "mass_density"
+            key_std = "mass_density_stddev"
+            self.results[dim][key] = np.average(
+                self._results[:, idx_start : (idx_start + self.nbins)],
+                axis=0,
+                weights=weights,
+            )
+            idx_start += self.nbins
             self.results[dim][key_std] = np.average(
                 self._results[:, idx_start : (idx_start + self.nbins)],
                 axis=0,
@@ -435,6 +464,12 @@ class LinearDensity(ParallelAnalysisBase):
         # radicand_mass and radicand_charge are therefore calculated first
         # and negative values set to 0 before the square root
         # is calculated.
+        radicand_number = self.results[dim]["number_density_stddev"] - np.square(
+            self.results[dim]["number_density"]
+        )
+        radicand_number[radicand_number < 0] = 0
+        self.results[dim]["number_density_stddev"] = np.sqrt(radicand_number)
+
         radicand_mass = self.results[dim]["mass_density_stddev"] - np.square(
             self.results[dim]["mass_density"]
         )
@@ -481,6 +516,8 @@ class LinearDensity(ParallelAnalysisBase):
                 dir_out / f"lineardensity_{dim}_{self._tag}.npz",
                 hist_bin_edges=self.results[dim]["hist_bin_edges"],
                 hist_bin_centers=self.results[dim]["hist_bin_centers"],
+                number_density=self.results[dim]["number_density"],
+                number_density_stddev=self.results[dim]["number_density_stddev"],
                 mass_density=self.results[dim]["mass_density"],
                 mass_density_stddev=self.results[dim]["mass_density_stddev"],
                 charge_density=self.results[dim]["charge_density"],
@@ -488,7 +525,7 @@ class LinearDensity(ParallelAnalysisBase):
             )
 
     def figures(
-        self, dim: str = "z", title: str = "Linear Density", ext: str = "png"
+        self, dim: str = None, title: str = "Linear Density", ext: str = "png"
     ) -> tuple[plt.figure, plt.axes]:
         """
         Plot the mass and charge density profiles.
@@ -496,7 +533,7 @@ class LinearDensity(ParallelAnalysisBase):
         Parameters
         ----------
         dim : str, optional
-            Axis to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+            Axis to plot. Default is None. Must be one of 'x', 'y', or 'z'.
         title : str, optional
             Title of the plot
         ext : str, optional
@@ -510,15 +547,67 @@ class LinearDensity(ParallelAnalysisBase):
         figs = []
         axs = []
 
-        fig, ax = self.plt_mass_density(dim=dim, title=title, ext=ext)
-        figs.append(fig)
-        axs.append(ax)
+        if dim is None:
+            dim = ["x", "y", "z"]
 
-        fig, ax = self.plt_charge_density(dim=dim, title=title, ext=ext)
-        figs.append(fig)
-        axs.append(ax)
+        for d in dim:
+            fig, ax = self.plt_number_density(dim=d, title=title, ext=ext)
+            figs.append(fig)
+            axs.append(ax)
+
+            fig, ax = self.plt_mass_density(dim=d, title=title, ext=ext)
+            figs.append(fig)
+            axs.append(ax)
+
+            fig, ax = self.plt_charge_density(dim=d, title=title, ext=ext)
+            figs.append(fig)
+            axs.append(ax)
 
         return figs, axs
+
+    def plt_number_density(self, dim: str = "z", title: str = None, ext: str = "png"):
+        """
+        Plot the number density profiles.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Dimension to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figure and axes of the plot.
+
+        Raises
+        ------
+        ValueError
+            If `dim` is not one of 'x', 'y', or 'z'.
+        """
+        if dim not in ["x", "y", "z"]:
+            raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
+        if title is None:
+            title = f"${dim}$-axis"
+        if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
+            (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            self.results[dim]["hist_bin_centers"] / 10,
+            self.results[dim]["number_density"],
+            label=f"{dim}-axis",
+        )
+        ax.set_xlabel("Position [nm]")
+        ax.set_ylabel("Number density [mol/cm$^3$]")
+        ax.set_title(title, y=1.05)
+        fig.savefig(self._dir_out / f"figures/number_density_{dim}_{self._tag}.{ext}")
+
+        return fig, ax
 
     def plt_mass_density(self, dim: str = "z", title: str = None, ext: str = "png"):
         """
@@ -547,6 +636,8 @@ class LinearDensity(ParallelAnalysisBase):
             raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
         if title is None:
             title = f"${dim}$-axis"
+        if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
+            (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -558,7 +649,7 @@ class LinearDensity(ParallelAnalysisBase):
         ax.set_xlabel("Position [nm]")
         ax.set_ylabel("Mass density [g/cm$^3$]")
         ax.set_title(title, y=1.05)
-        fig.savefig(self._dir_out / f"mass_density_{dim}_{self._tag}.{ext}")
+        fig.savefig(self._dir_out / f"figures/mass_density_{dim}_{self._tag}.{ext}")
 
         return fig, ax
 
@@ -589,6 +680,8 @@ class LinearDensity(ParallelAnalysisBase):
             raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
         if title is None:
             title = f"${dim}$-axis"
+        if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
+            (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -598,8 +691,8 @@ class LinearDensity(ParallelAnalysisBase):
             label=f"{dim}-axis",
         )
         ax.set_xlabel("Position [nm]")
-        ax.set_ylabel("Charge density [e$\cdot$mol/cm$^3$]")
+        ax.set_ylabel("Charge density [$e$$\cdot$mol/cm$^3$]")
         ax.set_title(title, y=1.05)
-        fig.savefig(self._dir_out / f"charge_density_{dim}_{self._tag}.{ext}")
+        fig.savefig(self._dir_out / f"figures/charge_density_{dim}_{self._tag}.{ext}")
 
         return fig, ax
