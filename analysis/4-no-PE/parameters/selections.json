@@ -7,7 +7,7 @@
     "O_ace": "resname LAC RAC ACE and name OA OB",
     "O_alc": "resname LAL RAL ALC and name OA",
     "O_water": "resname SOL and name OW",
-    "H_water": "resname SOL and name HW",
+    "H_water": "resname SOL and name HW1 HW2",
     "Ca_ion": "resname CA and name CA",
     "Na_ion": "resname NA and name NA",
     "Cl_ion": "resname CL and name CL",

@@ -77,7 +77,7 @@ def wrapper_rdf(
     This function is designed to be called from the universe_analysis function.
 
     The following collective variables are calculated:
-    | - RDF(Ca_ion, Ca_ion)
+    | - RDF(Cl_ion, Ca_ion)
     | - RDF(O_water, Ca_ion)
     | - RDF(O_water, Carbonate Carbon atoms)
     """
@@ -85,23 +85,24 @@ def wrapper_rdf(
     label_groups, label_references, updating, exclusions = [], [], [], []
     output_path = Path("mdanalysis_rdf/data")
 
-    # {Ca_ion, Ca_ion}
-    label_references.append(sel_dict["Ca_ion"])
-    label_groups.append(sel_dict["Ca_ion"])
-    updating.append((False, False))
-    exclusions.append((1, 1))
-
-    # {O_water, Ca_ion}
-    label_references.append(sel_dict["O_water"])
+    # {Cl_ion, Ca_ion}
+    label_references.append(sel_dict["Cl_ion"])
     label_groups.append(sel_dict["Ca_ion"])
     updating.append((False, False))
     exclusions.append(None)
 
-    # {O_water, Carbonate C}
-    label_references.append(sel_dict["O_water"])
-    label_groups.append(sel_dict["C_crb_ion"])
-    updating.append((False, False))
-    exclusions.append(None)
+    if SOLVENT:
+        # {O_water, Ca_ion}
+        label_references.append(sel_dict["O_water"])
+        label_groups.append(sel_dict["Ca_ion"])
+        updating.append((False, False))
+        exclusions.append(None)
+
+        # {O_water, Carbonate C}
+        label_references.append(sel_dict["O_water"])
+        label_groups.append(sel_dict["C_crb_ion"])
+        updating.append((False, False))
+        exclusions.append(None)
 
     for group, reference, update, exclude in tqdm(
         zip(label_groups, label_references, updating, exclusions),
@@ -187,6 +188,7 @@ def wrapper_lineardensity(
     | - LinearDensity of non-solvent atoms
     | - LinearDensity of water oxygen atoms
     | - LinearDensity of water hydrogen atoms
+    | - LinearDensity of all atoms
     """
     # set output path and information for analysis section
     label_groups, groupings = [], []
@@ -217,17 +219,18 @@ def wrapper_lineardensity(
     label_groups.append(sel_dict["not_sol"])
     groupings.append("atoms")
 
-    # O_water
-    label_groups.append(sel_dict["O_water"])
-    groupings.append("atoms")
+    if SOLVENT:
+        # O_water
+        label_groups.append(sel_dict["O_water"])
+        groupings.append("atoms")
 
-    # H_water
-    label_groups.append(sel_dict["H_water"])
-    groupings.append("atoms")
+        # H_water
+        label_groups.append(sel_dict["H_water"])
+        groupings.append("atoms")
 
-    # all atoms
-    label_groups.append("all")
-    groupings.append("atoms")
+        # all atoms
+        label_groups.append("all")
+        groupings.append("atoms")
 
     for group, grouping in tqdm(
         zip(label_groups, groupings),
@@ -311,19 +314,20 @@ def wrapper_survivalprobability(
     )
     output_path = Path("mdanalysis_survivalprobability/data")
 
-    # {O_water, Ca_ion}
-    label_groups.append(sel_dict["O_water"])
-    label_references.append(sel_dict["Ca_ion"])
-    r_cuts_ang.append(3.2)
-    window_steps.append(1)
-    tau_maxs.append(100)
+    if SOLVENT:
+        # {O_water, Ca_ion}
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["Ca_ion"])
+        r_cuts_ang.append(3.2)
+        window_steps.append(1)
+        tau_maxs.append(100)
 
-    # {O_water, Carbonate C}
-    label_groups.append(sel_dict["O_water"])
-    label_references.append(sel_dict["C_crb_ion"])
-    r_cuts_ang.append(5.0)
-    window_steps.append(1)
-    tau_maxs.append(100)
+        # {O_water, Carbonate C}
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["C_crb_ion"])
+        r_cuts_ang.append(5.0)
+        window_steps.append(1)
+        tau_maxs.append(100)
 
     for group, reference, r_cut, window, tau_max in tqdm(
         zip(label_groups, label_references, r_cuts_ang, window_steps, tau_maxs),
@@ -452,6 +456,7 @@ if __name__ == "__main__":
         )
         n_frames_analyze = (last_frame - START) // STEP
         n_frames_block = n_frames_analyze // N_BLOCKS
+        log.info(f"Slicing frames: {START} to {last_frame} with step {STEP}")
         log.info(f"Frames to analyze: {n_frames_analyze}")
         log.info(f"Frames per block: {n_frames_block}")
 

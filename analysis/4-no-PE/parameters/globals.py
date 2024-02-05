@@ -11,11 +11,11 @@ from pathlib import Path
 
 # MDAnalysis trajectory parameters
 START: int = int(1e3)  # First frame to read
-STOP: int = int(20e3)  # Last frame to read
-STEP: int = 1  # Step between frames to read
+STOP: int = int(201e3)  # Last frame to read
+STEP: int = 10  # Step between frames to read
 N_JOBS: int = 30  # Number of parallel jobs
 N_BLOCKS: int = int(200)  # Number of blocks to split trajectory into
-UNWRAP: bool = False  # Unwrap trajectory before analysis
+SOLVENT: bool = True  # Whether or not to include solvent in the analysis
 
 # Data processing parameters
 VERBOSE: bool = True  # Verbose output

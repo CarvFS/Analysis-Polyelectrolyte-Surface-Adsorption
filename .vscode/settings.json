@@ -31,6 +31,7 @@
         "blit",
         "carb",
         "cbar",
+        "chargedensity",
         "chunksize",
         "cmap",
         "cmasher",
@@ -88,6 +89,7 @@
         "histrogram",
         "hremd",
         "hrex",
+        "hsol",
         "hstack",
         "hydrogenbonds",
         "Hynes",
@@ -153,6 +155,7 @@
         "nondim",
         "nopython",
         "norming",
+        "notsol",
         "nrdf",
         "nrows",
         "numba",
@@ -245,7 +248,9 @@
         "ylabel",
         "ylim",
         "ytick",
-        "zdim"
+        "zdim",
+        "zmax",
+        "zmin"
     ],
     "python.testing.pytestArgs": [
         "src"
