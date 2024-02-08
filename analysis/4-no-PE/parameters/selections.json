@@ -1,6 +1,6 @@
 {
     "polyelectrolyte": "resname LAI ACI RAI AI1 LAN ACN RAN AN1 LAC ACE RAC AC1 LAL ALC RAL AL1",
-    "C_alpha": "resname LAI RAI ACI LAN RAN ACN LAC RAC ACE LAL RAL ALC and name CA",
+    "C_alpha": "resname LAI ACI RAI AI1 LAN ACN RAN AN1 LAC ACE RAC AC1 LAL ALC RAL AL1 and name CA",
     "C_carb": "resname LAI RAI ACI LAN RAN ACN and name CB",
     "C_ace": "resname LAC RAC ACE and name CB",
     "O_carb": "resname LAI RAI ACI LAN RAN ACN and name OB1 OB2",

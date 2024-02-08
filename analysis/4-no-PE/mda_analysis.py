@@ -196,7 +196,11 @@ def wrapper_lineardensity(
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
-    groupings.append("residues")
+    groupings.append("fragments")
+
+    # Polyelectrolyte monomer C_alpha
+    label_groups.append(sel_dict["C_alpha"])
+    groupings.append("atoms")
 
     # Na_ion
     label_groups.append(sel_dict["Na_ion"])
@@ -242,7 +246,7 @@ def wrapper_lineardensity(
         dynamic_ncols=True,
     ):
         log.info(f"Collective variable: LinearDensity({group})")
-        label = f"{group.replace(' ', '_')}"
+        label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
         file_gr = f"lineardensity_{label}.parquet"
         output_np = output_path / file_gr
