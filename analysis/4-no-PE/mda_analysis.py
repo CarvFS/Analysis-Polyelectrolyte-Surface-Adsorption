@@ -14,7 +14,6 @@ and they can be analyzed in parallel by running multiple instances of this
 script at the same time.
 """
 
-
 # #############################################################################
 # Imports
 # #############################################################################
@@ -220,6 +219,10 @@ def wrapper_lineardensity(
     groupings.append("atoms")
 
     if SOLVENT:
+        # solvent
+        label_groups.append(sel_dict["sol"])
+        groupings.append("atoms")
+
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
