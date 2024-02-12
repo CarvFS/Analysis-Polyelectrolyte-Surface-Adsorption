@@ -596,7 +596,7 @@ class DataPipeline:
             str(file),
             names=header,
             comment="#",
-            delim_whitespace=True,
+            sep=r"\s+",
             skipinitialspace=True,
             usecols=list(range(n_cols)),
         )
