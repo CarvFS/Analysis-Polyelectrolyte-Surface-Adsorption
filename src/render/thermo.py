@@ -50,7 +50,8 @@ from .util import save_fig
 def plt_pmf(
     cv_grid: np.ndarray,
     pmf: np.ndarray,
-    ymax: float = None,
+    xrange: tuple[float, float],
+    yrange: tuple[float, float],
     dir_fig: str = "figures",
     tag: str = None,
 ) -> plt.Figure:
@@ -67,8 +68,10 @@ def plt_pmf(
     pmf : np.ndarray
         Array of free energies as a function of collective variable, assumed to be
         unitless.
-    ymax : float, optional
-        Maximum value for the y-axis, by default None
+    xrange : tuple[float, float]
+        Tuple of (min, max) values for the x-axis.
+    yrange : tuple[float, float]
+        Tuple of (min, max) values for the y-axis.
     dir_fig : str, optional
         Directory to save the figure, by default "figures"
     tag : str, optional
@@ -91,8 +94,10 @@ def plt_pmf(
     ax1.set_xlabel(r"$z$ [nm]")
     ax1.set_ylabel(r"$\Delta F$ [$k_\mathrm{B}T$]")
     ax1.plot(cv_grid, pmf, linewidth=3)
-    if ymax is not None:
-        ax1.set_ylim((0, ymax))
+    if xrange != (None, None):
+        ax1.set_xlim(xrange)
+    if yrange != (None, None):
+        ax1.set_ylim(yrange)
 
     # save figure
     save_fig(fig, fname, dir_fig)
@@ -184,7 +189,8 @@ def mov_pmf_conv(
     cv_grid: np.ndarray,
     pmfs: np.ndarray,
     tag: str = None,
-    ymax: float = None,
+    xrange: tuple[float, float] = (None, None),
+    yrange: tuple[float, float] = (None, None),
     dir_fig: str = "movies",
 ) -> plt.Figure:
     """
@@ -204,8 +210,10 @@ def mov_pmf_conv(
         unitless.
     tag : str, optional
         Tag to append to the figure name, by default None
-    ymax : float, optional
-        Maximum value for the y-axis, by default None
+    xrange : tuple[float, float], optional
+        Tuple of (min, max) values for the x-axis, by default (None, None)
+    yrange : tuple[float, float], optional
+        Tuple of (min, max) values for the y-axis, by default (None, None)
     dir_fig : str, optional
         Directory to save the figure, by default "movies"
 
@@ -225,8 +233,11 @@ def mov_pmf_conv(
     # setup figure
     ax = fig.add_subplot(111)
     ax.set_xlabel(r"$z$ [nm]", labelpad=10)
+    if xrange != (None, None):
+        ax.set_xlim(xrange)
     ax.set_ylabel(r"$\Delta F$ [$k_\mathrm{B}T$]", labelpad=10)
-    ax.set_ylim((0, ymax))
+    if yrange != (None, None):
+        ax.set_ylim(yrange)
     ax.set_title("Potential of Mean Force", pad=10)
 
     # initialize plot elements
@@ -267,7 +278,7 @@ def mov_pmf_conv(
     anim.save(
         f"{dir_fig}/{fname}.mp4",
         writer="ffmpeg",
-        fps=20,
+        fps=15,
         dpi=300,
     )
 

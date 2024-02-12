@@ -40,6 +40,7 @@ def fes_1d(
     d3_coord: bool = False,
     cv_grid: np.ndarray = None,
     domain: tuple[float, float] = (None, None),
+    plateau_domain: tuple[float, float] = (None, None),
     n_grid: int = 300,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the free energy surface for a given distance collective variable.
@@ -115,6 +116,13 @@ def fes_1d(
 
     # set minimum to zero
     fes -= np.nanmin(fes)
+
+    # apply plateau correction
+    if plateau_domain is not None:
+        plateau_idx = np.where(
+            (cv_grid > plateau_domain[0]) & (cv_grid < plateau_domain[1])
+        )
+        fes -= np.nanmean(fes[plateau_idx])
 
     return cv_grid, fes
 

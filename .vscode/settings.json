@@ -248,6 +248,7 @@
         "yerr",
         "ylabel",
         "ylim",
+        "yrange",
         "ytick",
         "zdim",
         "zmax",

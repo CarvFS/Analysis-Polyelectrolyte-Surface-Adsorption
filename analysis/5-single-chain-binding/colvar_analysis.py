@@ -55,13 +55,15 @@ EQBM_PERCENT: float = 0.10
 BANDWIDTH: float = 0.08
 
 # calculate free energy difference between the two states
-CV_GRID: float = np.linspace(0.2, 2.25, 250)
-CV_LOWER_WELL: tuple[float, float] = (0.8, 1.0)
-CV_UPPER_WELL: tuple[float, float] = (1.9, 2.1)
+CV_GRID: float = np.linspace(0.2, 5.0, 250)
+CV_LOWER_WELL: tuple[float, float] = (0.9, 1.1)
+CV_UPPER_WELL: tuple[float, float] = (2.3, 2.5)
+CV_PLATEAU: tuple[float, float] = (2.2, 2.6)
 
 # plotting parameters
 N_TIMESTEP_RENDER: int = 200
-PMF_YMAX: float = 12
+PMF_YRANGE: tuple[float, float] = (-10.5, 2.5)
+PMF_XRANGE: tuple[float, float] = (0.2, 3.5)
 
 
 # ########################################################################### #
@@ -140,7 +142,6 @@ def free_energy_surface(
     cv: str,
     cv_grid: np.ndarray,
     bandwidth: float,
-    ymax: float,
     eqbm_percent: float,
     method: str,
 ) -> None:
@@ -156,8 +157,6 @@ def free_energy_surface(
         Grid for free energy surface.
     bandwidth : float
         Bandwidth for kernel density estimation.
-    ymax : float
-        Maximum value for y-axis.
     eqbm_percent : float
         Percent of simulation to use for equilibration.
     method : str
@@ -173,6 +172,7 @@ def free_energy_surface(
         bandwidth=bandwidth,
         weights=df["weight"],
         eqbm_percent=eqbm_percent,
+        plateau_domain=CV_PLATEAU,
     )
     df = pd.DataFrame({"cv": cv_grid, "pmf": pmf})
     df.to_csv(output_dir / f"{method}_pmf_{cv}.csv", index=False)
@@ -181,8 +181,9 @@ def free_energy_surface(
     fig = plt_pmf(
         cv_grid=cv_grid,
         pmf=pmf,
-        ymax=ymax,
         tag=f"{method}_cv_{cv}",
+        xrange=PMF_XRANGE,
+        yrange=PMF_YRANGE,
     )
     close_fig(fig)
 
@@ -192,7 +193,6 @@ def free_energy_difference(
     cv: str,
     cv_grid: np.ndarray,
     bandwidth: float,
-    ymax: float,
     eqbm_percent: float,
     lower_well: tuple[float, float],
     upper_well: tuple[float, float],
@@ -215,8 +215,6 @@ def free_energy_difference(
         Grid for free energy surface.
     bandwidth : float
         Bandwidth for kernel density estimation.
-    ymax : float
-        Maximum value for y-axis.
     eqbm_percent : float
         Percent of simulation to use for equilibration.
     lower_well : tuple[float, float]
@@ -246,6 +244,7 @@ def free_energy_difference(
             weights=df["weight"],
             eqbm_percent=eqbm_percent,
             final_percent=p,
+            plateau_domain=CV_PLATEAU,
         )
         pmf_diffs[i] = diff_fes_1d(
             pmf=pmfs[i],
@@ -277,7 +276,6 @@ def free_energy_difference(
         lower_well=lower_well,
         upper_well=upper_well,
         tag=f"{method}_cv_{cv}",
-        ymax=ymax,
     )
     close_fig(fig)
 
@@ -287,7 +285,8 @@ def free_energy_difference(
         cv_grid=cv_grid,
         pmfs=pmfs,
         tag=f"{method}_cv_{cv}",
-        ymax=ymax,
+        xrange=(0, max(CV_GRID)),
+        yrange=(np.nanmin(pmfs), 5.5),
     )
     close_fig(fig)
 
@@ -322,7 +321,6 @@ def all_analysis(method: str, pipeline: DataPipeline) -> None:
         cv=CV,
         cv_grid=CV_GRID,
         bandwidth=BANDWIDTH,
-        ymax=PMF_YMAX,
         eqbm_percent=EQBM_PERCENT,
         method=method,
     )
@@ -331,7 +329,6 @@ def all_analysis(method: str, pipeline: DataPipeline) -> None:
         cv=CV,
         cv_grid=CV_GRID,
         bandwidth=BANDWIDTH,
-        ymax=PMF_YMAX,
         eqbm_percent=EQBM_PERCENT,
         lower_well=CV_LOWER_WELL,
         upper_well=CV_UPPER_WELL,
