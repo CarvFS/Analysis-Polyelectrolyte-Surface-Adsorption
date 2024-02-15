@@ -345,6 +345,8 @@ class DataPipeline:
             for x in self.sampling_paths
             if "eqbm" not in x.name
         ]
+        # remove "-bad-" from sampling method names
+        self.sampling_methods = [x for x in self.sampling_methods if "-bad-" not in x]
 
         # if sampling method has multiple replicas (subdirectories of the sampling
         # method directory of the form "replica-#") then append the replica number
@@ -599,6 +601,31 @@ class DataPipeline:
             sep=r"\s+",
             skipinitialspace=True,
             usecols=list(range(n_cols)),
+        )
+
+        # drop any null columns
+        nrows = len(df)
+        df = df.dropna(axis=1, how="all")
+        self._log.warning(
+            f"Dropped {n_cols - len(df.columns)} columns ({(n_cols - len(df.columns))/n_cols*100:.2f}%) with NaN values"
+        )
+
+        # convert columns to numeric and drop any rows with NaN values
+        nrows = len(df)
+        df = df.apply(pd.to_numeric, errors="coerce").dropna()
+        self._log.warning(
+            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) that could not be converted to numeric"
+        )
+
+        # drop rows where abs(*.bias) is > bias_max
+        bias_max = 100
+        cols = [
+            col for col in df.columns if col.endswith(".bias") or col.endswith(".rbias")
+        ]
+        nrows = len(df)
+        df = df[~(df[cols].abs() > bias_max).any(axis=1)]
+        self._log.warning(
+            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) where bias > {bias_max}"
         )
 
         # sort by time

@@ -13,3 +13,6 @@
 [submodule "ddpm/examples/ddim"]
 	path = ddpm/examples/ddim
 	url = https://github.com/ermongroup/ddim.git
+[submodule "src/mdhelper"]
+	path = src/mdhelper
+	url = https://github.com/bbye98/mdhelper.git

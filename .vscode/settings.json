@@ -60,6 +60,7 @@
         "docstrings",
         "doctrees",
         "dref",
+        "dropna",
         "dtmax",
         "dtype",
         "edgecolor",

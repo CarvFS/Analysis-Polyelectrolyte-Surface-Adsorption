@@ -4,6 +4,7 @@
 
 # standard library
 import argparse
+import datetime
 from pathlib import Path
 import os
 import sys
@@ -56,13 +57,13 @@ BANDWIDTH: float = 0.08
 
 # calculate free energy difference between the two states
 CV_GRID: float = np.linspace(0.2, 5.0, 250)
-CV_LOWER_WELL: tuple[float, float] = (0.9, 1.1)
-CV_UPPER_WELL: tuple[float, float] = (2.3, 2.5)
+CV_LOWER_WELL: tuple[float, float] = (0.7, 1.0)
+CV_UPPER_WELL: tuple[float, float] = (3.0, 3.2)
 CV_PLATEAU: tuple[float, float] = (2.2, 2.6)
 
 # plotting parameters
 N_TIMESTEP_RENDER: int = 200
-PMF_YRANGE: tuple[float, float] = (-10.5, 2.5)
+PMF_YRANGE: tuple[float, float] = (-20, 10)
 PMF_XRANGE: tuple[float, float] = (0.2, 3.5)
 
 
@@ -98,7 +99,7 @@ def load_data(
         method_no_replica = method.split("-replica")[0] + "_replex"
     else:
         method_no_replica = method
-    output_dir = Path(output_subdir) / pipeline.tag / method_no_replica
+    output_dir = CWDIR / Path(output_subdir) / pipeline.tag / method_no_replica
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # load plumed data
@@ -286,7 +287,7 @@ def free_energy_difference(
         pmfs=pmfs,
         tag=f"{method}_cv_{cv}",
         xrange=(0, max(CV_GRID)),
-        yrange=(np.nanmin(pmfs), 5.5),
+        yrange=PMF_YRANGE,
     )
     close_fig(fig)
 
@@ -307,7 +308,7 @@ def all_analysis(method: str, pipeline: DataPipeline) -> None:
     # load data
     os.chdir(CWDIR)
     output_dir, colvar = load_data(pipeline, method, OUTPUT_SDIR)
-    os.chdir(CWDIR / output_dir)
+    os.chdir(output_dir)
     pipeline.save_plumed_colvar(method, directory="data")
 
     # figures
@@ -347,16 +348,24 @@ if __name__ == "__main__":
     # command line input
     parser = argparse.ArgumentParser(description="Analyze COLVAR data")
     parser.add_argument(
-        "-d",
         "--dir",
+        "-d",
         type=str,
         help="Subdirectory for the input data",
         default=SIMULATION_SDIR,
     )
     args = parser.parse_args()
 
+    # FIXME: remove this line
+    # args.dir = "data/6.4.2-calcite-104surface-12nm_surface-13nm_vertical-1chain-PAcn-32mer-0Crb-0Ca-0Na-0Cl-300K-1bar-NVT"
+
     # find subdirectory for input data
     dir_list = [d for d in (INPUT_BASE_DIR / args.dir).iterdir() if d.is_dir()]
+    # remove directories that have pattern "1-energy-minimization", "2-equilibration", "3-*"
+    patterns = ["1-energy-minimization", "2-equilibration", "3-"]
+    dir_list = [d for d in dir_list if not any(p in str(d) for p in patterns)]
+    if len(dir_list) == 0:
+        dir_list = [INPUT_BASE_DIR / args.dir]
     if VERBOSE:
         print(f"Found {len(dir_list)} subdirectories for input data")
 
@@ -364,18 +373,38 @@ if __name__ == "__main__":
         if VERBOSE:
             print(f"{i}: {d}")
 
-        # create data pipeline
-        pipeline = DataPipeline(
-            data_path_base=d,
-            temperature=TEMPERATURE_K,
-            verbose=VERBOSE,
-        )
+        try:
+            # create data pipeline
+            pipeline = DataPipeline(
+                data_path_base=d,
+                temperature=TEMPERATURE_K,
+                verbose=VERBOSE,
+            )
 
-        # perform analysis in parallel using joblib with tqdm progress bar
-        methods = pipeline.sampling_methods
-        Parallel(n_jobs=N_JOBS, verbose=10)(
-            delayed(all_analysis)(method, pipeline) for method in methods
-        )
+            # perform analysis in parallel using joblib with tqdm progress bar
+            methods = pipeline.sampling_methods
+            Parallel(n_jobs=N_JOBS, verbose=10)(
+                delayed(all_analysis)(method, pipeline) for method in methods
+            )
+
+            # write complete file to directory
+            with open(
+                CWDIR / OUTPUT_SDIR / "analysis_complete.txt", "w+", encoding="utf-8"
+            ) as f:
+                f.write(
+                    f"Colvar analysis for {d} complete at {datetime.datetime.now()}.\n"
+                )
+
+        except Exception as e:
+            print(f"Error in directory {d}: {e}")
+            with open(
+                CWDIR / OUTPUT_SDIR / "analysis_error.txt", "w+", encoding="utf-8"
+            ) as f:
+                f.write(
+                    f"Error in colvar analysis for {d} at {datetime.datetime.now()}.\n"
+                )
+                f.write(f"{e}\n")
+                # raise e
 
     # clean-up
     print("Script complete!")
