@@ -44,13 +44,14 @@ def setup_logging(
         for handler in log.handlers[:]:
             log.removeHandler(handler)
 
+        # fmt="%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : "
+        # + "%(lineno)d : Log : %(message)s",
+
     # add formatter
     formatter = logging.Formatter(
-        fmt="%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : "
-        + "%(lineno)d : Log : %(message)s",
+        fmt="%(asctime)s | %(levelname)-8s | %(message)s",
         datefmt="%Y-%m-%d %I:%M:%S",
     )
-
     # add file handler
     handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
     if verbose:

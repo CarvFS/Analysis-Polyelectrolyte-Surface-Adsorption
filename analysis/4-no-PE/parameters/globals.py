@@ -11,8 +11,8 @@ from pathlib import Path
 
 # MDAnalysis trajectory parameters
 START: int = int(1e3)  # First frame to read
-STOP: int = int(201e3)  # Last frame to read
-STEP: int = 10  # Step between frames to read
+STOP: int = int(500e3)  # Last frame to read
+STEP: int = 25  # Step between frames to read
 N_JOBS: int = 32  # Number of parallel jobs
 N_BLOCKS: int = 256  # Number of blocks to split trajectory into
 SOLVENT: bool = True  # Whether or not to include solvent in the analysis

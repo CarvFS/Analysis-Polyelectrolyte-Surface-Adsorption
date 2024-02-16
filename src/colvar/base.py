@@ -364,16 +364,19 @@ class ParallelAnalysisBase(AnalysisBase):
                 )
 
         # combine results
+        self._logger.debug("Combining results")
         if len(block_results) > 0:
             self._results = np.concatenate(block_results)
         else:
             self._results = np.array([])
             self._logger.warning("No results returned.")
 
+        self._logger.debug("Time elapsed: " f"{datetime.now() - time_start}.")
         if verbose:
             print(f"Finished! Time elapsed: {datetime.now() - time_start}.")
 
         # create dataframe
+        self._logger.debug("Creating dataframe")
         if self._columns is None:
             self._logger.warning("No columns specified. Not creating dataframe.")
         else:

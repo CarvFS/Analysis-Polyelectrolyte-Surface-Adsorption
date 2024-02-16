@@ -262,10 +262,10 @@ class DataPipeline:
 
             # set logging format
             formatter = logging.Formatter(
-                fmt="%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : "
-                + "%(lineno)d : Log : %(message)s",
+                fmt="%(asctime)s | %(levelname)-8s | %(message)s",
                 datefmt="%Y-%m-%d %I:%M:%S",
             )
+
             handler.setFormatter(formatter)
             fhandler.setFormatter(formatter)
 

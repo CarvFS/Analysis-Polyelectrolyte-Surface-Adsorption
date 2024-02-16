@@ -12,6 +12,7 @@ simulation.
 """
 
 # Standard library
+import concurrent.futures
 from pathlib import Path
 import sys
 import warnings
@@ -202,19 +203,30 @@ class LinearDensity(ParallelAnalysisBase):
         self,
         select,
         grouping="atoms",
-        binsize=0.25,
+        bins=0.25,
         label=None,
         df_weights=None,
+        verbose=False,
         **kwargs,
     ):
         super().__init__(select.universe.trajectory, (select,), label=label, **kwargs)
-        self._logger = setup_logging(log_file=f"logs/{__name__}.log")
+        self._logger = setup_logging(log_file=f"logs/{__name__}.log", verbose=verbose)
+        self._verbose = verbose
 
         # allows use of run(parallel=True)
         self._ags = [select]
         self._universe = select.universe
 
-        self.binsize = binsize
+        # Box sides
+        self.dimensions = self._universe.dimensions[:3]
+        self.volume = np.prod(self.dimensions)
+        if not isinstance(bins, (int, float)):
+            self.binsize = bins[1] - bins[0]
+            self.bins = bins
+        else:
+            self.binsize = bins
+            self.bins = (self.dimensions // self.binsize).astype(int)
+        self.nbins = len(self.bins) - 1
 
         # group of atoms on which to compute the COM (same as used in
         # AtomGroup.wrap())
@@ -225,16 +237,9 @@ class LinearDensity(ParallelAnalysisBase):
         self.results["y"] = Results(dim=1)
         self.results["z"] = Results(dim=2)
 
-        # Box sides
-        self.dimensions = self._universe.dimensions[:3]
-        self.volume = np.prod(self.dimensions)
-        # number of bins
-        bins = (self.dimensions // self.binsize).astype(int)
-
         # Here we choose a number of bins of the largest cell side so that
         # x, y and z values can use the same "coord" column in the output file
-        self.nbins = bins.max()
-        slices_vol = self.volume / bins
+        slices_vol = self.volume / (self.bins[1:] - self.bins[:-1])
 
         self.keys = [
             "number_density",
@@ -266,7 +271,10 @@ class LinearDensity(ParallelAnalysisBase):
             self._df_weights: pd.DataFrame = None
 
         # output data
-        self._dir_out: Path = Path("./mdanalysis_lineardensity")
+        self._dir_out: Path = Path(
+            "./mdanalysis_lineardensity"
+            + f"-{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
+        )
         self._df_filename = f"lineardensity_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df = None
@@ -279,6 +287,7 @@ class LinearDensity(ParallelAnalysisBase):
                 self._columns.append(f"{dim}_hist_bin_edge_{idx}")
 
         self._ncols = len(self._columns)
+        self._columns = None  # ths avoids creation of dataframe
 
     def _single_frame(self, idx_frame: int) -> None:
         # get current frame
@@ -321,8 +330,7 @@ class LinearDensity(ParallelAnalysisBase):
             # histogram for positions
             hist, _ = np.histogram(
                 positions[:, idx],
-                bins=self.nbins,
-                range=(0.0, max(self.dimensions)),
+                bins=self.bins,
             )
             result[idx_start : idx_start + self.nbins] = hist
             idx_start += self.nbins
@@ -333,8 +341,7 @@ class LinearDensity(ParallelAnalysisBase):
             hist, _ = np.histogram(
                 positions[:, idx],
                 weights=self.masses,
-                bins=self.nbins,
-                range=(0.0, max(self.dimensions)),
+                bins=self.bins,
             )
             result[idx_start : idx_start + self.nbins] = hist
             idx_start += self.nbins
@@ -345,8 +352,7 @@ class LinearDensity(ParallelAnalysisBase):
             hist, bin_edges = np.histogram(
                 positions[:, idx],
                 weights=self.charges,
-                bins=self.nbins,
-                range=(0.0, max(self.dimensions)),
+                bins=self.bins,
             )
             result[idx_start : idx_start + self.nbins] = hist
             idx_start += self.nbins
@@ -375,10 +381,16 @@ class LinearDensity(ParallelAnalysisBase):
             self._logger.debug("No weights provided")
             weights = np.ones(len(self._results[:, 0]))
 
+        # drop self._df for memory
+        self._df = None
+        self._logger.info(f"Memory of results: {self._results.nbytes / 1024**2} MB")
+
         # output data from self._results to self.results
         # weighted average over all frames (rows of self._results)
+        self._logger.debug(f"Computing results from {self._results.shape[0]} frames")
         idx_start = 2  # skip frame and time columns
         for dim in ["x", "y", "z"]:
+            self._logger.debug(f"Computing results for {dim}")
             # number density
             key = "number_density"
             key_std = "number_density_stddev"
@@ -459,6 +471,7 @@ class LinearDensity(ParallelAnalysisBase):
         # radicand_mass and radicand_charge are therefore calculated first
         # and negative values set to 0 before the square root
         # is calculated.
+        self._logger.debug("Computing standard deviation")
         radicand_number = self.results[dim]["number_density_stddev"] - np.square(
             self.results[dim]["number_density"]
         )
@@ -477,6 +490,7 @@ class LinearDensity(ParallelAnalysisBase):
         radicand_charge[radicand_charge < 0] = 0
         self.results[dim]["charge_density_stddev"] = np.sqrt(radicand_charge)
 
+        self._logger.debug("Normalizing results")
         for dim in ["x", "y", "z"]:
             # norming factor, units of A^3
             norm = self.results[dim]["slice_volume"]
@@ -498,15 +512,18 @@ class LinearDensity(ParallelAnalysisBase):
             results are saved to the directory specified in the
             `dir_out` attribute.
         """
+        self._logger.info(f"Saving results for {self._tag} to {dir_out}")
         if dir_out is None:
             dir_out = self._dir_out / "data"
         Path(dir_out).mkdir(parents=True, exist_ok=True)
 
         # save the dataframe to a file
-        self._df.to_parquet(dir_out / self._df_filename)
+        # self._logger.debug(f"Saving results to {dir_out / self._df_filename}")
+        # self._df.to_parquet(dir_out / self._df_filename)
 
         # save the results to a compressed numpy file
-        for dim in ["x", "y", "z"]:
+        def save_results(dim: str) -> None:
+            self._logger.debug(f"Saving results for {dim}")
             np.savez_compressed(
                 dir_out / f"lineardensity_{dim}_{self._tag}.npz",
                 hist_bin_edges=self.results[dim]["hist_bin_edges"],
@@ -518,6 +535,9 @@ class LinearDensity(ParallelAnalysisBase):
                 charge_density=self.results[dim]["charge_density"],
                 charge_density_stddev=self.results[dim]["charge_density_stddev"],
             )
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(save_results, ["x", "y", "z"])
 
     def figures(
         self, dim: str = None, title: str = "Linear Density", ext: str = "png"

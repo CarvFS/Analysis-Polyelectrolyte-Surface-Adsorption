@@ -196,8 +196,9 @@ def wrapper_lineardensity(
     """
     # set output path and information for analysis section
     label_groups, groupings = [], []
-    output_path = Path("mdanalysis_lineardensity/data")
-    binsize_ang = 0.02
+    bins = np.linspace(0, max(uni.dimensions[:3]), 50001, endpoint=True)
+    label = f"-{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
+    output_path = Path("mdanalysis_lineardensity-{label}")
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
@@ -248,7 +249,7 @@ def wrapper_lineardensity(
         log.info(f"Collective variable: LinearDensity({group})")
         label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
-        file_gr = f"lineardensity_{label}.parquet"
+        file_gr = f"lineardensity_z_{label}.npz"
         output_np = output_path / file_gr
 
         if output_np.exists() and not RELOAD_DATA:
@@ -259,7 +260,7 @@ def wrapper_lineardensity(
             mda_ld = LinearDensity(
                 select=select,
                 grouping=grouping,
-                binsize=binsize_ang,
+                bins=bins,
                 label=label,
                 df_weights=df_weights if df_weights is not None else None,
                 verbose=VERBOSE,
@@ -279,8 +280,16 @@ def wrapper_lineardensity(
                 f"[frames, atoms, grouping] = [{mda_ld.n_frames}, "
                 + f"{select.n_atoms}, {grouping}]"
             )
+
+            t_start = time.time()
             mda_ld.save()
+            t_end = time.time()
+            log.debug(f"Saving took {(t_end - t_start)/60:.2f} min")
+
+            t_start = time.time()
             mda_ld.figures(ext=FIG_EXT)
+            t_end = time.time()
+            log.debug(f"Figures took {(t_end - t_start)/60:.2f} min")
             mda_ld = None
             plt.close("all")
 
@@ -513,9 +522,9 @@ def universe_analysis(
     """
     t_start_uni = time.time()
     # wrapper_mdhelper_density(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
-    wrapper_survivalprobability(uni, sel_dict)
+    # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 
