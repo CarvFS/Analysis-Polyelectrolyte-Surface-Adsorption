@@ -30,7 +30,9 @@ import sys
 import MDAnalysis as mda
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
+import numpy as np
 import pandas as pd
+import mdhelper as mdh  # noqa: E402
 
 # add local src directory to path
 sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
@@ -180,10 +182,13 @@ def wrapper_lineardensity(
     This function is designed to be called from the universe_analysis function.
 
     The following collective variables are calculated:
-    | - LinearDensity of Ca_ion
+    | - LinearDensity of polyelectrolyte monomers
+    | - LinearDensity of polyelectrolyte monomer C_alpha
     | - LinearDensity of Na_ion
     | - LinearDensity of Cl_ion
+    | - LinearDensity of Ca_ion
     | - LinearDensity of Carbonate Carbon atoms
+    | - LinearDensity of Carbonate Oxygen atoms
     | - LinearDensity of non-solvent atoms
     | - LinearDensity of water oxygen atoms
     | - LinearDensity of water hydrogen atoms
@@ -192,12 +197,11 @@ def wrapper_lineardensity(
     # set output path and information for analysis section
     label_groups, groupings = [], []
     output_path = Path("mdanalysis_lineardensity/data")
-    binsize_ang = 0.2
+    binsize_ang = 0.02
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
     groupings.append("fragments")
-
     # Polyelectrolyte monomer C_alpha
     label_groups.append(sel_dict["C_alpha"])
     groupings.append("atoms")
@@ -205,19 +209,18 @@ def wrapper_lineardensity(
     # Na_ion
     label_groups.append(sel_dict["Na_ion"])
     groupings.append("atoms")
-
-    # Ca_ion
-    label_groups.append(sel_dict["Ca_ion"])
-    groupings.append("atoms")
-
     # Cl_ion
     label_groups.append(sel_dict["Cl_ion"])
     groupings.append("atoms")
-
+    # Ca_ion
+    label_groups.append(sel_dict["Ca_ion"])
+    groupings.append("atoms")
     # Carbonate C
     label_groups.append(sel_dict["C_crb_ion"])
     groupings.append("atoms")
-
+    # Carbonate O
+    label_groups.append(sel_dict["O_crb_ion"])
+    groupings.append("atoms")
     # not solvent
     label_groups.append(sel_dict["not_sol"])
     groupings.append("atoms")
@@ -226,15 +229,12 @@ def wrapper_lineardensity(
         # solvent
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
-
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
-
         # H_water
         label_groups.append(sel_dict["H_water"])
         groupings.append("atoms")
-
         # all atoms
         label_groups.append("all")
         groupings.append("atoms")
@@ -283,6 +283,119 @@ def wrapper_lineardensity(
             mda_ld.figures(ext=FIG_EXT)
             mda_ld = None
             plt.close("all")
+
+
+def wrapper_mdhelper_density(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    # set output path and information for analysis section
+    label_groups, groupings = [], []
+    output_path = Path("mdhelper_density/data")
+    fig_path = Path("mdhelper_density/figures")
+    output_path.mkdir(parents=True, exist_ok=True)
+    fig_path.mkdir(parents=True, exist_ok=True)
+
+    # Polyelectrolyte monomers
+    label_groups.append(sel_dict["polyelectrolyte"])
+    groupings.append("segments")
+    # Polyelectrolyte monomer C_alpha
+    label_groups.append(sel_dict["C_alpha"])
+    groupings.append("atoms")
+    # Na_ion
+    label_groups.append(sel_dict["Na_ion"])
+    groupings.append("atoms")
+    # Ca_ion
+    label_groups.append(sel_dict["Ca_ion"])
+    groupings.append("atoms")
+    # Cl_ion
+    label_groups.append(sel_dict["Cl_ion"])
+    groupings.append("atoms")
+    # Carbonate C
+    label_groups.append(sel_dict["C_crb_ion"])
+    groupings.append("atoms")
+    # not solvent
+    label_groups.append(sel_dict["not_sol"])
+    groupings.append("atoms")
+
+    if SOLVENT:
+        # solvent
+        label_groups.append(sel_dict["sol"])
+        groupings.append("segments")
+        # all atoms
+        label_groups.append("all")
+        groupings.append("atoms")
+
+    for group, grouping in tqdm(
+        zip(label_groups, groupings),
+        total=len(label_groups),
+        desc="LinearDensity",
+        dynamic_ncols=True,
+    ):
+        log.info(f"Collective variable: MDHelperDensity({group})")
+        label = f"{group.replace(' ', '_')}_{grouping}"
+        file_gr = f"lineardensity_z_{label}"
+        output_np = output_path / file_gr
+        select = uni.select_atoms(group)
+
+        if Path(f"{output_np}.npz").exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+        elif len(select) == 0:
+            log.warning(f"No atoms found for group {group}")
+        else:
+            # run analysis
+            mdh_ld = mdh.analysis.profile.DensityProfile(
+                groups=select,
+                groupings=grouping,
+                axes="z",
+                n_bins=1000,
+                verbose=VERBOSE,
+            )
+            print(f"{mdh_ld._charges=}")
+            mdh_ld.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+            )
+            mdh_ld.calculate_potential_profile(dielectric=1.0, axis=2, sigma_e=0)
+            mdh_ld.save(file=output_np)
+
+            # gather_results
+            nm_per_angstrom = 0.10
+            bins = mdh_ld.results.bins[0] * nm_per_angstrom
+            number_density = np.array(mdh_ld.results.number_density[0]).flatten() * (
+                nm_per_angstrom**3
+            )
+            charge_density = np.array(mdh_ld.results.charge_density[0]).flatten() * (
+                nm_per_angstrom**3
+            )
+            potential_profile = np.array(mdh_ld.results.potential[2]).flatten()
+
+            # plot number density and charge density on the same plot with different y-axes
+            fig, ax = plt.subplots()
+            ax2 = ax.twinx()
+            ax.plot(bins, number_density, "b-", label="Number Density")
+            ax2.plot(bins, charge_density, "r-", label="Charge Density")
+            ax.set_xlabel("z [nm]")
+            ax.set_ylabel("Number Density [nm$^{-3}$]", color="b")
+            ax2.set_ylabel("Charge Density [$e$/nm$^{3}$]", color="r")
+            fig.tight_layout()
+            plt.savefig(output_path.parent / "figures" / f"density_profile_{label}.png")
+
+            # plot potential profile
+            fig, ax = plt.subplots()
+            ax.plot(bins, potential_profile, "b-", label="Potential Profile")
+            ax.set_xlabel("z [nm]")
+            ax.set_ylabel("Electrostatic Potential [V]")
+            fig.tight_layout()
+            plt.savefig(
+                output_path.parent / "figures" / f"potential_profile_{label}.png"
+            )
+
+            # clean up
+            mdh_ld = None
 
 
 def wrapper_survivalprobability(
@@ -399,6 +512,7 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
+    # wrapper_mdhelper_density(uni, df_weights, sel_dict)
     wrapper_rdf(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_survivalprobability(uni, sel_dict)
@@ -423,7 +537,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # I/O and parameters
-    dir_out_base = Path(f"{os.getcwd()}/data-START_{START}-STOP_{STOP}-STEP_{STEP}")
+    dir_out_base = Path(f"{os.getcwd()}/data/START_{START}-STOP_{STOP}-STEP_{STEP}")
     data_dir = Path(f"{args.dir}")
     set_style()
     with open("parameters/selections.json", "r") as f:

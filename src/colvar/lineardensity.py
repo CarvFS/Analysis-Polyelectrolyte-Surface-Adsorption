@@ -366,11 +366,6 @@ class LinearDensity(ParallelAnalysisBase):
         return result
 
     def _conclude(self):
-        avogadro = constants["N_Avogadro"]  # unit: mol^{-1}
-        volume_conversion = 1e-24  # unit: A^3/cm^3
-        # divide result values by avogadro and convert from A3 to cm3
-        k = avogadro * volume_conversion
-
         # merge weights with results
         if self._weighted:
             self._logger.debug("Merging weights with results")
@@ -483,8 +478,8 @@ class LinearDensity(ParallelAnalysisBase):
         self.results[dim]["charge_density_stddev"] = np.sqrt(radicand_charge)
 
         for dim in ["x", "y", "z"]:
-            # norming factor, units of mol^-1 cm^3
-            norm = k * self.results[dim]["slice_volume"]
+            # norming factor, units of A^3
+            norm = self.results[dim]["slice_volume"]
             for key in self.keys:
                 self.results[dim][key] /= norm
 
@@ -599,11 +594,11 @@ class LinearDensity(ParallelAnalysisBase):
         ax = fig.add_subplot(111)
         ax.plot(
             self.results[dim]["hist_bin_centers"] / 10,
-            self.results[dim]["number_density"],
+            self.results[dim]["number_density"] / (10**3),
             label=f"{dim}-axis",
         )
         ax.set_xlabel("Position [nm]")
-        ax.set_ylabel("Number density [mol/cm$^3$]")
+        ax.set_ylabel("Number density [nm$^{-3}$]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/number_density_{dim}_{self._tag}.{ext}")
 
@@ -643,11 +638,11 @@ class LinearDensity(ParallelAnalysisBase):
         ax = fig.add_subplot(111)
         ax.plot(
             self.results[dim]["hist_bin_centers"] / 10,
-            self.results[dim]["mass_density"],
+            self.results[dim]["mass_density"] / (10**3),
             label=f"{dim}-axis",
         )
         ax.set_xlabel("Position [nm]")
-        ax.set_ylabel("Mass density [g/cm$^3$]")
+        ax.set_ylabel("Mass density [g/nm$^3$]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/mass_density_{dim}_{self._tag}.{ext}")
 
@@ -687,11 +682,11 @@ class LinearDensity(ParallelAnalysisBase):
         ax = fig.add_subplot(111)
         ax.plot(
             self.results[dim]["hist_bin_centers"] / 10,
-            self.results[dim]["charge_density"],
+            self.results[dim]["charge_density"] / (10**3),
             label=f"{dim}-axis",
         )
         ax.set_xlabel("Position [nm]")
-        ax.set_ylabel("Charge density [$e$$\cdot$mol/cm$^3$]")
+        ax.set_ylabel("Charge density [$e$/nm$^3$]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/charge_density_{dim}_{self._tag}.{ext}")
 

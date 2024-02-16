@@ -36,7 +36,7 @@ for ((i = 0; i < ${#dir_sims[@]}; i++)); do
 done
 
 # run analysis script
-mkdir -p "output"
+mkdir -p "logs"
 if [[ "${single_analysis}" != "1" ]]; then
     for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do
         echo "- Analysis on index $((sim_idx + 1))/${n_sims}..."
@@ -44,7 +44,7 @@ if [[ "${single_analysis}" != "1" ]]; then
         {
             python3 "${python_script}" \
                 --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
-        } | tee "output/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+        } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
     done
 
 # run single analysis job
@@ -54,5 +54,5 @@ else
     {
         python3 "${python_script}" \
             --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
-    } | tee "output/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+    } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
 fi
