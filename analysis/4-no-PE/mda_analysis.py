@@ -251,7 +251,6 @@ def wrapper_lineardensity(
         select = uni.select_atoms(group)
         file_gr = f"lineardensity_z_{label}.npz"
         output_np = output_path / file_gr
-
         if output_np.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
         elif len(select) == 0:
@@ -522,7 +521,7 @@ def universe_analysis(
     """
     t_start_uni = time.time()
     # wrapper_mdhelper_density(uni, df_weights, sel_dict)
-    # wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_rdf(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
