@@ -405,6 +405,7 @@ def wrapper_solvent_orientation(
                 cos_dip=results["cos_dip"],
                 Pr_cos_dip=results["Pr_cos_dip"],
             )
+            log.debug(f"Saved results to {output_np}")
 
             # plot results
             fig, ax = plt.subplots(1, 3, figsize=(15, 5))
@@ -421,7 +422,10 @@ def wrapper_solvent_orientation(
             ax[2].set_ylabel(r"$P(\cos(\theta_{dip}))$")
             ax[2].set_title(r"Water orientation $\theta_{dip}$")
             fig.suptitle(f"Solvent orientation {label}")
-            fig.savefig(f"{output_path}/figures/solventorientation_{label}.png")
+            fig.tight_layout()
+            fig.savefig(
+                f"{output_path}/figures/solventorientation_{label}.png", dpi=600
+            )
             plt.close("all")
 
 
