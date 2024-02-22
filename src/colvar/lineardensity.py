@@ -21,6 +21,7 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy import integrate
 
 import numpy as np
 import warnings
@@ -465,6 +466,8 @@ class LinearDensity(ParallelAnalysisBase):
             self._logger.error(msg)
             raise ValueError(msg)
 
+        # add electrostatic potential
+
         # Compute standard deviation for the error
         # For certain tests in testsuite, floating point imprecision
         # can lead to negative radicands of tiny magnitude (yielding nan).
@@ -496,6 +499,63 @@ class LinearDensity(ParallelAnalysisBase):
             norm = self.results[dim]["slice_volume"]
             for key in self.keys:
                 self.results[dim][key] /= norm
+
+        # calculate potential
+        self._logger.debug("Calculating potential")
+        self.calculate_potential()
+
+    def calculate_potential(
+        self, sigma_e: float = 0.0, dielectric: float = 1.0
+    ) -> None:
+        """Calculate the electrostatic potential from the charge density profile.
+
+        Parameters
+        ----------
+        sigma_e : float, optional
+            Surface charge density [e/A^2]. Default is 0.0.
+        dielectric : float, optional
+            Relative dielectric constant [unitless]. Default is 1.0.
+        """
+        # constants
+        elementary_charge = 1.60217663e-19  # [C]
+        vacuum_permittivity = 8.85418782e-12  # [F/m] = [C/(V*m)]
+        angstrom = 1e-10  # [m]
+        permittivity = vacuum_permittivity * dielectric * angstrom  # [C/(V*A)]
+        prefactor = elementary_charge / permittivity  # [V]
+
+        def cumulative_trapezoidal_error(yerr, x):
+            """Calculate the error of the cumulative trapezoidal rule."""
+            prefactor = (x[1:] - x[:-1]) / 2
+            std_dev = np.sqrt(np.cumsum((np.square(yerr[1:]) + np.square(yerr[:-1]))))
+            return prefactor * std_dev
+
+        for dim in ["x", "y", "z"]:
+            self._logger.debug(f"Calculating potential for {dim}")
+            density = self.results[dim]["charge_density"]  # [e/A^3]
+            err = self.results[dim]["charge_density_stddev"]  # [e/A^3]
+            bins = self.results[dim]["hist_bin_centers"]  # [A]
+
+            # Calculate the first integral of the charge density profile [e/A^2]
+            potential = integrate.cumulative_trapezoid(
+                density,  # [e/A^3]
+                bins,  # [A]
+                initial=0,  # [e/A^2] arbitrary reference
+            )
+            potential_var = cumulative_trapezoidal_error(err, bins)  # [e/A^2]
+
+            # Calculate the second integral of the charge density profile [e/A]
+            potential = -integrate.cumulative_trapezoid(
+                potential - sigma_e,  # [e/A^2]
+                bins,  # [A]
+                initial=0,  # [e/A] no voltage at dim=0 (arbitrary reference)
+            )
+            potential_var = cumulative_trapezoidal_error(potential_var, bins)  # [e/A]
+
+            # Add units to potential to convert to [V]
+            potential *= prefactor
+            potential_var *= prefactor
+            self.results[dim]["potential"] = potential
+            self.results[dim]["potential_stddev"] = potential_var
 
     def save(self, dir_out: str = None) -> None:
         """
@@ -534,6 +594,8 @@ class LinearDensity(ParallelAnalysisBase):
                 mass_density_stddev=self.results[dim]["mass_density_stddev"],
                 charge_density=self.results[dim]["charge_density"],
                 charge_density_stddev=self.results[dim]["charge_density_stddev"],
+                potential=self.results[dim]["potential"],
+                potential_stddev=self.results[dim]["potential_stddev"],
             )
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
