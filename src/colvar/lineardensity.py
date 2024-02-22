@@ -525,7 +525,7 @@ class LinearDensity(ParallelAnalysisBase):
 
         def cumulative_trapezoidal_error(yerr, x):
             """Calculate the error of the cumulative trapezoidal rule."""
-            prefactor = (x[1:] - x[:-1]) / 2
+            prefactor = (x[1:] - x[:-1]) / 2.0
             std_dev = np.sqrt(np.cumsum((np.square(yerr[1:]) + np.square(yerr[:-1]))))
             return prefactor * std_dev
 

@@ -32,7 +32,6 @@ import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
 import pandas as pd
-import mdhelper as mdh  # noqa: E402
 
 # add local src directory to path
 sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
@@ -293,117 +292,137 @@ def wrapper_lineardensity(
             plt.close("all")
 
 
-def wrapper_mdhelper_density(
+def wrapper_solvent_orientation(
     uni: mda.Universe,
-    df_weights: pd.DataFrame,
     sel_dict: dict,
 ) -> None:
-    # set output path and information for analysis section
-    label_groups, groupings = [], []
-    output_path = Path("mdhelper_density/data")
-    fig_path = Path("mdhelper_density/figures")
-    output_path.mkdir(parents=True, exist_ok=True)
-    fig_path.mkdir(parents=True, exist_ok=True)
+    """
+    Wrapper function for solvent orientation calculation.
 
-    # Polyelectrolyte monomers
-    label_groups.append(sel_dict["polyelectrolyte"])
-    groupings.append("segments")
-    # Polyelectrolyte monomer C_alpha
-    label_groups.append(sel_dict["C_alpha"])
-    groupings.append("atoms")
-    # Na_ion
-    label_groups.append(sel_dict["Na_ion"])
-    groupings.append("atoms")
-    # Ca_ion
-    label_groups.append(sel_dict["Ca_ion"])
-    groupings.append("atoms")
-    # Cl_ion
-    label_groups.append(sel_dict["Cl_ion"])
-    groupings.append("atoms")
-    # Carbonate C
-    label_groups.append(sel_dict["C_crb_ion"])
-    groupings.append("atoms")
-    # not solvent
-    label_groups.append(sel_dict["not_sol"])
-    groupings.append("atoms")
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    sel_dict : dict
+        Dictionary of selection strings
 
-    if SOLVENT:
-        # solvent
-        label_groups.append(sel_dict["sol"])
-        groupings.append("segments")
-        # all atoms
-        label_groups.append("all")
-        groupings.append("atoms")
+    Returns
+    -------
+    None
 
-    for group, grouping in tqdm(
-        zip(label_groups, groupings),
-        total=len(label_groups),
-        desc="LinearDensity",
-        dynamic_ncols=True,
-    ):
-        log.info(f"Collective variable: MDHelperDensity({group})")
-        label = f"{group.replace(' ', '_')}_{grouping}"
-        file_gr = f"lineardensity_z_{label}"
-        output_np = output_path / file_gr
-        select = uni.select_atoms(group)
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
 
-        if Path(f"{output_np}.npz").exists() and not RELOAD_DATA:
-            log.debug("Skipping calculation")
-        elif len(select) == 0:
-            log.warning(f"No atoms found for group {group}")
-        else:
-            # run analysis
-            mdh_ld = mdh.analysis.profile.DensityProfile(
-                groups=select,
-                groupings=grouping,
-                axes="z",
-                n_bins=1000,
+    The following collective variables are calculated:
+    | - SolventOrientation of water molecules along the z-axis
+    """
+    if not SOLVENT:
+        log.warning("Skipping solvent orientation calculation")
+        return
+
+    output_path = Path("mdanalysis_solventorientation")
+    bins = np.linspace(0, max(uni.dimensions[2]), 1001, endpoint=True)
+    axis = "z"
+    n_bins = 100
+
+    # water
+    label_groups = [sel_dict["sol"]]
+
+    # iterate over all groups
+    for group in label_groups:
+        log.info(f"Collective variable: SolventOrientation({group})")
+
+        # iterate over all bins
+        for dim_min, dim_max in tqdm(
+            zip(bins[:-1], bins[1:]),
+            total=len(bins) - 1,
+            desc="Axis Binning",
+            dynamic_ncols=True,
+        ):
+            # select atoms
+            label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
+            select = uni.select_atoms(
+                f"{group} and (prop z > {dim_min} and prop z < {dim_max})",
+                updating=True,
+            )
+
+            # check if output file exists or if no atoms are found
+            file_gr = f"solventorientation_z-{label}.npz"
+            output_np = f"{output_path}/data/{file_gr}"
+            if Path(output_np).exists() and not RELOAD_DATA:
+                log.debug("Skipping calculation")
+                continue
+            elif len(select) == 0:
+                log.warning(f"No atoms found for group {group}")
+                continue
+
+            # perform calculation
+            mda_so = mda.analysis.waterdynamics.AngularDistribution(
+                universe=uni,
+                select=select,
+                bins=n_bins,
+                axis=axis,
                 verbose=VERBOSE,
             )
-            print(f"{mdh_ld._charges=}")
-            mdh_ld.run(
+            t_start = time.time()
+            mda_so.run(
                 start=START,
                 stop=STOP,
                 step=STEP,
                 verbose=VERBOSE,
             )
-            mdh_ld.calculate_potential_profile(dielectric=1.0, axis=2, sigma_e=0)
-            mdh_ld.save(file=output_np)
+            t_end = time.time()
+            log.debug(f"SO took {(t_end - t_start)/60:.2f} min")
 
-            # gather_results
-            nm_per_angstrom = 0.10
-            bins = mdh_ld.results.bins[0] * nm_per_angstrom
-            number_density = np.array(mdh_ld.results.number_density[0]).flatten() * (
-                nm_per_angstrom**3
+            # save results
+            results = {
+                "Pr_cos_OH": np.array(
+                    [float(column.split()[0]) for column in mda_so.graph[0][:-1]]
+                ),
+                "cos_OH": np.array(
+                    [float(column.split()[1]) for column in mda_so.graph[0][:-1]]
+                ),
+                "Pr_cos_HH": np.array(
+                    [float(column.split()[0]) for column in mda_so.graph[1][:-1]]
+                ),
+                "cos_HH": np.array(
+                    [float(column.split()[1]) for column in mda_so.graph[1][:-1]]
+                ),
+                "Pr_cos_dip": np.array(
+                    [float(column.split()[0]) for column in mda_so.graph[2][:-1]]
+                ),
+                "cos_dip": np.array(
+                    [float(column.split()[1]) for column in mda_so.graph[2][:-1]]
+                ),
+            }
+            np.savez_compressed(
+                output_np,
+                cos_OH=results["cos_OH"],
+                Pr_cos_OH=results["Pr_cos_OH"],
+                cos_HH=results["cos_HH"],
+                Pr_cos_HH=results["Pr_cos_HH"],
+                cos_dip=results["cos_dip"],
+                Pr_cos_dip=results["Pr_cos_dip"],
             )
-            charge_density = np.array(mdh_ld.results.charge_density[0]).flatten() * (
-                nm_per_angstrom**3
-            )
-            potential_profile = np.array(mdh_ld.results.potential[2]).flatten()
 
-            # plot number density and charge density on the same plot with different y-axes
-            fig, ax = plt.subplots()
-            ax2 = ax.twinx()
-            ax.plot(bins, number_density, "b-", label="Number Density")
-            ax2.plot(bins, charge_density, "r-", label="Charge Density")
-            ax.set_xlabel("z [nm]")
-            ax.set_ylabel("Number Density [nm$^{-3}$]", color="b")
-            ax2.set_ylabel("Charge Density [$e$/nm$^{3}$]", color="r")
-            fig.tight_layout()
-            plt.savefig(output_path.parent / "figures" / f"density_profile_{label}.png")
-
-            # plot potential profile
-            fig, ax = plt.subplots()
-            ax.plot(bins, potential_profile, "b-", label="Potential Profile")
-            ax.set_xlabel("z [nm]")
-            ax.set_ylabel("Electrostatic Potential [V]")
-            fig.tight_layout()
-            plt.savefig(
-                output_path.parent / "figures" / f"potential_profile_{label}.png"
-            )
-
-            # clean up
-            mdh_ld = None
+            # plot results
+            fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+            ax[0].plot(results["cos_OH"], results["Pr_cos_OH"])
+            ax[0].set_xlabel(r"$\cos(\theta_{OH})$")
+            ax[0].set_ylabel(r"$P(\cos(\theta_{OH}))$")
+            ax[0].set_title(r"Water orientation $\theta_{OH}$")
+            ax[1].plot(results["cos_HH"], results["Pr_cos_HH"])
+            ax[1].set_xlabel(r"$\cos(\theta_{HH})$")
+            ax[1].set_ylabel(r"$P(\cos(\theta_{HH}))$")
+            ax[1].set_title(r"Water orientation $\theta_{HH}$")
+            ax[2].plot(results["cos_dip"], results["Pr_cos_dip"])
+            ax[2].set_xlabel(r"$\cos(\theta_{dip})$")
+            ax[2].set_ylabel(r"$P(\cos(\theta_{dip}))$")
+            ax[2].set_title(r"Water orientation $\theta_{dip}$")
+            fig.suptitle(f"Solvent orientation {label}")
+            fig.savefig(f"{output_path}/figures/solventorientation_{label}.png")
+            plt.close("all")
 
 
 def wrapper_survivalprobability(
@@ -520,8 +539,7 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
-    # wrapper_mdhelper_density(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
