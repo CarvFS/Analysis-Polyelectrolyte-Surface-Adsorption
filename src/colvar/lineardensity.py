@@ -578,6 +578,10 @@ class LinearDensity(ParallelAnalysisBase):
             figs.append(fig)
             axs.append(ax)
 
+            fig, ax = self.plt_potential(dim=d, title=title, ext=ext)
+            figs.append(fig)
+            axs.append(ax)
+
         return figs, axs
 
     def plt_number_density(self, dim: str = "z", title: str = None, ext: str = "png"):
@@ -709,5 +713,49 @@ class LinearDensity(ParallelAnalysisBase):
         ax.set_ylabel("Charge density [$e$/nm$^3$]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/charge_density_{dim}_{self._tag}.{ext}")
+
+        return fig, ax
+
+    def plt_potential(self, dim: str = "z", title: str = None, ext: str = "png"):
+        """
+        Plot the electrostatic potential profiles.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Dimension to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figure and axes of the plot.
+
+        Raises
+        ------
+        ValueError
+            If `dim` is not one of 'x', 'y', or 'z'.
+        """
+        if dim not in ["x", "y", "z"]:
+            raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
+        if title is None:
+            title = f"${dim}$-axis"
+        if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
+            (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            self.results[dim]["hist_bin_centers"] / 10,
+            self.results[dim]["potential"],
+            label=f"{dim}-axis",
+        )
+        ax.set_xlabel("Position [nm]")
+        ax.set_ylabel("Electrostatic Potential [V]")
+        ax.set_title(title, y=1.05)
+        fig.savefig(self._dir_out / f"figures/potential_{dim}_{self._tag}.{ext}")
 
         return fig, ax

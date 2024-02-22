@@ -147,6 +147,7 @@
         "nbins",
         "nblocks",
         "nbsphinx",
+        "nbytes",
         "ncol",
         "ncols",
         "ndarray",
