@@ -28,6 +28,7 @@ import sys
 
 # External dependencies
 import MDAnalysis as mda
+from MDAnalysis.analysis import waterdynamics
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
@@ -322,7 +323,7 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_solventorientation")
-    bins = np.linspace(0, max(uni.dimensions[2]), 1001, endpoint=True)
+    bins = np.linspace(0, uni.dimensions[2], 1001, endpoint=True)
     axis = "z"
     n_bins = 100
 
@@ -342,10 +343,7 @@ def wrapper_solvent_orientation(
         ):
             # select atoms
             label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
-            select = uni.select_atoms(
-                f"{group} and (prop z > {dim_min} and prop z < {dim_max})",
-                updating=True,
-            )
+            selection = f"{group} and (prop z > {dim_min} and prop z < {dim_max})"
 
             # check if output file exists or if no atoms are found
             file_gr = f"solventorientation_z-{label}.npz"
@@ -353,17 +351,16 @@ def wrapper_solvent_orientation(
             if Path(output_np).exists() and not RELOAD_DATA:
                 log.debug("Skipping calculation")
                 continue
-            elif len(select) == 0:
+            elif len(uni.select_atoms(selection)) == 0:
                 log.warning(f"No atoms found for group {group}")
                 continue
 
             # perform calculation
-            mda_so = mda.analysis.waterdynamics.AngularDistribution(
+            mda_so = waterdynamics.AngularDistribution(
                 universe=uni,
-                select=select,
+                select=selection,
                 bins=n_bins,
                 axis=axis,
-                verbose=VERBOSE,
             )
             t_start = time.time()
             mda_so.run(
@@ -543,8 +540,9 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
-    # wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_solvent_orientation(uni, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
