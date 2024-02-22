@@ -196,7 +196,7 @@ def wrapper_lineardensity(
     """
     # set output path and information for analysis section
     label_groups, groupings = [], []
-    bins = np.linspace(0, max(uni.dimensions[:3]), 50001, endpoint=True)
+    bins = np.linspace(0, max(uni.dimensions[:3]), 5001, endpoint=True)
     label = f"-{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
     output_path = Path("mdanalysis_lineardensity-{label}")
 
@@ -323,7 +323,7 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_solventorientation")
-    bins = np.linspace(0, uni.dimensions[2], 1001, endpoint=True)
+    bins = np.linspace(20, 70, 51, endpoint=True)
     axis = "z"
     n_bins = 100
 
@@ -354,6 +354,8 @@ def wrapper_solvent_orientation(
             elif len(uni.select_atoms(selection)) == 0:
                 log.warning(f"No atoms found for group {group}")
                 continue
+            else:
+                log.debug(f"Selection string: {selection}")
 
             # perform calculation
             mda_so = waterdynamics.AngularDistribution(
