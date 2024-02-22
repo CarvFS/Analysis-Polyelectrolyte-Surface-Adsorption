@@ -39,6 +39,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
 from data.pipeline import DataPipeline  # noqa: E402
+from colvar.angulardistribution import AngularDistribution  # noqa: E402
 from colvar.atompair import SurvivalProbability  # noqa: E402
 from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
@@ -295,6 +296,7 @@ def wrapper_lineardensity(
 
 def wrapper_solvent_orientation(
     uni: mda.Universe,
+    df_weights: pd.DataFrame,
     sel_dict: dict,
 ) -> None:
     """
@@ -304,6 +306,8 @@ def wrapper_solvent_orientation(
     ----------
     uni : mda.Universe
         Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
     sel_dict : dict
         Dictionary of selection strings
 
@@ -323,12 +327,14 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_solventorientation")
-    bins = np.linspace(20, 70, 51, endpoint=True)
-    axis = "z"
-    n_bins = 100
+    min_dist = 20
+    max_dist = 50
+    bin_width = 0.1
+    bins = np.arange(min_dist, max_dist + bin_width, bin_width)
 
     # water
-    label_groups = [sel_dict["sol"]]
+    label_groups = [sel_dict["O_water"]]
+    grouping = "residues"
 
     # iterate over all groups
     for group in label_groups:
@@ -343,7 +349,8 @@ def wrapper_solvent_orientation(
         ):
             # select atoms
             label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
-            selection = f"{group} and (prop z > {dim_min} and prop z < {dim_max})"
+            selection = f"same resid as ({group} and (prop z > {dim_min} and prop z <= {dim_max}))"
+            ag = uni.select_atoms(selection, updating=True)
 
             # check if output file exists or if no atoms are found
             file_gr = f"solventorientation_z-{label}.npz"
@@ -351,18 +358,23 @@ def wrapper_solvent_orientation(
             if Path(output_np).exists() and not RELOAD_DATA:
                 log.debug("Skipping calculation")
                 continue
-            elif len(uni.select_atoms(selection)) == 0:
-                log.warning(f"No atoms found for group {group}")
+            elif len(uni.select_atoms(selection)) % 3 != 0:
+                raise ValueError(
+                    f"Number of atoms not divisible by 3 for selection {selection}"
+                )
+            elif len(uni.select_atoms(selection)) < 3 * 10:
+                log.warning(f"Not enough atoms found for selection {selection}")
                 continue
             else:
                 log.debug(f"Selection string: {selection}")
+                log.debug(f"Number of residues: {ag.n_residues}")
 
             # perform calculation
-            mda_so = waterdynamics.AngularDistribution(
-                universe=uni,
-                select=selection,
-                bins=n_bins,
-                axis=axis,
+            mda_so = AngularDistribution(
+                atomgroup=ag,
+                grouping=grouping,
+                label=label,
+                df_weights=df_weights if df_weights is not None else None,
             )
             t_start = time.time()
             mda_so.run(
@@ -370,61 +382,22 @@ def wrapper_solvent_orientation(
                 stop=STOP,
                 step=STEP,
                 verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
             )
             t_end = time.time()
             log.debug(f"SO took {(t_end - t_start)/60:.2f} min")
 
-            # save results
-            results = {
-                "Pr_cos_OH": np.array(
-                    [float(column.split()[0]) for column in mda_so.graph[0][:-1]]
-                ),
-                "cos_OH": np.array(
-                    [float(column.split()[1]) for column in mda_so.graph[0][:-1]]
-                ),
-                "Pr_cos_HH": np.array(
-                    [float(column.split()[0]) for column in mda_so.graph[1][:-1]]
-                ),
-                "cos_HH": np.array(
-                    [float(column.split()[1]) for column in mda_so.graph[1][:-1]]
-                ),
-                "Pr_cos_dip": np.array(
-                    [float(column.split()[0]) for column in mda_so.graph[2][:-1]]
-                ),
-                "cos_dip": np.array(
-                    [float(column.split()[1]) for column in mda_so.graph[2][:-1]]
-                ),
-            }
-            np.savez_compressed(
-                output_np,
-                cos_OH=results["cos_OH"],
-                Pr_cos_OH=results["Pr_cos_OH"],
-                cos_HH=results["cos_HH"],
-                Pr_cos_HH=results["Pr_cos_HH"],
-                cos_dip=results["cos_dip"],
-                Pr_cos_dip=results["Pr_cos_dip"],
-            )
-            log.debug(f"Saved results to {output_np}")
+            t_start = time.time()
+            mda_so.save()
+            t_end = time.time()
+            log.debug(f"Saving took {(t_end - t_start)/60:.2f} min")
 
-            # plot results
-            fig, ax = plt.subplots(1, 3, figsize=(15, 5))
-            ax[0].plot(results["cos_OH"], results["Pr_cos_OH"])
-            ax[0].set_xlabel(r"$\cos(\theta_{OH})$")
-            ax[0].set_ylabel(r"$P(\cos(\theta_{OH}))$")
-            ax[0].set_title(r"Water orientation $\theta_{OH}$")
-            ax[1].plot(results["cos_HH"], results["Pr_cos_HH"])
-            ax[1].set_xlabel(r"$\cos(\theta_{HH})$")
-            ax[1].set_ylabel(r"$P(\cos(\theta_{HH}))$")
-            ax[1].set_title(r"Water orientation $\theta_{HH}$")
-            ax[2].plot(results["cos_dip"], results["Pr_cos_dip"])
-            ax[2].set_xlabel(r"$\cos(\theta_{dip})$")
-            ax[2].set_ylabel(r"$P(\cos(\theta_{dip}))$")
-            ax[2].set_title(r"Water orientation $\theta_{dip}$")
-            fig.suptitle(f"Solvent orientation {label}")
-            fig.tight_layout()
-            fig.savefig(
-                f"{output_path}/figures/solventorientation_{label}.png", dpi=600
-            )
+            t_start = time.time()
+            mda_so.figures(ext=FIG_EXT)
+            t_end = time.time()
+            log.debug(f"Figures took {(t_end - t_start)/60:.2f} min")
+            mda_so = None
             plt.close("all")
 
 
@@ -542,7 +515,7 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
-    wrapper_solvent_orientation(uni, sel_dict)
+    wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     # wrapper_rdf(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)

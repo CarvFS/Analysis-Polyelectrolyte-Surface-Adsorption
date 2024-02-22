@@ -572,9 +572,9 @@ class LinearDensity(ParallelAnalysisBase):
             results are saved to the directory specified in the
             `dir_out` attribute.
         """
-        self._logger.info(f"Saving results for {self._tag} to {dir_out}")
         if dir_out is None:
             dir_out = self._dir_out / "data"
+        self._logger.info(f"Saving results for {self._tag} to {dir_out}")
         Path(dir_out).mkdir(parents=True, exist_ok=True)
 
         # save the dataframe to a file
