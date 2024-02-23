@@ -196,53 +196,57 @@ def wrapper_lineardensity(
     | - LinearDensity of all atoms
     """
     # set output path and information for analysis section
-    label_groups, groupings = [], []
-    bins = np.linspace(0, max(uni.dimensions[:3]), 5001, endpoint=True)
-    label_bin = f"{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
-    output_path = Path(f"mdanalysis_lineardensity-{label_bin}")
+    output_path = Path("mdanalysis_lineardensity")
+    label_groups, groupings, bins = [], [], []
+    bins_tight = np.linspace(0, max(uni.dimensions[:3]), 50001, endpoint=True)
+    bins_normal = np.linspace(0, max(uni.dimensions[:3]), 1001, endpoint=True)
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
-    groupings.append("segments")
+    groupings.append("atoms")
+    bins.append(bins_normal)
     # Polyelectrolyte monomer C_alpha
     label_groups.append(sel_dict["C_alpha"])
     groupings.append("atoms")
+    bins.append(bins_normal)
 
     # Na_ion
     label_groups.append(sel_dict["Na_ion"])
     groupings.append("atoms")
+    bins.append(bins_normal)
     # Cl_ion
     label_groups.append(sel_dict["Cl_ion"])
     groupings.append("atoms")
+    bins.append(bins_normal)
     # Ca_ion
     label_groups.append(sel_dict["Ca_ion"])
     groupings.append("atoms")
+    bins.append(bins_normal)
     # Carbonate C
     label_groups.append(sel_dict["C_crb_ion"])
     groupings.append("atoms")
-    # Carbonate O
-    label_groups.append(sel_dict["O_crb_ion"])
-    groupings.append("atoms")
+    bins.append(bins_normal)
     # not solvent
     label_groups.append(sel_dict["not_sol"])
-    groupings.append("residues")
+    groupings.append("atoms")
+    bins.append(bins_normal)
 
     if SOLVENT:
         # solvent
         label_groups.append(sel_dict["sol"])
-        groupings.append("residues")
+        groupings.append("atoms")
+        bins.append(bins_tight)
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
-        # H_water
-        label_groups.append(sel_dict["H_water"])
-        groupings.append("atoms")
+        bins.append(bins_normal)
         # all atoms
         label_groups.append("all")
         groupings.append("atoms")
+        bins.append(bins_tight)
 
-    for group, grouping in tqdm(
-        zip(label_groups, groupings),
+    for group, grouping, bin in tqdm(
+        zip(label_groups, groupings, bins),
         total=len(label_groups),
         desc="LinearDensity",
         dynamic_ncols=True,
@@ -250,8 +254,10 @@ def wrapper_lineardensity(
         log.info(f"Collective variable: LinearDensity({group})")
         label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
+
         file_gr = f"lineardensity_z_{label}.npz"
         output_np = output_path / "data" / file_gr
+
         if output_np.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
         elif len(select) == 0:
@@ -260,7 +266,7 @@ def wrapper_lineardensity(
             mda_ld = LinearDensity(
                 select=select,
                 grouping=grouping,
-                bins=bins,
+                bins=bin,
                 label=label,
                 df_weights=df_weights if df_weights is not None else None,
                 verbose=VERBOSE,

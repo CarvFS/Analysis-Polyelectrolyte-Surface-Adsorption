@@ -272,10 +272,7 @@ class LinearDensity(ParallelAnalysisBase):
             self._df_weights: pd.DataFrame = None
 
         # output data
-        self._dir_out: Path = Path(
-            "./mdanalysis_lineardensity"
-            + f"-{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
-        )
+        self._dir_out: Path = Path("./mdanalysis_lineardensity")
         self._df_filename = f"lineardensity_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df = None
@@ -328,7 +325,7 @@ class LinearDensity(ParallelAnalysisBase):
         for dim in ["x", "y", "z"]:
             idx = self.results[dim]["dim"]
 
-            # histogram for positions
+            # histogram for positions [# / A^3]
             hist, _ = np.histogram(
                 positions[:, idx],
                 bins=self.bins,
@@ -338,18 +335,19 @@ class LinearDensity(ParallelAnalysisBase):
             result[idx_start : idx_start + self.nbins] = np.square(hist)
             idx_start += self.nbins
 
-            # histogram for positions weighted on masses
+            # histogram for positions weighted on masses [g / A^3]
             hist, _ = np.histogram(
                 positions[:, idx],
                 weights=self.masses,
                 bins=self.bins,
-            )
+            )  # [# * g / mol / A^3]
+            hist /= 6.02214076e23  # Avogadro number [mol/#]
             result[idx_start : idx_start + self.nbins] = hist
             idx_start += self.nbins
             result[idx_start : idx_start + self.nbins] = np.square(hist)
             idx_start += self.nbins
 
-            # histogram for positions weighted on charges
+            # histogram for positions weighted on charges [e / A^3]
             hist, bin_edges = np.histogram(
                 positions[:, idx],
                 weights=self.charges,
@@ -519,7 +517,7 @@ class LinearDensity(ParallelAnalysisBase):
         elementary_charge = 1.60217663e-19  # [C]
         vacuum_permittivity = 8.85418782e-12  # [F/m] = [C/(V*m)]
         angstrom = 1e-10  # [m]
-        permittivity = vacuum_permittivity * dielectric * angstrom  # [C/(V*A)]
+        permittivity = vacuum_permittivity * dielectric * angstrom  # [C/(V*Angstrom)]
         prefactor = elementary_charge / permittivity  # [V]
 
         def cumulative_trapezoidal_error(yerr, x):
@@ -744,15 +742,22 @@ class LinearDensity(ParallelAnalysisBase):
         if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
             (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
 
+        kg_per_g = 0.001
+        nm_per_angstrom = 0.1
+        m_per_angstrom = 1e-10
+
+        x_nm = self.results[dim]["hist_bin_centers"] * nm_per_angstrom
+        y_kg_m3 = self.results[dim]["mass_density"] * kg_per_g / (m_per_angstrom**3)
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.plot(
-            self.results[dim]["hist_bin_centers"] / 10,
-            self.results[dim]["mass_density"] / (10**3),
+            x_nm,
+            y_kg_m3,
             label=f"{dim}-axis",
         )
         ax.set_xlabel("Position [nm]")
-        ax.set_ylabel("Mass density [g/nm$^3$]")
+        ax.set_ylabel("Mass density [kg/m$^3$]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/mass_density_{dim}_{self._tag}.{ext}")
 
@@ -877,10 +882,9 @@ class LinearDensity(ParallelAnalysisBase):
             (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
 
         kB = 1.38064852e-23  # [J/K]
-        T = 300  # [K]
+        T = 300.0  # [K]
         e_electron = 1.602176634e-19  # [C]
-        dimensionless_factor = 1.0 / (kB * T / e_electron)
-        self._logger.warning("The temperature is hardcoded to 300 K")
+        dimensionless_factor = e_electron / (kB * T)
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
