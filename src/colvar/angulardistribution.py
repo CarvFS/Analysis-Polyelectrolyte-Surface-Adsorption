@@ -29,6 +29,7 @@ class AngularDistribution(ParallelAnalysisBase):
         atomgroup: AtomGroup,
         grouping: str = "segments",
         label: str = None,
+        nbins: int = 150,
         df_weights: pd.DataFrame = None,
         axis: str = None,
         verbose: bool = False,
@@ -45,8 +46,10 @@ class AngularDistribution(ParallelAnalysisBase):
 
         # bins for angle distribution
         self.grouping = grouping
-        self.n_bins = 200
-        self.cos_bins = np.linspace(-1, 1, self.n_bins + 1)
+        self.n_bins = nbins
+        self.angle_bins = np.linspace(0, np.pi, self.n_bins + 1)[::-1]
+        self.angle_bins_centers = (self.angle_bins[1:] + self.angle_bins[:-1]) / 2.0
+        self.cos_bins = np.cos(self.angle_bins)
         self.cos_bins_centers = (self.cos_bins[1:] + self.cos_bins[:-1]) / 2.0
         self.angle_bins = np.arccos(self.cos_bins)
         self.angle_bins_centers = (self.angle_bins[1:] + self.angle_bins[:-1]) / 2.0
@@ -159,7 +162,6 @@ class AngularDistribution(ParallelAnalysisBase):
         self._logger.debug(f"Computing results from {self._results.shape[0]} frames")
         idx_start = 2
         for dim in self.dims:
-            self._logger.debug(f"Computing results for dimension {dim}")
             self.results[dim]["cos_bin_centers"] = self.cos_bins_centers
             self.results[dim]["bin_centers"] = self.angle_bins_centers
             self.results[dim]["cos_angle_density"] = np.average(
@@ -179,7 +181,6 @@ class AngularDistribution(ParallelAnalysisBase):
 
         # save results to a compressed numpy file
         def save_results(dim: str) -> None:
-            self._logger.debug(f"Saving results for dimension {dim}")
             np.savez_compressed(
                 dir_out / f"solventorientation_{dim}-{self._tag}.npz",
                 bin_centers=self.results[dim]["bin_centers"],

@@ -198,12 +198,12 @@ def wrapper_lineardensity(
     # set output path and information for analysis section
     label_groups, groupings = [], []
     bins = np.linspace(0, max(uni.dimensions[:3]), 5001, endpoint=True)
-    label = f"-{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
-    output_path = Path("mdanalysis_lineardensity-{label}")
+    label_bin = f"{bins[0]:.3f}_min-{bins[-1]:.3f}_max-{bins[1]-bins[0]:.3f}_delta"
+    output_path = Path(f"mdanalysis_lineardensity-{label_bin}")
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
-    groupings.append("fragments")
+    groupings.append("segments")
     # Polyelectrolyte monomer C_alpha
     label_groups.append(sel_dict["C_alpha"])
     groupings.append("atoms")
@@ -225,12 +225,12 @@ def wrapper_lineardensity(
     groupings.append("atoms")
     # not solvent
     label_groups.append(sel_dict["not_sol"])
-    groupings.append("atoms")
+    groupings.append("residues")
 
     if SOLVENT:
         # solvent
         label_groups.append(sel_dict["sol"])
-        groupings.append("atoms")
+        groupings.append("residues")
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
@@ -251,7 +251,7 @@ def wrapper_lineardensity(
         label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
         file_gr = f"lineardensity_z_{label}.npz"
-        output_np = output_path / file_gr
+        output_np = output_path / "data" / file_gr
         if output_np.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
         elif len(select) == 0:
@@ -326,7 +326,7 @@ def wrapper_solvent_orientation(
         log.warning("Skipping solvent orientation calculation")
         return
 
-    output_path = Path("mdanalysis_solventorientation")
+    output_path = Path("mdanalysis_angulardistribution")
     min_dist = 20
     max_dist = 50
     bin_width = 0.1
@@ -517,7 +517,7 @@ def universe_analysis(
     t_start_uni = time.time()
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
-    # wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_rdf(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")

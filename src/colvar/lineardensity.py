@@ -391,7 +391,6 @@ class LinearDensity(ParallelAnalysisBase):
         self._logger.debug(f"Computing results from {self._results.shape[0]} frames")
         idx_start = 2  # skip frame and time columns
         for dim in ["x", "y", "z"]:
-            self._logger.debug(f"Computing results for {dim}")
             # number density
             key = "number_density"
             key_std = "number_density_stddev"
@@ -525,15 +524,37 @@ class LinearDensity(ParallelAnalysisBase):
 
         def cumulative_trapezoidal_error(yerr, x):
             """Calculate the error of the cumulative trapezoidal rule."""
-            prefactor = (x[1:] - x[:-1]) / 2.0
-            std_dev = np.sqrt(np.cumsum((np.square(yerr[1:]) + np.square(yerr[:-1]))))
-            return prefactor * std_dev
+            if len(x) != len(yerr):
+                raise ValueError(
+                    "Length of x and yerr do not match. "
+                    f"x: {len(x)}, yerr: {len(yerr)}"
+                )
+
+            dx = x[1:] - x[:-1]
+            var_width = np.square(dx / 2.0)
+            var_height = np.square(yerr[1:]) + np.square(yerr[:-1])
+            var = var_width * var_height
+            std_dev = np.sqrt(np.cumsum(var))
+            # prepend yerr[0] to std_dev to match length of yerr
+            std_dev = np.insert(std_dev, 0, yerr[0])
+            return std_dev
 
         for dim in ["x", "y", "z"]:
             self._logger.debug(f"Calculating potential for {dim}")
             density = self.results[dim]["charge_density"]  # [e/A^3]
             err = self.results[dim]["charge_density_stddev"]  # [e/A^3]
             bins = self.results[dim]["hist_bin_centers"]  # [A]
+
+            if len(bins) != len(density):
+                raise ValueError(
+                    "Length of bins and density do not match. "
+                    f"bins: {len(bins)}, density: {len(density)}"
+                )
+            if len(bins) != len(err):
+                raise ValueError(
+                    "Length of bins and error do not match. "
+                    f"bins: {len(bins)}, error: {len(err)}"
+                )
 
             # Calculate the first integral of the charge density profile [e/A^2]
             potential = integrate.cumulative_trapezoid(
@@ -583,7 +604,6 @@ class LinearDensity(ParallelAnalysisBase):
 
         # save the results to a compressed numpy file
         def save_results(dim: str) -> None:
-            self._logger.debug(f"Saving results for {dim}")
             np.savez_compressed(
                 dir_out / f"lineardensity_{dim}_{self._tag}.npz",
                 hist_bin_edges=self.results[dim]["hist_bin_edges"],
@@ -641,6 +661,10 @@ class LinearDensity(ParallelAnalysisBase):
             axs.append(ax)
 
             fig, ax = self.plt_potential(dim=d, title=title, ext=ext)
+            figs.append(fig)
+            axs.append(ax)
+
+            fig, ax = self.plt_potential_nondim(dim=d, title=title, ext=ext)
             figs.append(fig)
             axs.append(ax)
 
@@ -819,5 +843,55 @@ class LinearDensity(ParallelAnalysisBase):
         ax.set_ylabel("Electrostatic Potential [V]")
         ax.set_title(title, y=1.05)
         fig.savefig(self._dir_out / f"figures/potential_{dim}_{self._tag}.{ext}")
+
+        return fig, ax
+
+    def plt_potential_nondim(self, dim: str = "z", title: str = None, ext: str = "png"):
+        """
+        Plot the electrostatic potential profiles in non-dimensional units.
+
+        Parameters
+        ----------
+        dim : str, optional
+            Dimension to plot. Default is 'z'. Must be one of 'x', 'y', or 'z'.
+        title : str, optional
+            Title of the plot
+        ext : str, optional
+            Extension of the plot file. Default is 'png'.
+
+        Returns
+        -------
+        tuple[plt.figure, plt.axes]
+            The figure and axes of the plot.
+
+        Raises
+        ------
+        ValueError
+            If `dim` is not one of 'x', 'y', or 'z'.
+        """
+        if dim not in ["x", "y", "z"]:
+            raise ValueError(f"dim must be one of 'x', 'y', or 'z'. Got {dim}.")
+        if title is None:
+            title = f"${dim}$-axis"
+        if self._dir_out / "figures" not in list(self._dir_out.iterdir()):
+            (self._dir_out / "figures").mkdir(parents=True, exist_ok=True)
+
+        kB = 1.38064852e-23  # [J/K]
+        T = 300  # [K]
+        e_electron = 1.602176634e-19  # [C]
+        dimensionless_factor = 1.0 / (kB * T / e_electron)
+        self._logger.warning("The temperature is hardcoded to 300 K")
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            self.results[dim]["hist_bin_centers"] / 10,
+            self.results[dim]["potential"] * dimensionless_factor,
+            label=f"{dim}-axis",
+        )
+        ax.set_xlabel("Position [nm]")
+        ax.set_ylabel("Electrostatic Potential [k$_B$T/e]")
+        ax.set_title(title, y=1.05)
+        fig.savefig(self._dir_out / f"figures/potential_nondim_{dim}_{self._tag}.{ext}")
 
         return fig, ax
