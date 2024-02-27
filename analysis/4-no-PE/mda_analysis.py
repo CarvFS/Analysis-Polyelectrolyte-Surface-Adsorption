@@ -28,7 +28,6 @@ import sys
 
 # External dependencies
 import MDAnalysis as mda
-from MDAnalysis.analysis import waterdynamics
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
@@ -41,6 +40,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 from data.pipeline import DataPipeline  # noqa: E402
 from colvar.angulardistribution import AngularDistribution  # noqa: E402
 from colvar.atompair import SurvivalProbability  # noqa: E402
+from colvar.dipole import Dipole  # noqa: E402
 from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
@@ -197,56 +197,83 @@ def wrapper_lineardensity(
     """
     # set output path and information for analysis section
     output_path = Path("mdanalysis_lineardensity")
-    label_groups, groupings, bins = [], [], []
-    bins_tight = np.linspace(0, max(uni.dimensions[:3]), 50001, endpoint=True)
-    bins_normal = np.linspace(0, max(uni.dimensions[:3]), 1001, endpoint=True)
+    label_groups, groupings, bins, dims, props = [], [], [], [], []
+
+    bins_tight = int(50e3)
+    bins_normal = int(1e3)
+
+    dims_all = ["x", "y", "z"]
+    dims_z = ["z"]
+
+    props_all = ["number", "mass", "charge"]
+    props_charge = ["charge"]
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
     groupings.append("atoms")
+    dims.append(dims_all)
     bins.append(bins_normal)
+    props.append(props_all)
     # Polyelectrolyte monomer C_alpha
     label_groups.append(sel_dict["C_alpha"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
 
     # Na_ion
     label_groups.append(sel_dict["Na_ion"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
     # Cl_ion
     label_groups.append(sel_dict["Cl_ion"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
     # Ca_ion
     label_groups.append(sel_dict["Ca_ion"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
     # Carbonate C
     label_groups.append(sel_dict["C_crb_ion"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
     # not solvent
     label_groups.append(sel_dict["not_sol"])
     groupings.append("atoms")
     bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
 
     if SOLVENT:
         # solvent
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
+        dims.append(dims_all)
+        props.append(props_charge)
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
         bins.append(bins_normal)
+        dims.append(dims_all)
+        props.append(props_all)
         # all atoms
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
+        dims.append(dims_all)
+        props.append(props_charge)
 
-    for group, grouping, bin in tqdm(
-        zip(label_groups, groupings, bins),
+    for group, grouping, bin, dim in tqdm(
+        zip(label_groups, groupings, bins, dims),
         total=len(label_groups),
         desc="LinearDensity",
         dynamic_ncols=True,
@@ -266,9 +293,10 @@ def wrapper_lineardensity(
             mda_ld = LinearDensity(
                 select=select,
                 grouping=grouping,
-                bins=bin,
+                nbins=bin,
                 label=label,
                 df_weights=df_weights if df_weights is not None else None,
+                dims=dim,
                 verbose=VERBOSE,
             )
             t_start = time.time()
@@ -407,6 +435,58 @@ def wrapper_solvent_orientation(
             plt.close("all")
 
 
+def wrapper_dipole(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    groups = []
+    output_path = Path("mdanalysis_dipole")
+
+    # water
+    groups.append(sel_dict["O_water"])
+    # caco3
+    groups.append(sel_dict["CaCO3"])
+    # all atoms
+    groups.append("all")
+
+    for group in groups:
+        log.info(f"Collective variable: DipoleMoment({group})")
+        label = f"{group.replace(' ', '_')}"
+        select = uni.select_atoms(group)
+
+        # see if output file exists, and if so, load it
+        file_gr = f"dipole_{label}.parquet"
+        output_np = output_path / file_gr
+        if output_np.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+        elif len(select) == 0:
+            log.warning(f"No atoms found for group {group}")
+        else:
+            mda_d = Dipole(
+                atomgroup=select,
+                label=label,
+                verbose=VERBOSE,
+            )
+            t_start = time.time()
+            mda_d.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
+            )
+            t_end = time.time()
+            log.debug(
+                f"Dipole with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min"
+            )
+            mda_d.save()
+            mda_d.figures(ext=FIG_EXT)
+            mda_d = None
+            plt.close("all")
+
+
 def wrapper_survivalprobability(
     uni: mda.Universe,
     sel_dict: dict,
@@ -521,10 +601,11 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
-    wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_dipole(uni, df_weights, sel_dict)
+    # wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_rdf(uni, df_weights, sel_dict)
-    # wrapper_survivalprobability(uni, sel_dict)
+    wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

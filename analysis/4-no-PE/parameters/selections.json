@@ -13,6 +13,7 @@
     "Cl_ion": "resname CL and name CL",
     "C_crb_ion": "resname CRB and name CX1",
     "O_crb_ion": "resname CRB and name OX1 OX2 OX3",
+    "CaCO3": "(resname CA and name CA) or (resname CRB and name CX1 OX1 OX2 OX3)",
     "not_sol": "not resname SOL",
     "sol": "resname SOL"
 }

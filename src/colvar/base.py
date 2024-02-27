@@ -363,17 +363,30 @@ class ParallelAnalysisBase(AnalysisBase):
                     )
                 )
 
+        time_analysis = datetime.now()
+        self._logger.debug(
+            f"Finished analysis. Time elapsed: {time_analysis - time_start}."
+        )
+
         # combine results
         self._logger.debug("Combining results")
         if len(block_results) > 0:
-            self._results = np.concatenate(block_results)
+            self._results = np.zeros((self.n_frames, len(block_results[0][0])))
+            idx = 0
+            for block in block_results:
+                for res in block:
+                    self._results[idx] = res
+                    idx += 1
         else:
             self._results = np.array([])
             self._logger.warning("No results returned.")
 
-        self._logger.debug("Time elapsed: " f"{datetime.now() - time_start}.")
-        if verbose:
-            print(f"Finished! Time elapsed: {datetime.now() - time_start}.")
+        self._logger.debug(
+            f"Combined results. Time elapsed: {datetime.now() - time_analysis}."
+        )
+
+        # drop block_results for memory
+        block_results = None
 
         # create dataframe
         self._logger.debug("Creating dataframe")

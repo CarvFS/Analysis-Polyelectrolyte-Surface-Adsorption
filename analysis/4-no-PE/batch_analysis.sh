@@ -22,7 +22,7 @@ set -o nounset # exit when script tries to use undeclared variable
 # analysis method
 python_script='mda_analysis.py'
 single_analysis='0'
-sim_idx='1'
+sim_idx='6'
 
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/4_many_monomer_binding'
 
