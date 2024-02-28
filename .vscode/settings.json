@@ -271,7 +271,8 @@
         "ytick",
         "zdim",
         "zmax",
-        "zmin"
+        "zmin",
+        "zorder"
     ],
     "python.testing.pytestArgs": [
         "src"
