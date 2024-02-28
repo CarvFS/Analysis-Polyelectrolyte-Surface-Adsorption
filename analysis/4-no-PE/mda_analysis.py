@@ -602,10 +602,10 @@ def universe_analysis(
     """
     t_start_uni = time.time()
     wrapper_dipole(uni, df_weights, sel_dict)
-    # wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_rdf(uni, df_weights, sel_dict)
-    wrapper_survivalprobability(uni, sel_dict)
+    # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

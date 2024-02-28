@@ -24,6 +24,7 @@ import pandas as pd
 from scipy import integrate
 from scipy import interpolate
 from scipy import linalg
+from scipy import sparse
 from scipy.signal import find_peaks
 
 import numpy as np
@@ -214,21 +215,19 @@ def periodic_bvp(
 
     # Laplacian matrix
     N = len(x)
-    A = (
-        np.diag(-2 * np.ones(N), 0)
-        + np.diag(np.ones(N - 1), -1)
-        + np.diag(np.ones(N - 1), 1)
-    )
-    # periodic boundary conditions
-    A[0, N - 1] = 1
-    A[N - 1, 0] = 1
-    # scale by dx^2
-    A = A / dx**2
+    A = sparse.diags((1, -2, 1), (-1, 0, 1), shape=(N, N), format="csc")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=sparse.SparseEfficiencyWarning)
+        # periodic boundary conditions
+        A[0, N - 1] = 1
+        A[N - 1, 0] = 1
+        # scale by dx^2
+        A = A / dx**2
 
     # solve the linear system
-    b = -y
+    b = -y.copy()
     u = np.zeros(N)
-    u[1:] = linalg.solve(A[1:, 1:], b[1:])
+    u[1:] = sparse.linalg.solve(A[1:, 1:], b[1:])
     u[0] = u[-1]
     return u, np.zeros_like(u)
 
