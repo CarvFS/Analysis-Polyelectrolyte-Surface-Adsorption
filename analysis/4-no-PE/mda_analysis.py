@@ -363,7 +363,7 @@ def wrapper_solvent_orientation(
     output_path = Path("mdanalysis_angulardistribution")
     min_dist = 20
     max_dist = 50
-    bin_width = 0.1
+    bin_width = 0.2
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
 
     # water

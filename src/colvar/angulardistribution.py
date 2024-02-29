@@ -120,18 +120,25 @@ class AngularDistribution(ParallelAnalysisBase):
             return results
 
         # calculate dipole vector of all compounds [n_groups, 3]
-        dipoles = ag.dipole_vector(compound=self.grouping)
+        dipoles = ag.dipole_vector(compound=self.grouping, unwrap=True)
         norms = np.linalg.norm(dipoles, axis=1)
-        dipoles_norm = np.empty_like(dipoles)
-        dipoles_norm.fill(np.nan)
-        with np.errstate(divide="ignore"):
-            dipoles_norm = dipoles / norms[:, np.newaxis]
+        dipoles_norm = dipoles
+        for i in range(len(norms)):
+            if norms[i] != 0:
+                dipoles_norm[i] = dipoles[i] / norms[i]
+            else:
+                dipoles_norm[i] = np.nan
+
+        # drop rows with NaN
+        idx_drop = np.where(np.isnan(dipoles_norm[:, 0]))[0]
+        dipoles_norm = np.delete(dipoles_norm, idx_drop, axis=0)
 
         # calculate angle of dipole vector with respect to axis
         idx_start = 2
         for axis in self.axes:
-            # calculate cosine of angle
-            cos_angle = np.clip(np.dot(dipoles_norm, axis), -1, 1)
+            # calculate angle between axis and rows of dipoles
+            cos_angle = np.dot(dipoles_norm, axis)
+            cos_angle = np.clip(cos_angle, -1, 1)
             hist, _ = np.histogram(cos_angle, bins=self.cos_bins, density=True)
             # save results
             results[idx_start : idx_start + self.n_bins] = hist
