@@ -29,7 +29,7 @@ class AngularDistribution(ParallelAnalysisBase):
         atomgroup: AtomGroup,
         grouping: str = "segments",
         label: str = None,
-        nbins: int = 150,
+        nbins: int = 100,
         df_weights: pd.DataFrame = None,
         axis: str = None,
         verbose: bool = False,

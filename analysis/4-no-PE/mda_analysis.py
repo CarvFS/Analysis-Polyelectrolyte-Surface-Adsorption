@@ -365,6 +365,7 @@ def wrapper_solvent_orientation(
     max_dist = 50
     bin_width = 0.2
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
+    nbins_angle = 100
 
     # water
     label_groups = [sel_dict["sol"]]
@@ -408,6 +409,7 @@ def wrapper_solvent_orientation(
                 atomgroup=ag,
                 grouping=grouping,
                 label=label,
+                nbins=nbins_angle,
                 df_weights=df_weights if df_weights is not None else None,
             )
             t_start = time.time()
