@@ -227,7 +227,7 @@ def periodic_bvp(
     # solve the linear system
     b = -y.copy()
     u = np.zeros(N)
-    u[1:] = sparse.linalg.solve(A[1:, 1:], b[1:])
+    u[1:] = sparse.linalg.spsolve(A[1:, 1:], b[1:])
     u[0] = u[-1]
     return u, np.zeros_like(u)
 

@@ -367,7 +367,7 @@ def wrapper_solvent_orientation(
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
 
     # water
-    label_groups = [sel_dict["O_water"]]
+    label_groups = [sel_dict["sol"]]
     grouping = "residues"
 
     # iterate over all groups
@@ -387,7 +387,7 @@ def wrapper_solvent_orientation(
             ag = uni.select_atoms(selection, updating=True)
 
             # check if output file exists or if no atoms are found
-            file_gr = f"solventorientation_z-{label}.npz"
+            file_gr = f"angulardistribution_z-{label}.npz"
             output_np = f"{output_path}/data/{file_gr}"
             if Path(output_np).exists() and not RELOAD_DATA:
                 log.debug("Skipping calculation")
@@ -457,7 +457,7 @@ def wrapper_dipole(
 
         # see if output file exists, and if so, load it
         file_gr = f"dipole_{label}.parquet"
-        output_np = output_path / file_gr
+        output_np = output_path / "data" / file_gr
         if output_np.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
         elif len(select) == 0:

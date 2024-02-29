@@ -133,9 +133,6 @@ class AngularDistribution(ParallelAnalysisBase):
             # calculate cosine of angle
             cos_angle = np.clip(np.dot(dipoles_norm, axis), -1, 1)
             hist, _ = np.histogram(cos_angle, bins=self.cos_bins, density=True)
-            # replace hist where cos_angle is 0 with nearest neighbor average for smoothness
-            idx_zero = np.where(cos_angle == 0)[0]
-            hist[idx_zero] = (hist[idx_zero - 1] + hist[idx_zero + 1]) / 2
             # save results
             results[idx_start : idx_start + self.n_bins] = hist
             idx_start += self.n_bins
@@ -182,7 +179,7 @@ class AngularDistribution(ParallelAnalysisBase):
         # save results to a compressed numpy file
         def save_results(dim: str) -> None:
             np.savez_compressed(
-                dir_out / f"solventorientation_{dim}-{self._tag}.npz",
+                dir_out / f"angulardistribution_{dim}-{self._tag}.npz",
                 bin_centers=self.results[dim]["bin_centers"],
                 angle_density=self.results[dim]["angle_density"],
                 cos_bin_centers=self.results[dim]["cos_bin_centers"],
