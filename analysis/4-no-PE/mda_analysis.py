@@ -210,7 +210,7 @@ def wrapper_lineardensity(
 
     # Polyelectrolyte monomers
     label_groups.append(sel_dict["polyelectrolyte"])
-    groupings.append("atoms")
+    groupings.append("residues")
     dims.append(dims_all)
     bins.append(bins_normal)
     props.append(props_all)
