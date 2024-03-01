@@ -273,6 +273,7 @@
         "ylim",
         "yrange",
         "ytick",
+        "yticks",
         "zdim",
         "zmax",
         "zmin",
