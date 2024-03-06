@@ -438,6 +438,13 @@ class ParallelAnalysisBase(AnalysisBase):
 
         nrows = len(self._df)
         df_out = pd.merge(self._df, df, on=col, how="inner")
+        # find indices of rows in self._df that are not in df_out
+        idx = self._df.index.difference(df_out.index)
+        if len(idx) > 0:
+            self._logger.warning(
+                f"Rows {idx} in self._df not found in df_out. " f"Dropping these rows."
+            )
+            self._results = np.delete(self._results, idx, axis=0)
 
         if len(df_out) == 0:
             warnings.warn("Could not merge dataframes. No data merged.")

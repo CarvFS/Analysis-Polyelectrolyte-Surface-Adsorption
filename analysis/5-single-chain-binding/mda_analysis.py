@@ -389,9 +389,9 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_angulardistribution")
-    min_dist = 20
-    max_dist = 50
-    bin_width = 0.1
+    min_dist = 20  # [Angstrom]
+    max_dist = 50  # [Angstrom]
+    bin_width = 0.2  # [Angstrom]
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
     nbins_angle = 100
 
@@ -451,7 +451,6 @@ def wrapper_solvent_orientation(
             )
             t_end = time.time()
             log.debug(f"SO took {(t_end - t_start)/60:.2f} min")
-            mda_so.merge_external_data(df_weights)
 
             t_start = time.time()
             mda_so.save()
@@ -526,6 +525,7 @@ def wrapper_dipole(
                 atomgroup=select,
                 label=label,
                 verbose=VERBOSE,
+                df_weights=df_weights if df_weights is not None else None,
             )
             t_start = time.time()
             mda_d.run(
@@ -540,8 +540,6 @@ def wrapper_dipole(
             log.debug(
                 f"Dipole with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min"
             )
-            if df_weights is not None:
-                mda_d.merge_external_data(df_weights)
             mda_d.save()
             mda_d.figures(ext=FIG_EXT)
             mda_d = None
@@ -688,7 +686,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # I/O and parameters
-    dir_out_base = Path(f"{os.getcwd()}/data/START_{START}-STOP_{STOP}-STEP_{STEP}")
+    mda_tag = f"START_{START}-STOP_{STOP}-STEP_{STEP}"
+    dir_out_base = Path(f"{os.getcwd()}/data")
     data_dir = Path(f"{args.dir}")
     set_style()
     with open("parameters/selections.json", "r") as f:

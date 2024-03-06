@@ -21,31 +21,41 @@ set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
 python_script='mda_analysis.py'
+gnu_parallel='0'
 single_analysis='0'
-sim_idx='6'
-
+sim_idx='0'
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding'
 
 # dir sims is all subdirectories in the base directory
 mapfile -t dir_sims < <(find "${dir_sims_base}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 n_sims="${#dir_sims[@]}"
-
 echo "Found ${#dir_sims[@]} simulations in ${dir_sims_base}"
 for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${dir_sims[${i}]}"
 done
+mkdir -p "logs"
 
 # run analysis script
-mkdir -p "logs"
 if [[ "${single_analysis}" != "1" ]]; then
-    for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do
-        echo "- Analysis on index $((sim_idx + 1))/${n_sims}..."
-        echo "python3 ${python_script} --dir ${dir_sims_base}/${dir_sims[${sim_idx}]}"
-        {
-            python3 "${python_script}" \
-                --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
-        } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
-    done
+
+    # run parallel analysis using GNU parallel
+    if [[ "${gnu_parallel}" == "1" ]]; then
+        echo "- Running analysis in parallel..."
+        parallel -j 32 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
+            python3 "${python_script}" --dir "${dir_sims_base}/{1}" \
+            ::: "${dir_sims[@]}"
+
+    # run analysis serially
+    else
+        for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do
+            echo "- Analysis on index $((sim_idx + 1))/${n_sims}..."
+            echo "python3 ${python_script} --dir ${dir_sims_base}/${dir_sims[${sim_idx}]}"
+            {
+                python3 "${python_script}" \
+                    --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
+            } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+        done
+    fi
 
 # run single analysis job
 else

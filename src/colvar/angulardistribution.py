@@ -150,11 +150,17 @@ class AngularDistribution(ParallelAnalysisBase):
         # get weights
         if self._df_weights is not None:
             self._logger.debug("Merge weights with results")
-            self.merge_external_data(self._df_weights)
-            weights = self._df_weights["weight"].to_numpy()
+            df_weights = self.merge_external_data(self._df_weights)
+            weights = df_weights["weight"].to_numpy()
         else:
             self._logger.debug("No weights provided")
             weights = np.ones(len(self._results[:, 0]))
+
+        # check that weights and results have the same length
+        if len(weights) != len(self._results[:, 0]):
+            raise ValueError(
+                f"Length of weights ({len(weights)}) and results ({len(self._results[:, 0])}) do not match"
+            )
 
         # drop indices containing NaN
         idx_drop = np.where(np.isnan(self._results[:, 0]))[0]
