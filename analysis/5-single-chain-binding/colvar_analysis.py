@@ -356,9 +356,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # FIXME: remove this line
-    # args.dir = "data/6.4.2-calcite-104surface-12nm_surface-13nm_vertical-1chain-PAcn-32mer-0Crb-0Ca-0Na-0Cl-300K-1bar-NVT"
-
     # find subdirectory for input data
     dir_list = [d for d in (INPUT_BASE_DIR / args.dir).iterdir() if d.is_dir()]
     # remove directories that have pattern "1-energy-minimization", "2-equilibration", "3-*"
