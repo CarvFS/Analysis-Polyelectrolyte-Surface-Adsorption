@@ -20,11 +20,10 @@ set -o errexit # exit when a command fails. Add || true to commands allowed to f
 set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
-python_script='colvar_analysis.py'
 gnu_parallel='0'
-single_analysis='1'
-sim_idx='9'
-
+single_analysis='0'
+sim_idx='0'
+python_script='colvar_analysis.py'
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding'
 
 # dir sims is all subdirectories in the base directory

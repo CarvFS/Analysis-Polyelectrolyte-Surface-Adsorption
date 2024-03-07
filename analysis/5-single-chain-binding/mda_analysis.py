@@ -703,6 +703,9 @@ if __name__ == "__main__":
     if VERBOSE:
         print(f"Found {len(pipeline.sampling_methods)} sampling methods")
 
+    step_init = STEP
+    start_init = START
+
     # iterate over all simulation methods
     for i, method in tqdm(
         enumerate(pipeline.sampling_methods),
@@ -720,6 +723,16 @@ if __name__ == "__main__":
         df_plumed = pipeline.load_plumed_colvar(method)
         pipeline.save_plumed_colvar(method, directory=dir_out / "plumed")
         universe = pipeline.load_universe(method)
+
+        # non-base replicas are down-sampled by a factor of 10
+        if ("replica" in method) and (method.split("_")[1] != "0"):
+            log.critical(f"Reducing STEP by factor of 10 to {STEP//10}")
+            STEP = step_init // 10
+            log.critical(f"Reducing START by factor of 10 to {START//10}")
+            START = start_init // 10
+        else:
+            STEP = step_init
+            START = start_init
 
         # calculate number of frames to analyze and frames per block
         last_frame = (

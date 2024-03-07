@@ -437,6 +437,12 @@ class DataPipeline:
             self.data_files[method]["df_energy"] = None
             self.data_files[method]["universe"] = None
 
+            # sort files by name
+            self.data_files[method]["top"].sort()
+            self.data_files[method]["traj"].sort()
+            self.data_files[method]["energy"].sort()
+            self.data_files[method]["plumed"].sort()
+
             # log the number of files found for this sampling method
             self._log.debug(
                 "Found "
@@ -618,7 +624,7 @@ class DataPipeline:
         )
 
         # drop rows where abs(*.bias) is > bias_max
-        bias_max = 100
+        bias_max = 1000
         cols = [
             col for col in df.columns if col.endswith(".bias") or col.endswith(".rbias")
         ]
@@ -722,13 +728,6 @@ class DataPipeline:
         ValueError
             If there is not exactly one topology file for the given method.
         """
-
-        self._log.info(f"Loading universe for method: {method}")
-        self._log.debug(
-            f"Found {len(self.data_files[method]['traj'])} trajectory files"
-        )
-        self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
-
         # check that there is only one topology file for this method
         num_top_files = len(self.data_files[method]["top"])
         if num_top_files != 1:
@@ -738,6 +737,9 @@ class DataPipeline:
             )
 
         self._log.debug(f"Loading MDA universe for method: {method}")
+        self._log.debug(
+            f"Found {len(self.data_files[method]['traj'])} trajectory files"
+        )
         self._log.debug(f"Topology file: {self.data_files[method]['top'][0]}")
         self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
         universe = mda.Universe(
