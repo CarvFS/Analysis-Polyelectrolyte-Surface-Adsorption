@@ -725,7 +725,7 @@ if __name__ == "__main__":
         universe = pipeline.load_universe(method)
 
         # non-base replicas are down-sampled by a factor of 10
-        if ("replica" in method) and (method.split("_")[1] != "0"):
+        if ("replica" in method) and (method.split("_")[1] != "00"):
             log.critical(f"Reducing STEP by factor of 10 to {STEP//10}")
             STEP = step_init // 10
             log.critical(f"Reducing START by factor of 10 to {START//10}")
