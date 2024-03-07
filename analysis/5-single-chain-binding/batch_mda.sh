@@ -21,19 +21,20 @@ set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
 python_script='mda_analysis.py'
-gnu_parallel='0'
+gnu_parallel='1'
 single_analysis='0'
 sim_idx='0'
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding'
 
 # dir sims is all subdirectories in the base directory
+mkdir -p "logs"
 mapfile -t dir_sims < <(find "${dir_sims_base}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
+mapfile -t dir_sims < <(printf "%s\n" "${dir_sims[@]}" | sort)
 n_sims="${#dir_sims[@]}"
 echo "Found ${#dir_sims[@]} simulations in ${dir_sims_base}"
 for ((i = 0; i < ${#dir_sims[@]}; i++)); do
-    echo "  ${dir_sims[${i}]}"
+    echo "  ${i}: ${dir_sims[${i}]}"
 done
-mkdir -p "logs"
 
 # run analysis script
 if [[ "${single_analysis}" != "1" ]]; then

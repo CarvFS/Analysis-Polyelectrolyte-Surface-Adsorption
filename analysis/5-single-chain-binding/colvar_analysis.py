@@ -359,7 +359,7 @@ if __name__ == "__main__":
     # find subdirectory for input data
     dir_list = [d for d in (INPUT_BASE_DIR / args.dir).iterdir() if d.is_dir()]
     # remove directories that have pattern "1-energy-minimization", "2-equilibration", "3-*"
-    patterns = ["1-energy-minimization", "2-equilibration", "3-"]
+    patterns = ["1-energy-minimization", "2-equilibration", "3-", "corrupt", "bad"]
     dir_list = [d for d in dir_list if not any(p in str(d) for p in patterns)]
     if len(dir_list) == 0:
         dir_list = [INPUT_BASE_DIR / args.dir]
