@@ -40,8 +40,11 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 from data.pipeline import DataPipeline  # noqa: E402
 from colvar.angulardistribution import AngularDistribution  # noqa: E402
 from colvar.atompair import SurvivalProbability  # noqa: E402
+from colvar.contacts import Contacts  # noqa: E402
 from colvar.dipole import Dipole  # noqa: E402
+from colvar.dihedrals import Dihedral  # noqa: E402
 from colvar.lineardensity import LinearDensity  # noqa: E402
+from colvar.polymerlengths import PolymerLengths  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
@@ -51,6 +54,278 @@ from parameters.globals import *  # noqa: E402
 # #############################################################################
 # Functions
 # #############################################################################
+
+
+def wrapper_polymerlength(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    """
+    Wrapper function for polymer length calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - PolymerLength of polyelectrolyte
+    """
+    # set output path and information for analysis section
+    label_groups, groupings = [], []
+    output_path = Path("mdanalysis_polymer_lengths")
+
+    # Polyelectrolyte
+    label_groups.append(sel_dict["polyelectrolyte"])
+
+    for group in tqdm(
+        label_groups,
+        total=len(label_groups),
+        desc="PolymerLength",
+        dynamic_ncols=True,
+    ):
+        log.info(f"Collective variable: PolymerLength({group})")
+        label = f"{group.replace(' ', '_')}"
+        select = uni.select_atoms(group)
+
+        file_gr = f"pl_{label}.parquet"
+        output_np = output_path / "data" / file_gr
+        if output_np.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+        elif len(select) == 0:
+            log.warning(f"No atoms found for group {group}")
+        else:
+            mda_pl = PolymerLengths(
+                atomgroup=select,
+                label=label,
+                verbose=VERBOSE,
+            )
+            t_start = time.time()
+            mda_pl.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
+            )
+            t_end = time.time()
+            log.debug(f"PL with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min")
+
+            mda_pl.merge_external_data(df_weights)
+            mda_pl.save()
+            mda_pl.figures(ext=FIG_EXT)
+            mda_pl = None
+            plt.close("all")
+
+
+def wrapper_dihedrals(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    """
+    Wrapper function for dihedral angle calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - Dihedrals of polyelectrolyte
+    """
+    # set output path and information for analysis section
+    label_groups, groupings = [], []
+    output_path = Path("mdanalysis_dihedrals")
+
+    # Polyelectrolyte
+    label_groups.append(sel_dict["polyelectrolyte"])
+
+    for group in tqdm(
+        label_groups,
+        total=len(label_groups),
+        desc="Dihedrals",
+        dynamic_ncols=True,
+    ):
+        log.info(f"Collective variable: Dihedrals({group})")
+        label = f"{group.replace(' ', '_')}"
+        select = uni.select_atoms(group)
+
+        file_gr = f"dihedral_{label}.parquet"
+        output_np = output_path / "data" / file_gr
+        if output_np.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+        elif len(select) == 0:
+            log.warning(f"No atoms found for group {group}")
+        else:
+            mda_dh = Dihedral(
+                atomgroup=select,
+                label=label,
+                verbose=VERBOSE,
+            )
+            t_start = time.time()
+            mda_dh.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
+            )
+            t_end = time.time()
+            log.debug(
+                f"Dihedrals with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min"
+            )
+
+            mda_dh.merge_external_data(df_weights)
+            mda_dh.save()
+            # mda_dh.figures(ext=FIG_EXT)
+            mda_dh = None
+            plt.close("all")
+
+
+def wrapper_contacts(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    """
+    Wrapper function for contact calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - Contacts of polyelectrolyte
+    """
+    methods = ["hard_cut", "6_12"]
+
+    # set output path and information for analysis section
+    label_groups, label_references, updating = [], [], []
+    kwargs_hard_cut, kwargs_rational = [], []
+    output_path = Path("mdanalysis_contacts")
+
+    # {Ca, O_carboxylate}
+    label_references.append(sel_dict["O_carb"])
+    label_groups.append(sel_dict["Ca_ion"])
+    updating.append((False, False))
+    kwargs_hard_cut.append({"radius": 3.5})
+    kwargs_rational.append({"radius": 0.98, "d0": 2.80})
+
+    # {Na, O_carboxylate}
+    label_references.append(sel_dict["O_carb"])
+    label_groups.append(sel_dict["Na_ion"])
+    updating.append((False, False))
+    kwargs_hard_cut.append({"radius": 3.5})
+    kwargs_rational.append({"radius": 0.98, "d0": 2.80})
+
+    for group, reference, update, kw_hc, kw_r in tqdm(
+        zip(label_groups, label_references, updating, kwargs_hard_cut, kwargs_rational),
+        total=len(label_groups),
+        desc="Contacts",
+        dynamic_ncols=True,
+    ):
+        for method in methods:
+            log.info(
+                f"Collective variable: Contacts({group}, {reference}) with {method}"
+            )
+            label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}-{method}"
+            file_gr = f"contacts_{label}.parquet"
+            output_np = output_path / "data" / file_gr
+            if output_np.exists() and not RELOAD_DATA:
+                log.debug("Skipping calculation")
+                continue
+
+            coord = uni.select_atoms(reference, updating=update[0])
+            ref = uni.select_atoms(group, updating=update[1])
+            if len(coord) == 0:
+                log.warning(f"No reference atoms found for reference {reference}")
+                continue
+            elif len(ref) == 0:
+                log.warning(f"No reference atoms found for group {group}")
+                continue
+
+            if method == "hard_cut":
+                mda_cn = Contacts(
+                    uni,
+                    (coord, ref),
+                    method=method,
+                    radius=kw_hc["radius"],
+                    label=label,
+                    verbose=VERBOSE,
+                )
+            elif method == "6_12":
+                mda_cn = Contacts(
+                    uni,
+                    (coord, ref),
+                    method=method,
+                    radius=kw_r["radius"],
+                    label=label,
+                    verbose=VERBOSE,
+                    kwargs={"d0": kw_r["d0"]},
+                )
+            else:
+                raise ValueError(f"Unknown method {method}")
+
+            t_start = time.time()
+            mda_cn.run(
+                start=START,
+                stop=STOP,
+                step=STEP,
+                verbose=VERBOSE,
+                n_jobs=N_JOBS,
+                n_blocks=N_BLOCKS,
+            )
+            t_end = time.time()
+            log.debug(
+                f"Contacts with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min"
+            )
+
+            mda_cn.merge_external_data(df_weights)
+            mda_cn.save()
+            mda_cn.figures(ext=FIG_EXT)
+            mda_cn = None
+            plt.close("all")
 
 
 def wrapper_rdf(
@@ -660,11 +935,14 @@ def universe_analysis(
         Dictionary of selection strings
     """
     t_start_uni = time.time()
-    wrapper_dipole(uni, df_weights, sel_dict)
-    wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_polymerlength(uni, df_weights, sel_dict)
+    wrapper_dihedrals(uni, df_weights, sel_dict)
+    wrapper_contacts(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
+    wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_dipole(uni, df_weights, sel_dict)
     wrapper_rdf(uni, df_weights, sel_dict)
-    # wrapper_survivalprobability(uni, sel_dict)
+    wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

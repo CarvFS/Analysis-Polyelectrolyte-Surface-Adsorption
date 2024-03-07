@@ -190,6 +190,7 @@
         "pipefail",
         "PMDA",
         "pmfs",
+        "polymerlength",
         "polymerlengths",
         "prange",
         "prdf",
