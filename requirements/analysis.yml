@@ -29,6 +29,7 @@ dependencies:
   - pandas>=2.0.0
   - pyarrow
   # MD packages
+  - gromacswrapper
   - mdanalysis>=2.6.0
   - mdanalysistests
   - panedr
