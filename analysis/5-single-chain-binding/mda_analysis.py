@@ -964,8 +964,9 @@ def universe_analysis(
 # #############################################################################
 # Script
 # #############################################################################
-
 if __name__ == "__main__":
+    log = setup_logging(log_file="mda_data_gen.log", verbose=VERBOSE, stream=True)
+
     # command line input
     parser = argparse.ArgumentParser(description="Analyze MD data")
     parser.add_argument(
@@ -1008,7 +1009,6 @@ if __name__ == "__main__":
         dir_out = dir_out_base / f"{pipeline.tag}/{method}"
         dir_out.mkdir(parents=True, exist_ok=True)
         os.chdir(dir_out)
-        log = setup_logging(log_file="mda_data_gen.log", verbose=VERBOSE, stream=True)
         pipeline._init_log(log_file="data_pipeline.log")
 
         # load data for method
