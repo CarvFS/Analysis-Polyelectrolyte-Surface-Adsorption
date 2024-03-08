@@ -270,7 +270,7 @@ def wrapper_contacts(
                 f"Collective variable: Contacts({group}, {reference}) with {method}"
             )
             label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}-{method}"
-            file_gr = f"contacts_{label}.parquet"
+            file_gr = f"contact_{label}.parquet"
             output_np = output_path / "data" / file_gr
             if output_np.exists() and not RELOAD_DATA:
                 log.debug("Skipping calculation")
