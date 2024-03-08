@@ -481,7 +481,9 @@ def wrapper_lineardensity(
     The following collective variables are calculated:
     | - LinearDensity of polyelectrolyte monomers
     | - LinearDensity of polyelectrolyte chains
-    | - LinearDensity of polyelectrolyte monomer C_alpha
+    | - LinearDensity of polyelectrolyte C_alpha atoms
+    | - LinearDensity of polyelectrolyte C_carb atoms
+    | - LinearDensity of polyelectrolyte O_carb atoms
     | - LinearDensity of Na_ion
     | - LinearDensity of Cl_ion
     | - LinearDensity of Ca_ion
@@ -517,8 +519,20 @@ def wrapper_lineardensity(
     dims.append(dims_all)
     bins.append(bins_normal)
     props.append(props_all)
-    # Polyelectrolyte monomer C_alpha
+    # Polyelectrolyte C_alpha atoms
     label_groups.append(sel_dict["C_alpha"])
+    groupings.append("atoms")
+    bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
+    # Polyelectrolyte C_carb atoms
+    label_groups.append(sel_dict["C_carb"])
+    groupings.append("atoms")
+    bins.append(bins_normal)
+    dims.append(dims_all)
+    props.append(props_all)
+    # Polyelectrolyte O_carb atoms
+    label_groups.append(sel_dict["O_carb"])
     groupings.append("atoms")
     bins.append(bins_normal)
     dims.append(dims_all)
