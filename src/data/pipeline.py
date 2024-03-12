@@ -624,7 +624,7 @@ class DataPipeline:
         )
 
         # drop rows where abs(*.bias) is > bias_max
-        bias_max = 1000
+        bias_max = 100
         cols = [
             col for col in df.columns if col.endswith(".bias") or col.endswith(".rbias")
         ]

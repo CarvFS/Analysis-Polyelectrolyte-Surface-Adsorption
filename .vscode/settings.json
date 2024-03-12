@@ -159,6 +159,7 @@
         "nanmean",
         "nanmin",
         "nanpercentile",
+        "nanstd",
         "nbins",
         "nblocks",
         "nbsphinx",

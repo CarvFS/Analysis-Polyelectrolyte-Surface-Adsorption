@@ -36,6 +36,16 @@ for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${i}: ${dir_sims[${i}]}"
 done
 
+# if there is more than 1 command line argument, then the first argument is the index of the simulation to analyze
+if [[ "${#}" -gt 0 ]]; then
+    single_analysis='1'
+    sim_idx="${1}"
+    if [[ "${sim_idx}" -ge "${n_sims}" ]]; then
+        echo "Error: Simulation index ${sim_idx} is out of range [0, ${n_sims})"
+        exit 1
+    fi
+fi
+
 # run analysis script
 if [[ "${single_analysis}" != "1" ]]; then
 

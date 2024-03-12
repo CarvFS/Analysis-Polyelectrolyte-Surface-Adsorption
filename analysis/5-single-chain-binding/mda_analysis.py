@@ -161,7 +161,7 @@ def wrapper_dihedrals(
     | - Dihedrals of polyelectrolyte
     """
     # set output path and information for analysis section
-    label_groups, groupings = [], []
+    label_groups = []
     output_path = Path("mdanalysis_dihedrals")
 
     # Polyelectrolyte
@@ -965,7 +965,8 @@ def universe_analysis(
 # Script
 # #############################################################################
 if __name__ == "__main__":
-    log = setup_logging(log_file="mda_data_gen.log", verbose=VERBOSE, stream=True)
+    Path("logs").mkdir(parents=True, exist_ok=True)
+    log = setup_logging(log_file="logs/mda_data_gen.log", verbose=VERBOSE, stream=True)
 
     # command line input
     parser = argparse.ArgumentParser(description="Analyze MD data")
@@ -1005,6 +1006,11 @@ if __name__ == "__main__":
         total=len(pipeline.sampling_methods),
         desc="Sampling Methods",
     ):
+        # FIXME: remove this
+        if method.split("_")[1] != "00":
+            log.critical("Skipping non-base replica")
+            continue
+
         # create output directory
         dir_out = dir_out_base / f"{pipeline.tag}/{method}"
         dir_out.mkdir(parents=True, exist_ok=True)

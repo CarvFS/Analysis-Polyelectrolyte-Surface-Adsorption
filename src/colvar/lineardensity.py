@@ -598,12 +598,14 @@ class LinearDensity(ParallelAnalysisBase):
             weights_mda = np.zeros_like(times_mda)
             for idx, time in enumerate(times_mda):
                 idx_closest = np.argmin(np.abs(time - times_plumed))
+                weights_mda[idx] = weights_plumed[idx_closest]
+
                 if np.abs(time - times_plumed[idx_closest]) > 1e-3:
                     self._logger.warning(
                         f"Closest time in plumed file: {times_plumed[idx_closest]}, "
-                        f"MDAnalysis time: {time}"
+                        f"MDAnalysis time: {time}, dropping frame {idx}"
                     )
-                weights_mda[idx] = weights_plumed[idx_closest]
+                    weights_mda[idx] = 0.0
 
             weights = weights_mda
 

@@ -169,7 +169,7 @@ class ParallelAnalysisBase(AnalysisBase):
         frames: np.array = None,
         verbose: bool = None,
         n_jobs: int = 1,
-        module: str = "joblib",
+        module: str = "dask",
         method: str = None,
         n_blocks: int = None,
         **kwargs,

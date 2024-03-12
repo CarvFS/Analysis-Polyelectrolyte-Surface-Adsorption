@@ -36,8 +36,18 @@ for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${i}: ${dir_sims[${i}]}"
 done
 
+# if there is more than 1 command line argument, then the first argument is the index of the simulation to analyze
+if [[ "${#}" -gt 0 ]]; then
+    single_analysis='1'
+    sim_idx="${1}"
+    if [[ "${sim_idx}" -ge "${n_sims}" ]]; then
+        echo "Error: Simulation index ${sim_idx} is out of range [0, ${n_sims})"
+        exit 1
+    fi
+fi
+
 # run analysis script
-mkdir -p "data"
+mkdir -p "logs"
 if [[ "${single_analysis}" != "1" ]]; then
     if [[ "${gnu_parallel}" != "1" ]]; then
         for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do
@@ -46,12 +56,12 @@ if [[ "${single_analysis}" != "1" ]]; then
             {
                 python3 "${python_script}" \
                     --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
-            } | tee "data/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+            } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
         done
 
     else
         echo "- Running analysis in parallel..."
-        parallel -j 32 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
+        parallel -j 32 --joblog "logs/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
             python3 "${python_script}" --dir "${dir_sims_base}/{1}" \
             ::: "${dir_sims[@]}"
     fi
@@ -63,5 +73,5 @@ else
     {
         python3 "${python_script}" \
             --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
-    } | tee "data/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+    } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
 fi
