@@ -86,13 +86,17 @@ def test_scheduler(analysis: NoneAnalysis, scheduler: Client):
 @pytest.mark.parametrize("n_blocks", np.arange(1, 11))
 def test_nblocks(analysis: NoneAnalysis, scheduler: Client, n_blocks: int):
     analysis.run(n_blocks=n_blocks)
-    assert len(analysis._results) == analysis.n_frames
+    assert (
+        len(analysis._results) == analysis.n_frames
+    ), f"len={len(analysis._results)} n_frames={analysis.n_frames}"
 
 
 def test_guess_nblocks(analysis: NoneAnalysis, scheduler: Client):
     with dask.config.set(scheduler="processes"):
         analysis.run(n_jobs=-1)
-    assert len(analysis._results) == analysis.n_frames
+    assert (
+        len(analysis._results) == analysis.n_frames
+    ), f"len={len(analysis._results)} n_frames={analysis.n_frames}"
 
 
 def test_reduce(scheduler: Client):

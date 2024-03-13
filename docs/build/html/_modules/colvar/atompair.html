@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>colvar.atompair &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">colvar.atompair</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for colvar.atompair</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:Authors: Alec Glisman</span>
+<span class="sd">:Year: 2022</span>
+<span class="sd">:Copyright: GNU Public License v2</span>
+
+<span class="sd">This module implements the calculation of the atom pair relaxation</span>
+<span class="sd">correlation function (APC). APCs are used to characterize the association</span>
+<span class="sd">dynamics between pairs of atoms in a system. The function is also commonly</span>
+<span class="sd">known as the mean residence time (MRT) and is used to describe the water</span>
+<span class="sd">residence time next to a given solute.</span>
+
+<span class="sd">Long relaxation times are associated with strong interactions between atoms</span>
+<span class="sd">in the specified groups. For a full explanation of the theory and derivation</span>
+<span class="sd">behind the atom pair relaxation function (`_survival_imm`), please read</span>
+<span class="sd">[Impey1983]_.</span>
+
+<span class="sd">Note that the IMM correlation function is highly sensitive to the maximum</span>
+<span class="sd">time (equivalent to number of successive frames) that a given pair is</span>
+<span class="sd">allowed to continuously unpair during a sub-trajectory. This time accounts</span>
+<span class="sd">for brief &quot;recrossing events&quot; that are not considered pair breaks. For a</span>
+<span class="sd">discussion of these issues, see [Laage2008]_.</span>
+
+<span class="sd">We also use an alternative implementation of the APC first derived in</span>
+<span class="sd">[Northrop1980]_ (`_survival_ssp`). This function does not look at the time</span>
+<span class="sd">spent in the paired state, but rather the time required to go from a reactant</span>
+<span class="sd">(paired) to product (unpaired) and does not need to explicitly account for a</span>
+<span class="sd">recrossing time. This function used with `n_frames_recross = None`.</span>
+
+
+<span class="sd">References</span>
+<span class="sd">----------</span>
+
+<span class="sd">.. [Northrop1980] Northrup, S. H.; Hynes, J. T. The Stable States Picture of</span>
+<span class="sd">                  Chemical Reactions. I. Formulation for Rate Constants and</span>
+<span class="sd">                  Initial Condition Effects. The Journal of Chemical Physics</span>
+<span class="sd">                  1980, 73 (6), 2700-2714. https://doi.org/10.1063/1.440484.</span>
+
+<span class="sd">.. [Impey1983]  Impey, R. W.; Madden, P. A.; McDonald, I. R. Hydration and</span>
+<span class="sd">                Mobility of Ions in Solution. J. Phys. Chem. 1983, 87 (25),</span>
+<span class="sd">                5071-5083. https://doi.org/10.1021/j150643a008.</span>
+
+<span class="sd">.. [Laage2008]  Laage, D.; Hynes, J. T. On the Residence Time for Water in a</span>
+<span class="sd">                Solute Hydration Shell: Application to Aqueous Halide</span>
+<span class="sd">                Solutions. Journal of Physical Chemistry B 2008, 112 (26),</span>
+<span class="sd">                7697-7701. https://doi.org/10.1021/jp802033r.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Standard library</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="c1"># Third-party packages</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="c1"># MDAnalysis package</span>
+<span class="kn">from</span> <span class="nn">MDAnalysis.core.groups</span> <span class="kn">import</span> <span class="n">AtomGroup</span>
+<span class="kn">from</span> <span class="nn">MDAnalysis.lib.log</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+
+<span class="c1"># Internal dependencies</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">ParallelAnalysisBase</span>
+
+<span class="c1"># add local src directory to path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span><span class="p">))</span>
+
+<span class="c1"># Local internal dependencies</span>
+<span class="kn">from</span> <span class="nn">utils.logs</span> <span class="kn">import</span> <span class="n">setup_logging</span>  <span class="c1"># noqa: E402</span>
+
+
+<div class="viewcode-block" id="mon_exp">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.mon_exp">[docs]</a>
+<span class="k">def</span> <span class="nf">mon_exp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">b1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b1</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="bi_exp">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.bi_exp">[docs]</a>
+<span class="k">def</span> <span class="nf">bi_exp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b1</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">c2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b2</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="tri_exp">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.tri_exp">[docs]</a>
+<span class="k">def</span> <span class="nf">tri_exp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">b3</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b1</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">c2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b2</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">c3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b3</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AtomPair">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair">[docs]</a>
+<span class="k">class</span> <span class="nc">AtomPair</span><span class="p">(</span><span class="n">ParallelAnalysisBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the calculation of the atom pair relaxation</span>
+<span class="sd">    correlation function (APC)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">select</span><span class="p">:</span> <span class="n">AtomGroup</span><span class="p">,</span>
+        <span class="n">n_pairs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tau_max</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">window_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">fit_func</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize AtomPair analysis class. Method calls parent</span>
+<span class="sd">        class initializer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        select : AtomGroup</span>
+<span class="sd">            AtomGroup to analyze</span>
+<span class="sd">        n_pairs : int</span>
+<span class="sd">            Maximum number of pairs to analyze</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Label for the AtomGroup</span>
+<span class="sd">        tau_max : int</span>
+<span class="sd">            Maximum number of frames to calculate the survival probability</span>
+<span class="sd">        window_step : int, optional</span>
+<span class="sd">            Maximum number of frames an atom pair can be continuously unpaired</span>
+<span class="sd">            and be considered a recrossing event, by default 0</span>
+<span class="sd">        fit_func : Callable, optional</span>
+<span class="sd">            Function to fit the survival probability, by default None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">universe</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> <span class="p">(</span><span class="n">select</span><span class="p">,),</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;logs/</span><span class="si">{</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Verify that the atomgroups are of type AtomGroup</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="n">AtomGroup</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;selection must be of type AtomGroup&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">window_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">tau_max</span>
+
+        <span class="c1"># iterate through trajectory and find maximum number of pairs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_pairs</span> <span class="o">=</span> <span class="n">n_pairs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./mdanalysis_survivalprobability&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sp_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_func</span> <span class="o">=</span> <span class="n">mon_exp</span> <span class="k">if</span> <span class="n">fit_func</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fit_func</span>
+
+<div class="viewcode-block" id="AtomPair._prepare">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair._prepare">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize data structures dependent on `self.n_frames` and prepare</span>
+<span class="sd">        class for frame-by-frame trajectory analysis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># calculate number of frames to analyze</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_analysis</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_frames_analysis: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_frames_analysis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># output data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_frames_analysis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pairs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AtomPair._single_frame">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair._single_frame">[docs]</a>
+    <span class="k">def</span> <span class="nf">_single_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx_frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyze a single frame in the trajectory.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx_frame : int</span>
+<span class="sd">            The index of the current frame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            The weight, the volume of the box, and the histogram of the</span>
+<span class="sd">            pair distances at the current frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># update frame and atomgroup</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[</span><span class="n">idx_frame</span><span class="p">]</span>
+        <span class="n">ag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomgroups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># return atom indices for each atom in the selection</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">indices</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_pairs</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="AtomPair._conclude">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair._conclude">[docs]</a>
+    <span class="k">def</span> <span class="nf">_conclude</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the survival probability correlation function</span>
+<span class="sd">        for current trajectory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># convert results to list of sets and drop zeros</span>
+        <span class="c1"># now, we have the atom pairs that exist at each frame</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span>
+        <span class="n">unique_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">)</span>
+
+        <span class="c1"># create a 2D array of booleans indicating whether the atom pair exits</span>
+        <span class="c1"># size: (unique_pairs, n_frames)</span>
+        <span class="n">atom_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_pairs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_pairs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                <span class="n">atom_pairs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">frame</span>
+
+        <span class="c1"># calculate correlation function</span>
+        <span class="n">max_frames</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames</span><span class="p">)</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_frames</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">max_frames</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">):</span>
+            <span class="n">sp</span><span class="p">[</span><span class="n">lag</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lag</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+            <span class="n">sp</span><span class="p">[</span><span class="n">lag</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lag</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+            <span class="n">sp</span><span class="p">[</span><span class="n">lag</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">_survival_imm</span><span class="p">(</span><span class="n">lag</span><span class="p">,</span> <span class="n">atom_pairs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_step</span><span class="p">)</span>
+        <span class="c1"># normalize probability to start at 1</span>
+        <span class="n">sp</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">sp</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Frame&quot;</span><span class="p">,</span> <span class="s2">&quot;Time[ps]&quot;</span><span class="p">,</span> <span class="s2">&quot;Survival_Probability&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="c1"># Fit the ACF survival probability</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Time[ps]&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_func</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Time[ps]&quot;</span><span class="p">][:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span><span class="p">]</span> <span class="o">-</span> <span class="n">t0</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Survival_Probability&quot;</span><span class="p">][:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_max</span><span class="p">],</span>
+            <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">],</span>
+            <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">maxfev</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Survival_Probability_Fit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_func</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Time[ps]&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">t0</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomPair.save">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_out</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save key data structures for later analysis.</span>
+
+<span class="sd">        :param dir_out: directory path to output files, defaults to None</span>
+<span class="sd">        :type dir_out: str, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dir_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dir_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">dir_out</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># save dataframes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dir_out</span><span class="si">}</span><span class="s2">/sp_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomPair.figures">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair.figures">[docs]</a>
+    <span class="k">def</span> <span class="nf">figures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_apc</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">figs</span><span class="p">,</span> <span class="n">axs</span></div>
+
+
+<div class="viewcode-block" id="AtomPair.plt_apc">
+<a class="viewcode-back" href="../../colvar.atompair.html#colvar.atompair.AtomPair.plt_apc">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_apc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">cf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span>
+        <span class="n">prefactor</span> <span class="o">=</span> <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">timescale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Time[ps]&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Survival_Probability&quot;</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;ACF&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Time[ps]&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="s2">&quot;Survival_Probability_Fit&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;--&quot;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fit: $</span><span class="si">{</span><span class="n">prefactor</span><span class="si">:</span><span class="s2">0.3f</span><span class="si">}</span><span class="s2"> e^</span><span class="se">{{</span><span class="s2">t/</span><span class="si">{</span><span class="n">timescale</span><span class="si">:</span><span class="s2">0.3f</span><span class="se">}}</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Time [ns]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Survival Probability&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">/sp_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+</div>
+
+
+
+<span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nogil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_survival_imm</span><span class="p">(</span><span class="n">lag</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">atom_pairs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">window_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the un-normalized survival probability of all possible atom pairs</span>
+<span class="sd">    at all frames with range of the trajectory for a specific frame lag time.</span>
+<span class="sd">    The atom pair must exist in the frame for the lag time at both end points</span>
+<span class="sd">    and can be unpaired continuously for at most n_frame_unpair frames.</span>
+
+<span class="sd">    The survival probability is calculated using the algorithm in [Impey1983]_.</span>
+
+<span class="sd">    :param lag: Number of frames between the start and end frames of the</span>
+<span class="sd">    atom pair</span>
+<span class="sd">    :type lag: int</span>
+<span class="sd">    :param atom_pairs: 2D array (atom, n_frames) of booleans indicating</span>
+<span class="sd">    whether the atom pair exists at the frame</span>
+<span class="sd">    :type atom_pairs: np.ndarray</span>
+<span class="sd">    :return: Total number of atom pairs that existed in the trajectory for the</span>
+<span class="sd">    specified lag time</span>
+<span class="sd">    :rtype: int</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize number of surviving atom pairs to zero</span>
+    <span class="n">survive</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_ag</span><span class="p">,</span> <span class="n">n_frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">atom_pairs</span><span class="p">)</span>
+
+    <span class="c1"># loop over all possible subsets of trajectory with given lag time</span>
+    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_frames</span> <span class="o">-</span> <span class="n">lag</span><span class="p">):</span>  <span class="c1"># pylint: disable=not-an-iterable</span>
+        <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">lag</span>
+
+        <span class="c1"># iterate over all atom pairs</span>
+        <span class="k">for</span> <span class="n">ag</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_ag</span><span class="p">):</span>  <span class="c1"># pylint: disable=not-an-iterable</span>
+            <span class="c1"># skip if atom pair does not exist at both ends of trajectory</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">atom_pairs</span><span class="p">[</span><span class="n">ag</span><span class="p">,</span> <span class="n">start</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">atom_pairs</span><span class="p">[</span><span class="n">ag</span><span class="p">,</span> <span class="n">end</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># iterate through trajectory and verify that atom pair exists</span>
+            <span class="n">n_frames_unpair</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">atom_pairs</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">ag</span><span class="p">]:</span>
+                    <span class="n">n_frames_unpair</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">n_frames_unpair</span> <span class="o">&gt;</span> <span class="n">window_step</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+            <span class="c1"># if atom pair survived, increment counter</span>
+            <span class="k">if</span> <span class="n">n_frames_unpair</span> <span class="o">&lt;=</span> <span class="n">window_step</span><span class="p">:</span>
+                <span class="n">survive</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">survive</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

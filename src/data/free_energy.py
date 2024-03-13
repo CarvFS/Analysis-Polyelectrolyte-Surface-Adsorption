@@ -118,7 +118,7 @@ def fes_1d(
     fes -= np.nanmin(fes)
 
     # apply plateau correction
-    if plateau_domain is not None:
+    if plateau_domain != (None, None):
         plateau_idx = np.where(
             (cv_grid > plateau_domain[0]) & (cv_grid < plateau_domain[1])
         )

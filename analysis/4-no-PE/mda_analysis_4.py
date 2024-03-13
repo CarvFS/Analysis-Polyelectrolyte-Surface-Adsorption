@@ -39,13 +39,25 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 # Local internal dependencies
 from data.pipeline import DataPipeline  # noqa: E402
 from colvar.angulardistribution import AngularDistribution  # noqa: E402
-from colvar.atompair import SurvivalProbability  # noqa: E402
+from colvar.atompair import AtomPair  # noqa: E402
 from colvar.dipole import Dipole  # noqa: E402
 from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
-from parameters.globals import *  # noqa: E402
+from parameters.globals_4 import (  # noqa: E402
+    START,
+    STOP,
+    STEP,
+    N_JOBS,
+    N_BLOCKS,
+    SOLVENT,
+    VERBOSE,
+    RELOAD_DATA,
+    TEMPERATURE_K,
+    FIG_EXT,
+    DEFAULT_PATH,
+)
 
 
 # #############################################################################
@@ -203,7 +215,7 @@ def wrapper_lineardensity(
     bins_normal = int(1e3)
 
     dims_all = ["x", "y", "z"]
-    dims_z = ["z"]
+    # dims_z = ["z"]
 
     props_all = ["number", "mass", "charge"]
     props_charge = ["charge"]
@@ -384,7 +396,10 @@ def wrapper_solvent_orientation(
         ):
             # select atoms
             label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
-            selection = f"same resid as ({group} and (prop z > {dim_min} and prop z <= {dim_max}))"
+            selection = (
+                f"same resid as ({group} and "
+                + f"(prop z > {dim_min} and prop z <= {dim_max}))"
+            )
             ag = uni.select_atoms(selection, updating=True)
 
             # check if output file exists or if no atoms are found
@@ -557,7 +572,7 @@ def wrapper_survivalprobability(
         if output_np.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
         else:
-            mda_sp = SurvivalProbability(
+            mda_sp = AtomPair(
                 select=select,
                 n_pairs=uni.select_atoms(group).n_atoms,
                 label=label,
@@ -577,7 +592,8 @@ def wrapper_survivalprobability(
             t_end = time.time()
             log.debug(f"SP with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min")
             log.debug(
-                f"[frames, pairs] = [{mda_sp.n_frames}, {uni.select_atoms(group).n_atoms}]"
+                f"[frames, pairs] = [{mda_sp.n_frames}, "
+                + f"{uni.select_atoms(group).n_atoms}]"
             )
             mda_sp.save()
             mda_sp.figures(ext=FIG_EXT)
@@ -674,12 +690,10 @@ if __name__ == "__main__":
         log.info(f"Frames per block: {n_frames_block}")
 
         # print final simulation time
-        log.info(
-            f"Final simulation time: {universe.trajectory.n_frames * universe.trajectory.dt / 1e3:.2f} ns"
-        )
-        log.info(
-            f"Final analysis time: {last_frame * universe.trajectory.dt / 1e3:.2f} ns"
-        )
+        tf = universe.trajectory.n_frames * universe.trajectory.dt / 1e3
+        log.info(f"Final simulation time: {tf:.2f} ns")
+        tf_anl = last_frame * universe.trajectory.dt / 1e3
+        log.info(f"Final analysis time: {tf_anl:.2f} ns")
 
         # perform analysis
         universe_analysis(universe, df_plumed, sel)

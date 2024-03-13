@@ -1,32 +1,13 @@
-Name                                              Stmts   Miss  Cover   Missing
--------------------------------------------------------------------------------
-analysis/3-monomer-binding/combined_analysis.py      89     71    20%   60-71, 97-149, 153-175, 183-204
-src/colvar/__init__.py                                0      0   100%
-src/colvar/base.py                                  179     78    56%   36-37, 44-45, 161, 249-311, 317-318, 323-324, 344-363, 379-380, 383, 428-443, 522-549
-src/colvar/contacts.py                               87     16    82%   80-82, 167, 169, 171, 173, 207, 210, 214, 300-310
-src/colvar/dihedrals.py                             107     31    71%   124-129, 171, 199-240
-src/colvar/hbonds.py                                212     56    74%   240-254, 369-388, 496-514, 587-591, 656-689, 710-711, 744-745, 752-753, 789-790, 797-798, 818-825
-src/colvar/polymerlengths.py                        158    104    34%   146-149, 182-184, 220-242, 245-262, 265-303, 306-337, 340-369
-src/colvar/rdf.py                                   157     60    62%   119-120, 140, 228-233, 268-269, 334-348, 370-390, 412-440
-src/colvar/test/test_base.py                         70      0   100%
-src/colvar/test/test_contacts.py                     64     12    81%   46-67, 109
-src/colvar/test/test_dihedrals.py                    29      0   100%
-src/colvar/test/test_hbonds.py                      121      3    98%   146, 159-160
-src/colvar/test/test_polymerlengths.py               75      0   100%
-src/colvar/test/test_rdf.py                          84      0   100%
-src/data/__init__.py                                  0      0   100%
-src/data/free_energy.py                              41      4    90%   83, 87, 114, 171
-src/data/pipeline.py                                209    109    48%   153-161, 176-182, 197, 218, 241-248, 349, 351, 356, 433, 440, 446, 450, 481-499, 523-563, 587-627, 649-670, 691-709
-src/data/test/test_free_energy.py                    30      0   100%
-src/data/test/test_pipeline.py                       96      0   100%
-src/render/__init__.py                                0      0   100%
-src/render/util.py                                   24     17    29%   36-40, 105-113, 127-133
-src/stats/__init__.py                                 0      0   100%
-src/stats/block_error.py                            191    174     9%   85-116, 154-166, 236-259, 275-318, 358-428, 471-494, 525-591, 624-650
-src/utils/__init__.py                                 0      0   100%
-src/utils/dask.py                                    10      0   100%
-src/utils/logs.py                                    25      0   100%
-src/utils/test/test_dask.py                          11      0   100%
-src/utils/test/test_logs.py                          29      0   100%
--------------------------------------------------------------------------------
-TOTAL                                              2098    735    65%
+Name                                Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------
+src/colvar/__init__.py                  0      0   100%
+src/colvar/angulardistribution.py     147    128    13%   37-105, 109-146, 150-183, 187-203, 206-211, 216-236, 239-259
+src/colvar/atompair.py                114     88    23%   75, 79, 83, 122-141, 149-153, 171-179, 188-222, 233-238, 241-248, 251-279, 304-329
+src/colvar/base.py                    209    103    51%   37-38, 45-46, 131, 163, 252-317, 321-332, 341, 349-350, 356, 398-399, 417-427, 456-478, 495-511, 531, 557-584
+src/colvar/lineardensity.py           477    442     7%   75-125, 159-201, 208-227, 243, 250-253, 256-259, 399-501, 505-582, 586-728, 753-878, 895-920, 942-972, 997-1016, 1041-1067, 1092-1111, 1136-1155, 1180-1209
+src/colvar/parallel.py                 33     24    27%   50-59, 62-74, 80-89, 96-101
+src/colvar/test/test_base.py           70      2    97%   36-37
+src/utils/__init__.py                   0      0   100%
+src/utils/logs.py                      25     19    24%   43-74
+-----------------------------------------------------------------
+TOTAL                                1075    806    25%

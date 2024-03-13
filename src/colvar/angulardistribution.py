@@ -23,7 +23,6 @@ from colvar.lineardensity import Results  # noqa: E402
 
 
 class AngularDistribution(ParallelAnalysisBase):
-
     def __init__(
         self,
         atomgroup: AtomGroup,
@@ -159,7 +158,8 @@ class AngularDistribution(ParallelAnalysisBase):
         # check that weights and results have the same length
         if len(weights) != len(self._results[:, 0]):
             raise ValueError(
-                f"Length of weights ({len(weights)}) and results ({len(self._results[:, 0])}) do not match"
+                f"Length of weights ({len(weights)}) and "
+                + f"results ({len(self._results[:, 0])}) do not match"
             )
 
         # drop indices containing NaN

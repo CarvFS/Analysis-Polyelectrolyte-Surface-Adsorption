@@ -30,7 +30,7 @@ from tqdm.auto import tqdm
 
 try:
     import dask
-    from dask.distributed import progress, worker, Client, TimeoutError
+    from dask.distributed import progress, worker, Client
 
     FOUND_DASK = True
 
@@ -56,7 +56,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
 from utils.logs import setup_logging  # noqa: E402
-from colvar.parallel import ParallelTqdm
+from colvar.parallel import ParallelTqdm  # noqa: E402
 
 
 class ParallelAnalysisBase(AnalysisBase):
@@ -250,8 +250,8 @@ class ParallelAnalysisBase(AnalysisBase):
         if module == "dask" and FOUND_DASK:
             # make a dask client if it doesn't exist
             try:
-                client = Client("tcp://localhost:8786", timeout="2s")
-            except Exception as exc:
+                _ = Client("tcp://localhost:8786", timeout="2s")
+            except Exception:
                 pass
             try:
                 config = {"scheduler": worker.get_client(), **kwargs}
@@ -309,8 +309,7 @@ class ParallelAnalysisBase(AnalysisBase):
             for indices in block_indices:
                 jobs.append(dask.delayed(self._job_block)(indices))
 
-            if verbose:
-                time_start = datetime.now()
+            time_start = datetime.now()
 
             blocks = dask.delayed(jobs)
             blocks = blocks.persist(**config)
@@ -326,9 +325,9 @@ class ParallelAnalysisBase(AnalysisBase):
 
             msg = f"Starting analysis using Joblib ({n_jobs=}, backend={method})..."
             self._logger.debug(msg)
+            time_start = datetime.now()
             if verbose:
                 print(msg)
-                time_start = datetime.now()
 
             block_results = ParallelTqdm(
                 n_jobs=n_jobs,
@@ -352,9 +351,9 @@ class ParallelAnalysisBase(AnalysisBase):
 
             msg = f"Starting analysis using multiprocessing ({n_jobs=}, {method=})..."
             self._logger.debug(msg)
+            time_start = datetime.now()
             if verbose:
                 print(msg)
-                time_start = datetime.now()
 
             with multiprocessing.get_context(method).Pool(n_jobs) as p:
                 block_results = list(
@@ -376,8 +375,20 @@ class ParallelAnalysisBase(AnalysisBase):
 
         # combine results
         self._logger.debug("Combining results")
-        if len(block_results) > 0:
-            self._results = np.zeros((self.n_frames, len(block_results[0][0])))
+        n_blocks = len(block_results)
+        n_rows_block0 = len(block_results[0])
+        n_frames = sum(len(block) for block in block_results)
+        self._logger.debug(
+            f"Number of blocks: {n_blocks}, number of rows in block 0: {n_rows_block0}"
+        )
+        if n_blocks > 0:
+            try:
+                n_cols = len(block_results[0][0])
+            except TypeError:
+                n_cols = 1
+            except IndexError:
+                n_cols = 1
+            self._results = np.zeros((n_frames, n_cols))
             idx = 0
             for block in block_results:
                 for res in block:
@@ -386,6 +397,10 @@ class ParallelAnalysisBase(AnalysisBase):
         else:
             self._results = np.array([])
             self._logger.warning("No results returned.")
+
+        # if self._results is a single column, flatten it
+        if len(self._results.shape) == 2 and self._results.shape[1] == 1:
+            self._results = self._results.flatten()
 
         self._logger.debug(
             f"Combined results. Time elapsed: {datetime.now() - time_analysis}."

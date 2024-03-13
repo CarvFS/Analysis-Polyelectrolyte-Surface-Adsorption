@@ -1,20 +1,17 @@
 # Standard library
 from pathlib import Path
 import sys
-import warnings
 
 # Third-party libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy import stats as st
 
 # MDAnalysis inheritance
 from MDAnalysis.core.groups import AtomGroup
 
 # Internal dependencies
 from .base import ParallelAnalysisBase
-from stats.block_error import BlockError
 
 # add local src directory to path
 sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
@@ -24,7 +21,6 @@ from utils.logs import setup_logging  # noqa: E402
 
 
 class Dipole(ParallelAnalysisBase):
-
     def __init__(
         self, atomgroup: AtomGroup, label: str = None, verbose: bool = False, **kwargs
     ):

@@ -23,16 +23,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy import integrate
 from scipy import interpolate
-from scipy import linalg
 from scipy import sparse
 from scipy.signal import find_peaks
 
-import numpy as np
-import warnings
-
 # MDAnalysis inheritance
 from MDAnalysis.analysis.base import Results
-from MDAnalysis.units import constants
 
 # Internal dependencies
 from .base import ParallelAnalysisBase
@@ -622,7 +617,6 @@ class LinearDensity(ParallelAnalysisBase):
         self._logger.debug(f"Computing results from {self._results.shape[0]} frames")
         idx_start = 2  # skip frame and time columns
         for dim in self.dims:
-
             # number density
             if self.calc_number:
                 key = "number_density"
@@ -639,9 +633,8 @@ class LinearDensity(ParallelAnalysisBase):
                     self._logger.error(f"Error in np.average for {key}: {e}")
                     self._logger.error(f"idx_start: {idx_start}, nbins: {self.nbins}")
                     self._logger.error(f"weights shape: {weights.shape}")
-                    self._logger.error(
-                        f"results shape: {self._results[:, idx_start : (idx_start + self.nbins)].shape}"
-                    )
+                    shape = self._results[:, idx_start : (idx_start + self.nbins)].shape
+                    self._logger.error(f"results shape: {shape}")
                     raise e
 
                 self.results[dim][key_std] = np.average(
@@ -750,7 +743,8 @@ class LinearDensity(ParallelAnalysisBase):
         dielectric : float, optional
             Relative dielectric constant [unitless]. Default is 1.0.
         method : str, optional
-            Method to use for numerical integration. Must be one of 'cumtrapz', 'cumsimps', or 'periodic_bvp'.
+            Method to use for numerical integration. Must be one of 'cumtrapz',
+                'cumsimps', or 'periodic_bvp'.
             o'cumsimps'. Default is 'cumtrapz'.
         n_layers : int, optional
             Number of crystal layers to consider. Default is 4.

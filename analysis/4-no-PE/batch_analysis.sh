@@ -20,7 +20,7 @@ set -o errexit # exit when a command fails. Add || true to commands allowed to f
 set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
-python_script='mda_analysis.py'
+python_script='mda_analysis_4.py'
 single_analysis='0'
 sim_idx='6'
 

@@ -17,6 +17,3 @@ exclude = '''
   | tests/data
 )/
 '''
-
-[pytest]
-norecursedirs = 'docs,*/test/*'

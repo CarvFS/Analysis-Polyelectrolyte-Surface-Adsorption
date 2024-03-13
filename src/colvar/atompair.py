@@ -1,7 +1,4 @@
-r"""
-Atom Pair Relaxation --- :mod:`MDAnalysis.analysis.AtomPair`
-==============================================================
-
+"""
 :Authors: Alec Glisman
 :Year: 2022
 :Copyright: GNU Public License v2
@@ -24,7 +21,7 @@ for brief "recrossing events" that are not considered pair breaks. For a
 discussion of these issues, see [Laage2008]_.
 
 We also use an alternative implementation of the APC first derived in
-[Northrop1980_] (`_survival_ssp`). This function does not look at the time
+[Northrop1980]_ (`_survival_ssp`). This function does not look at the time
 spent in the paired state, but rather the time required to go from a reactant
 (paired) to product (unpaired) and does not need to explicitly account for a
 recrossing time. This function used with `n_frames_recross = None`.
@@ -46,18 +43,9 @@ References
                 Solute Hydration Shell: Application to Aqueous Halide
                 Solutions. Journal of Physical Chemistry B 2008, 112 (26),
                 7697-7701. https://doi.org/10.1021/jp802033r.
-
-                
-Classes
--------
-
-.. autoclass:: AtomPair
-    :members:
-    :inherited-members:
 """
 
 # Standard library
-import logging
 from pathlib import Path
 import sys
 from typing import Callable
@@ -70,7 +58,6 @@ import pandas as pd
 from scipy.optimize import curve_fit
 
 # MDAnalysis package
-from MDAnalysis.analysis import distances
 from MDAnalysis.core.groups import AtomGroup
 from MDAnalysis.lib.log import ProgressBar
 
@@ -96,7 +83,7 @@ def tri_exp(x, c1, b1, c2, b2, c3, b3):
     return c1 * np.exp(b1 * x) + c2 * np.exp(b2 * x) + c3 * np.exp(b3 * x)
 
 
-class SurvivalProbability(ParallelAnalysisBase):
+class AtomPair(ParallelAnalysisBase):
     """
     This class implements the calculation of the atom pair relaxation
     correlation function (APC)
@@ -145,7 +132,7 @@ class SurvivalProbability(ParallelAnalysisBase):
         # iterate through trajectory and find maximum number of pairs
         self.n_pairs = n_pairs
 
-        self._dir_out: Path = Path(f"./mdanalysis_survivalprobability")
+        self._dir_out: Path = Path("./mdanalysis_survivalprobability")
         self._df_filename = f"sp_{self._tag}.parquet"
         self._logger.debug(f"df_filename: {self._df_filename}")
         self._df: pd.DataFrame = None
@@ -311,6 +298,7 @@ def _survival_imm(lag: int, atom_pairs: np.ndarray, window_step: int = 0) -> int
     :return: Total number of atom pairs that existed in the trajectory for the
     specified lag time
     :rtype: int
+
     """
     # initialize number of surviving atom pairs to zero
     survive: int = 0

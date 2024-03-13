@@ -613,14 +613,16 @@ class DataPipeline:
         nrows = len(df)
         df = df.dropna(axis=1, how="all")
         self._log.warning(
-            f"Dropped {n_cols - len(df.columns)} columns ({(n_cols - len(df.columns))/n_cols*100:.2f}%) with NaN values"
+            f"Dropped {n_cols - len(df.columns)} columns "
+            + f"({(n_cols - len(df.columns))/n_cols*100:.2f}%) with NaN values"
         )
 
         # convert columns to numeric and drop any rows with NaN values
         nrows = len(df)
         df = df.apply(pd.to_numeric, errors="coerce").dropna()
         self._log.warning(
-            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) that could not be converted to numeric"
+            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) that "
+            + "could not be converted to numeric"
         )
 
         # drop rows where abs(*.bias) is > bias_max
@@ -631,7 +633,8 @@ class DataPipeline:
         nrows = len(df)
         df = df[~(df[cols].abs() > bias_max).any(axis=1)]
         self._log.warning(
-            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) where bias > {bias_max}"
+            f"Dropped {nrows - len(df)} rows ({(nrows - len(df))/nrows*100:.2f}%) "
+            + f"where bias > {bias_max}"
         )
 
         # sort by time

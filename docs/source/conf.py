@@ -46,6 +46,8 @@ autodoc_mock_imports = [
     "panedr",
     "tqdm",
     "dask",
+    "joblib",
+    "numba",
 ]
 autosummary_generate = True  # Make _autosummary files and include them
 napoleon_numpy_docstring = False  # Force consistency, leave only Google
@@ -86,6 +88,9 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     "seaborn": ("https://seaborn.pydata.org/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "joblib": ("https://joblib.readthedocs.io/en/latest/", None),
+    "numba": ("https://numba.pydata.org/numba-doc/latest/", None),
 }
 
 # -- Options for HTML output -------------------------------------------------

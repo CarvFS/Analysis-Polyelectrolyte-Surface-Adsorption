@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>colvar.lineardensity &mdash; Polyelectrolyte Interfacial Analysis Toolkit v0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2fea6348"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Polyelectrolyte Interfacial Analysis Toolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../colvar.base.html">colvar.base module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../stats.block_error.html">stats.block_error module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://www.dask.org/get-started">Dask</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/quickstart.html">MDAnalysis Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://userguide.mdanalysis.org/stable/examples/README.html">MDAnalysis Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis_modules.html">MDAnalysis Analysis Modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://mmb.irbbarcelona.org/molywood/gallery">Molywood Examples</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.plumed.org/doc-v2.8/user-doc/html/tutorials.html">Plumed Tutorials</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://www.ks.uiuc.edu/Research/vmd/current/ug/">VMD User Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Polyelectrolyte Interfacial Analysis Toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">colvar.lineardensity</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for colvar.lineardensity</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Linear Density --- :mod:`colvar.lineardensity`</span>
+<span class="sd">===========================================================</span>
+
+<span class="sd">A tool to compute mass and charge density profiles along the three</span>
+<span class="sd">cartesian axes [xyz] of the simulation cell. Works only for orthorombic,</span>
+<span class="sd">fixed volume cells (thus for simulations in canonical NVT ensemble).</span>
+
+<span class="sd">Modified from the original MDAnalysis.analysis.lineardensity module to</span>
+<span class="sd">allow for parallelization as well as weighted data from a biased</span>
+<span class="sd">simulation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Standard library</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># Third-party libraries</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">integrate</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
+
+<span class="c1"># MDAnalysis inheritance</span>
+<span class="kn">from</span> <span class="nn">MDAnalysis.analysis.base</span> <span class="kn">import</span> <span class="n">Results</span>
+
+<span class="c1"># Internal dependencies</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">ParallelAnalysisBase</span>
+
+<span class="c1"># add local src directory to path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span><span class="p">))</span>
+
+<span class="c1"># Local internal dependencies</span>
+<span class="kn">from</span> <span class="nn">utils.logs</span> <span class="kn">import</span> <span class="n">setup_logging</span>  <span class="c1"># noqa: E402</span>
+
+
+<div class="viewcode-block" id="cumsimps">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.cumsimps">[docs]</a>
+<span class="k">def</span> <span class="nf">cumsimps</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_condition</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cumulative integral of y using Simpson&#39;s rule.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of x values.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        1-D array of y values.</span>
+<span class="sd">    y_err : array_like, optional</span>
+<span class="sd">        1-D array of y errors. Default is None.</span>
+<span class="sd">    initial_condition : float, optional</span>
+<span class="sd">        Initial condition for the cumulative integral. Default is 0.</span>
+<span class="sd">    reverse_order : bool, optional</span>
+<span class="sd">        If True, the cumulative integral will be calculated in reverse order.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">        The cumulative integral and its error.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the length of x and y do not match.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the length of x and y_err do not match.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If x is not equally spaced.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">y_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of x and y do not match.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_err</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of x and y_err do not match.&quot;</span><span class="p">)</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x is not equally spaced.&quot;</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># calculate the cumulative integral</span>
+    <span class="n">y_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y_err</span><span class="p">)</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">integral_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_var</span> <span class="o">=</span> <span class="n">y_var</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># set initial condition</span>
+    <span class="n">integral</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_condition</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+        <span class="n">x_sub</span><span class="p">,</span> <span class="n">y_sub</span><span class="p">,</span> <span class="n">y_var_sub</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y_var</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">integral</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">y_sub</span><span class="p">,</span> <span class="n">x_sub</span><span class="p">)</span>
+
+        <span class="c1"># 2 points: trapezoidal rule for the error</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">integral_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_var_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># 3 points: 1 interval of Simpson&#39;s rule</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">integral_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="c1"># 4+ points: general case</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integral_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="o">+</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_var_sub</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+                <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_var_sub</span><span class="p">[</span><span class="mi">2</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+                <span class="o">+</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="o">-</span><span class="n">integral</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">integral_var</span> <span class="o">=</span> <span class="n">integral_var</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">integral</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">integral_var</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cumtrapz">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.cumtrapz">[docs]</a>
+<span class="k">def</span> <span class="nf">cumtrapz</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial_condition</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cumulative integral of y using the trapezoidal rule.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        1-D array of x values.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        1-D array of y values.</span>
+<span class="sd">    y_err : array_like, optional</span>
+<span class="sd">        1-D array of y errors. Default is None.</span>
+<span class="sd">    initial_condition : float, optional</span>
+<span class="sd">        Initial condition for the cumulative integral. Default is 0.</span>
+<span class="sd">    reverse_order : bool, optional</span>
+<span class="sd">        If True, the cumulative integral will be calculated in reverse order.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">        The cumulative integral and its error.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the length of x and y do not match.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the length of x and y_err do not match.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">y_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of x and y do not match.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_err</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of x and y_err do not match.&quot;</span><span class="p">)</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x is not equally spaced.&quot;</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># calculate the cumulative integral</span>
+    <span class="n">y_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y_err</span><span class="p">)</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">integral_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_var</span> <span class="o">=</span> <span class="n">y_var</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># set initial condition</span>
+    <span class="n">integral</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_condition</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+        <span class="n">x_sub</span><span class="p">,</span> <span class="n">y_sub</span><span class="p">,</span> <span class="n">y_var_sub</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y_var</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">integral</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y_sub</span><span class="p">,</span> <span class="n">x_sub</span><span class="p">)</span>
+
+        <span class="c1"># 2 points: trapezoidal rule for the error</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">integral_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_var_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># 3+ points: general case</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integral_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">y_var_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_var_sub</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_var_sub</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="o">-</span><span class="n">integral</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">integral_var</span> <span class="o">=</span> <span class="n">integral_var</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">integral</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">integral_var</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="periodic_bvp">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.periodic_bvp">[docs]</a>
+<span class="k">def</span> <span class="nf">periodic_bvp</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y_err</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="c1"># distance array for 2nd order differences</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dx</span><span class="p">),</span> <span class="s2">&quot;x is not equally spaced&quot;</span>
+
+    <span class="c1"># Laplacian matrix</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csc&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">sparse</span><span class="o">.</span><span class="n">SparseEfficiencyWarning</span><span class="p">)</span>
+        <span class="c1"># periodic boundary conditions</span>
+        <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># scale by dx^2</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># solve the linear system</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">u</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Results">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.Results">[docs]</a>
+<span class="k">class</span> <span class="nc">Results</span><span class="p">(</span><span class="n">Results</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;From version 3.0.0 onwards, some entries in Results will be renamed. See</span>
+<span class="sd">    the docstring for LinearDensity for details. The Results class is defined</span>
+<span class="sd">    here to implement deprecation warnings for the user.&quot;&quot;&quot;</span>
+
+    <span class="n">_deprecation_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="s2">&quot;mass_density&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pos_std&quot;</span><span class="p">:</span> <span class="s2">&quot;mass_density_stddev&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;char&quot;</span><span class="p">:</span> <span class="s2">&quot;charge_density&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;char_std&quot;</span><span class="p">:</span> <span class="s2">&quot;charge_density_stddev&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="Results._deprecation_warning">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.Results._deprecation_warning">[docs]</a>
+    <span class="k">def</span> <span class="nf">_deprecation_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">` is deprecated and will be removed in version 3.0.0. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please use `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">` instead.&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_warning</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Results</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Results</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_warning</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_dict</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Results</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LinearDensity">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity">[docs]</a>
+<span class="k">class</span> <span class="nc">LinearDensity</span><span class="p">(</span><span class="n">ParallelAnalysisBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linear density profile</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    select : AtomGroup</span>
+<span class="sd">          any atomgroup</span>
+<span class="sd">    grouping : str {&#39;atoms&#39;, &#39;residues&#39;, &#39;segments&#39;, &#39;fragments&#39;}</span>
+<span class="sd">          Density profiles will be computed either on the atom positions (in</span>
+<span class="sd">          the case of &#39;atoms&#39;) or on the center of mass of the specified</span>
+<span class="sd">          grouping unit (&#39;residues&#39;, &#39;segments&#39;, or &#39;fragments&#39;).</span>
+<span class="sd">    binsize : float</span>
+<span class="sd">          Bin width in Angstrom used to build linear density</span>
+<span class="sd">          histograms. Defines the resolution of the resulting density</span>
+<span class="sd">          profile (smaller --&gt; higher resolution)</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">          Show detailed progress of the calculation if set to ``True``</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    results.x.dim : int</span>
+<span class="sd">           index of the [xyz] axes</span>
+<span class="sd">    results.x.mass_density : numpy.ndarray</span>
+<span class="sd">           mass density in :math:`g \cdot cm^{-3}` in [xyz] direction</span>
+<span class="sd">    results.x.mass_density_stddev : numpy.ndarray</span>
+<span class="sd">           standard deviation of the mass density in [xyz] direction</span>
+<span class="sd">    results.x.charge_density : numpy.ndarray</span>
+<span class="sd">           charge density in :math:`\mathrm{e} \cdot mol \cdot cm^{-3}` in</span>
+<span class="sd">           [xyz] direction</span>
+<span class="sd">    results.x.charge_density_stddev : numpy.ndarray</span>
+<span class="sd">           standard deviation of the charge density in [xyz] direction</span>
+<span class="sd">    results.x.pos: numpy.ndarray</span>
+<span class="sd">        Alias to the :attr:`results.x.mass_density` attribute.</span>
+
+<span class="sd">        .. deprecated:: 2.2.0</span>
+<span class="sd">           Will be removed in MDAnalysis 3.0.0. Please use</span>
+<span class="sd">           :attr:`results.x.mass_density` instead.</span>
+<span class="sd">    results.x.pos_std: numpy.ndarray</span>
+<span class="sd">        Alias to the :attr:`results.x.mass_density_stddev` attribute.</span>
+
+<span class="sd">        .. deprecated:: 2.2.0</span>
+<span class="sd">           Will be removed in MDAnalysis 3.0.0. Please use</span>
+<span class="sd">           :attr:`results.x.mass_density_stddev` instead.</span>
+<span class="sd">    results.x.char: numpy.ndarray</span>
+<span class="sd">        Alias to the :attr:`results.x.charge_density` attribute.</span>
+
+<span class="sd">        .. deprecated:: 2.2.0</span>
+<span class="sd">           Will be removed in MDAnalysis 3.0.0. Please use</span>
+<span class="sd">           :attr:`results.x.charge_density` instead.</span>
+<span class="sd">    results.x.char_std: numpy.ndarray</span>
+<span class="sd">        Alias to the :attr:`results.x.charge_density_stddev` attribute.</span>
+
+<span class="sd">        .. deprecated:: 2.2.0</span>
+<span class="sd">           Will be removed in MDAnalysis 3.0.0. Please use</span>
+<span class="sd">           :attr:`results.x.charge_density_stddev` instead.</span>
+<span class="sd">    results.x.slice_volume : float</span>
+<span class="sd">           volume of bin in [xyz] direction</span>
+<span class="sd">    results.x.position : numpy.ndarray</span>
+<span class="sd">            centers of histogram bins for mass/charge densities, useful for, e.g.,</span>
+<span class="sd">            plotting of histogram data.</span>
+<span class="sd">    Note: These density units are likely to be changed in the future.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    First create a :class:`LinearDensity` object by supplying a selection,</span>
+<span class="sd">    then use the :meth:`run` method. Finally access the results</span>
+<span class="sd">    stored in results, i.e. the mass density in the x direction.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       ldens = LinearDensity(selection)</span>
+<span class="sd">       ldens.run()</span>
+<span class="sd">       print(ldens.results.x.mass_density)</span>
+
+
+<span class="sd">    Alternatively, other types of grouping can be selected using the</span>
+<span class="sd">    ``grouping`` keyword. For example to calculate the density based on</span>
+<span class="sd">    a grouping of the :class:`~MDAnalysis.core.groups.ResidueGroup`</span>
+<span class="sd">    of the input :class:`~MDAnalysis.core.groups.AtomGroup`.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       ldens = LinearDensity(selection, grouping=&#39;residues&#39;, binsize=1.0)</span>
+<span class="sd">       ldens.run()</span>
+
+
+
+<span class="sd">    .. versionadded:: 0.14.0</span>
+
+<span class="sd">    .. versionchanged:: 1.0.0</span>
+<span class="sd">       Support for the ``start``, ``stop``, and ``step`` keywords has been</span>
+<span class="sd">       removed. These should instead be passed to :meth:`LinearDensity.run`.</span>
+<span class="sd">       The ``save()`` method was also removed, you can use ``np.savetxt()`` or</span>
+<span class="sd">       ``np.save()`` on the :attr:`LinearDensity.results` dictionary contents</span>
+<span class="sd">       instead.</span>
+
+<span class="sd">    .. versionchanged:: 1.0.0</span>
+<span class="sd">       Changed `selection` keyword to `select`</span>
+
+<span class="sd">    .. versionchanged:: 2.0.0</span>
+<span class="sd">       Results are now instances of</span>
+<span class="sd">       :class:`~MDAnalysis.core.analysis.Results` allowing access</span>
+<span class="sd">       via key and attribute.</span>
+
+<span class="sd">    .. versionchanged:: 2.2.0</span>
+
+<span class="sd">       *  Fixed a bug that caused LinearDensity to fail if grouping=&quot;residues&quot;</span>
+<span class="sd">          or grouping=&quot;segments&quot; were set.</span>
+<span class="sd">       *  Residues, segments, and fragments will be analysed based on their</span>
+<span class="sd">          centre of mass, not centre of geometry as previously stated.</span>
+<span class="sd">       *  LinearDensity now works with updating atom groups.</span>
+<span class="sd">       *  Added new result container :attr:`results.x.hist_bin_edges`.</span>
+<span class="sd">          It contains the bin edges of the histrogram bins for calculated</span>
+<span class="sd">          densities and can be used for easier plotting of histogram data.</span>
+
+
+<span class="sd">    .. deprecated:: 2.2.0</span>
+<span class="sd">       The `results` dictionary has been changed and the attributes</span>
+<span class="sd">       :attr:`results.x.pos`, :attr:`results.x.pos_std`, :attr:`results.x.char`</span>
+<span class="sd">       and :attr:`results.x.char_std` are now deprecated. They will be removed</span>
+<span class="sd">       in 3.0.0. Please use :attr:`results.x.mass_density`,</span>
+<span class="sd">       :attr:`results.x.mass_density_stddev`, :attr:`results.x.charge_density`,</span>
+<span class="sd">       and :attr:`results.x.charge_density_stddev` instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">select</span><span class="p">,</span>
+        <span class="n">grouping</span><span class="o">=</span><span class="s2">&quot;atoms&quot;</span><span class="p">,</span>
+        <span class="n">nbins</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">df_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">],</span>
+        <span class="n">densities</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;mass&quot;</span><span class="p">,</span> <span class="s2">&quot;charge&quot;</span><span class="p">],</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">universe</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> <span class="p">(</span><span class="n">select</span><span class="p">,),</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">setup_logging</span><span class="p">(</span><span class="n">log_file</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;logs/</span><span class="si">{</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="c1"># dimensions for the analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dims: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># allows use of run(parallel=True)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span> <span class="o">=</span> <span class="p">[</span><span class="n">select</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">universe</span>
+
+        <span class="c1"># box dimensions</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># [Angstrom] to avoid numerical issues</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">dimensions</span>
+        <span class="c1"># convert to radians</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="c1"># volume of the parallelepiped</span>
+        <span class="n">angle_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="mf">1.0</span>
+            <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;angle_scale: </span><span class="si">{</span><span class="n">angle_scale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_volume</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">angle_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;volume: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_volume</span><span class="si">}</span><span class="s2"> [Angstrom^3]&quot;</span><span class="p">)</span>
+        <span class="c1"># discretization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span> <span class="o">=</span> <span class="n">nbins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nbins: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">nbins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">nbins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">c</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">nbins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span><span class="p">]</span>
+
+        <span class="c1"># calculate volume of each slice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_slice_volume</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">angle_scale</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_slice_volume</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">angle_scale</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_slice_volume</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">angle_scale</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># group of atoms on which to compute the COM (same as used in</span>
+        <span class="c1"># AtomGroup.wrap())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grouping</span> <span class="o">=</span> <span class="n">grouping</span>
+
+        <span class="c1"># Initiate result instances</span>
+        <span class="k">if</span> <span class="s2">&quot;x&quot;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="s2">&quot;slice_volume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_slice_volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="s2">&quot;y&quot;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">][</span><span class="s2">&quot;slice_volume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_slice_volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">][</span><span class="s2">&quot;slice_volume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_slice_volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># properties to calculate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span> <span class="o">=</span> <span class="n">densities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_mass</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;mass&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;charge&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_number</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;number&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_props</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_props</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="si">}</span><span class="s2">_density&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="si">}</span><span class="s2">_density_stddev&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating </span><span class="si">{</span><span class="n">prop</span><span class="si">}</span><span class="s2"> density in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> directions&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize results array with zeros</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initializing results for </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)</span>
+
+        <span class="c1"># dataframe containing weight of each frame from biasing potential</span>
+        <span class="k">if</span> <span class="n">df_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_weighted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df_weights</span> <span class="o">=</span> <span class="n">df_weights</span><span class="p">[[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_weighted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df_weights</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># output data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./mdanalysis_lineardensity&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;lineardensity_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;df_filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;frame&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ths avoids creation of dataframe</span>
+
+<div class="viewcode-block" id="LinearDensity._single_frame">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity._single_frame">[docs]</a>
+    <span class="k">def</span> <span class="nf">_single_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx_frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># get current frame</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[</span><span class="n">idx_frame</span><span class="p">]</span>
+        <span class="n">ag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># initialize result array</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">frame</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="c1"># Get masses and charges for the selection</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grouping</span> <span class="o">==</span> <span class="s2">&quot;atoms&quot;</span><span class="p">:</span>
+            <span class="n">masses</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">masses</span>
+            <span class="n">charges</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">charges</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">grouping</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;residues&quot;</span><span class="p">,</span> <span class="s2">&quot;segments&quot;</span><span class="p">,</span> <span class="s2">&quot;fragments&quot;</span><span class="p">]:</span>
+            <span class="n">masses</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">total_mass</span><span class="p">(</span><span class="n">compound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="p">)</span>
+            <span class="n">charges</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">total_charge</span><span class="p">(</span><span class="n">compound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="si">}</span><span class="s2"> is not a valid value for grouping.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># wrap the atomgroup to the unit cell</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="p">)</span>
+        <span class="n">ag</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">compound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="p">)</span>
+
+        <span class="c1"># Find position of atom/group of atoms</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grouping</span> <span class="o">==</span> <span class="s2">&quot;atoms&quot;</span><span class="p">:</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">positions</span>  <span class="c1"># faster for atoms</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Centre of mass for residues, segments, fragments</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">center_of_mass</span><span class="p">(</span><span class="n">compound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping</span><span class="p">)</span>
+
+        <span class="n">idx_start</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># skip frame and time columns</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;dim&quot;</span><span class="p">]</span>
+            <span class="n">bins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+            <span class="c1"># histogram for positions [# / A]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_number</span><span class="p">:</span>
+                <span class="n">hist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                    <span class="n">positions</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">],</span>
+                    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+            <span class="c1"># histogram for positions weighted on masses [g / A]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_mass</span><span class="p">:</span>
+                <span class="n">hist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                    <span class="n">positions</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">],</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">masses</span><span class="p">,</span>
+                    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                <span class="p">)</span>  <span class="c1"># [# * g / mol / A^3]</span>
+                <span class="n">hist</span> <span class="o">/=</span> <span class="mf">6.02214076e23</span>  <span class="c1"># Avogadro number [mol/#]</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+            <span class="c1"># histogram for positions weighted on charges [e / A]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span><span class="p">:</span>
+                <span class="n">hist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+                    <span class="n">positions</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">],</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">charges</span><span class="p">,</span>
+                    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">hist</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx_start</span> <span class="p">:</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+        <span class="k">if</span> <span class="n">idx_start</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;dim: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">, idx_start: </span><span class="si">{</span><span class="n">idx_start</span><span class="si">}</span><span class="s2">, ncols: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity._conclude">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity._conclude">[docs]</a>
+    <span class="k">def</span> <span class="nf">_conclude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># merge weights with results</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Merging weights with results&quot;</span><span class="p">)</span>
+            <span class="n">weights_plumed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_weights</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">times_plumed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df_weights</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">times_mda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># find weights_mda as the closest time in times_plumed</span>
+            <span class="n">weights_mda</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">times_mda</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">times_mda</span><span class="p">):</span>
+                <span class="n">idx_closest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">time</span> <span class="o">-</span> <span class="n">times_plumed</span><span class="p">))</span>
+                <span class="n">weights_mda</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_plumed</span><span class="p">[</span><span class="n">idx_closest</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">time</span> <span class="o">-</span> <span class="n">times_plumed</span><span class="p">[</span><span class="n">idx_closest</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Closest time in plumed file: </span><span class="si">{</span><span class="n">times_plumed</span><span class="p">[</span><span class="n">idx_closest</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;MDAnalysis time: </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2">, dropping frame </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">weights_mda</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights_mda</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No weights provided&quot;</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+
+        <span class="c1"># drop self._df for memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Memory of results: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">nbytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+
+        <span class="c1"># output data from self._results to self.results</span>
+        <span class="c1"># weighted average over all frames (rows of self._results)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computing results from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> frames&quot;</span><span class="p">)</span>
+        <span class="n">idx_start</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># skip frame and time columns</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="c1"># number density</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_number</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;number_density&quot;</span>
+                <span class="n">key_std</span> <span class="o">=</span> <span class="s2">&quot;number_density_stddev&quot;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in np.average for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;idx_start: </span><span class="si">{</span><span class="n">idx_start</span><span class="si">}</span><span class="s2">, nbins: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weights shape: </span><span class="si">{</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)]</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;results shape: </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key_std</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+            <span class="c1"># mass density</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_mass</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;mass_density&quot;</span>
+                <span class="n">key_std</span> <span class="o">=</span> <span class="s2">&quot;mass_density_stddev&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key_std</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+            <span class="c1"># charge density</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;charge_density&quot;</span>
+                <span class="n">key_std</span> <span class="o">=</span> <span class="s2">&quot;charge_density_stddev&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key_std</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[:,</span> <span class="n">idx_start</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span><span class="p">)],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">idx_start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbins</span>
+
+        <span class="c1"># delete self._results to free memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">idx_final</span> <span class="o">=</span> <span class="n">idx_start</span>
+        <span class="k">if</span> <span class="n">idx_final</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;dim: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">, idx_final: </span><span class="si">{</span><span class="n">idx_final</span><span class="si">}</span><span class="s2">, ncols: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncols</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Compute standard deviation for the error</span>
+        <span class="c1"># For certain tests in testsuite, floating point imprecision</span>
+        <span class="c1"># can lead to negative radicands of tiny magnitude (yielding nan).</span>
+        <span class="c1"># radicand_mass and radicand_charge are therefore calculated first</span>
+        <span class="c1"># and negative values set to 0 before the square root</span>
+        <span class="c1"># is calculated.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Computing standard deviation&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_number</span><span class="p">:</span>
+            <span class="n">radicand_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density_stddev&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">radicand_number</span><span class="p">[</span><span class="n">radicand_number</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density_stddev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radicand_number</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_mass</span><span class="p">:</span>
+            <span class="n">radicand_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density_stddev&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">radicand_mass</span><span class="p">[</span><span class="n">radicand_mass</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density_stddev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radicand_mass</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span><span class="p">:</span>
+            <span class="n">radicand_charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density_stddev&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">radicand_charge</span><span class="p">[</span><span class="n">radicand_charge</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density_stddev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radicand_charge</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Normalizing results&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="c1"># norming factor, units of A^3</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;slice_volume&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">/=</span> <span class="n">norm</span>
+
+        <span class="c1"># calculate potential</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating potential&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_potential</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.calculate_potential">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.calculate_potential">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_potential</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sigma_e</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dielectric</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;periodic_bvp&quot;</span><span class="p">,</span>
+        <span class="n">n_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the electrostatic potential from the charge density profile.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sigma_e : float, optional</span>
+<span class="sd">            Surface charge density [e/A^2]. Default is 0.0.</span>
+<span class="sd">        dielectric : float, optional</span>
+<span class="sd">            Relative dielectric constant [unitless]. Default is 1.0.</span>
+<span class="sd">        method : str, optional</span>
+<span class="sd">            Method to use for numerical integration. Must be one of &#39;cumtrapz&#39;,</span>
+<span class="sd">                &#39;cumsimps&#39;, or &#39;periodic_bvp&#39;.</span>
+<span class="sd">            o&#39;cumsimps&#39;. Default is &#39;cumtrapz&#39;.</span>
+<span class="sd">        n_layers : int, optional</span>
+<span class="sd">            Number of crystal layers to consider. Default is 4.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># constants</span>
+        <span class="n">elementary_charge</span> <span class="o">=</span> <span class="mf">1.60217663e-19</span>  <span class="c1"># [C]</span>
+        <span class="n">vacuum_permittivity</span> <span class="o">=</span> <span class="mf">8.85418782e-12</span>  <span class="c1"># [F/m] = [C/(V*m)]</span>
+        <span class="n">angstrom</span> <span class="o">=</span> <span class="mf">1e-10</span>  <span class="c1"># [m]</span>
+        <span class="n">permittivity</span> <span class="o">=</span> <span class="n">vacuum_permittivity</span> <span class="o">*</span> <span class="n">dielectric</span> <span class="o">*</span> <span class="n">angstrom</span>  <span class="c1"># [C/(V*Angstrom)]</span>
+        <span class="n">prefactor</span> <span class="o">=</span> <span class="n">elementary_charge</span> <span class="o">/</span> <span class="n">permittivity</span>  <span class="c1"># [V]</span>
+
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density&quot;</span><span class="p">]</span>  <span class="c1"># [e/A^3]</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density_stddev&quot;</span><span class="p">]</span>  <span class="c1"># [e/A^3]</span>
+            <span class="n">bins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>  <span class="c1"># [A]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">density</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Length of bins and density do not match. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;bins: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="si">}</span><span class="s2">, density: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">density</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Length of bins and error do not match. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;bins: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="si">}</span><span class="s2">, error: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># upsample the density by a factor of 10 with cubic spline interpolation</span>
+            <span class="c1"># to improve the accuracy of the numerical integration</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cumsimps&quot;</span><span class="p">,</span> <span class="s2">&quot;cumtrapz&quot;</span><span class="p">]:</span>
+                <span class="n">upsample</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;periodic_bvp&quot;</span><span class="p">:</span>
+                <span class="n">upsample</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">bins_upsampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">*</span> <span class="n">upsample</span><span class="p">)</span>
+            <span class="n">density_upsampled</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">)(</span><span class="n">bins_upsampled</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">prefactor</span>
+            <span class="p">)</span>
+            <span class="n">err_upsampled</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">)(</span><span class="n">bins_upsampled</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">prefactor</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span>
+                <span class="n">symmetry_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
+                <span class="n">symmetry_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span>
+                <span class="c1"># find n largest peaks in the density profile</span>
+                <span class="n">peaks</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">density_upsampled</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+                <span class="n">peaks</span> <span class="o">=</span> <span class="n">peaks</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">density_upsampled</span><span class="p">[</span><span class="n">peaks</span><span class="p">])[</span><span class="o">-</span><span class="n">n_layers</span><span class="p">:]]</span>
+                <span class="n">peak_locs</span> <span class="o">=</span> <span class="n">bins_upsampled</span><span class="p">[</span><span class="n">peaks</span><span class="p">]</span>
+                <span class="c1"># crystal center is average position of the n largest peaks</span>
+                <span class="n">crystal_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">peak_locs</span><span class="p">)</span>
+                <span class="c1"># crystal width is the distance between the n largest peaks</span>
+                <span class="n">crystal_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">peak_locs</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">peak_locs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Four largest peaks locations: </span><span class="si">{</span><span class="n">peak_locs</span><span class="si">}</span><span class="s2"> [A]&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crystal center: </span><span class="si">{</span><span class="n">crystal_center</span><span class="si">}</span><span class="s2"> [A]&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crystal width: </span><span class="si">{</span><span class="n">crystal_width</span><span class="si">}</span><span class="s2"> [A]&quot;</span><span class="p">)</span>
+
+                <span class="c1"># water width is the box length minus the crystal width</span>
+                <span class="n">water_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_universe</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">crystal_width</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Water width: </span><span class="si">{</span><span class="n">water_width</span><span class="si">}</span><span class="s2"> [A]&quot;</span><span class="p">)</span>
+
+                <span class="c1"># symmetry center is box_half_length away from the crystal center</span>
+                <span class="n">symmetry_center</span> <span class="o">=</span> <span class="n">crystal_center</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">water_width</span>
+
+            <span class="n">idx_symmetry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">bins_upsampled</span> <span class="o">-</span> <span class="n">symmetry_center</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Symmetry center: </span><span class="si">{</span><span class="n">symmetry_center</span><span class="si">}</span><span class="s2"> [A]&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Symmetry index: </span><span class="si">{</span><span class="n">idx_symmetry</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;cumsimps&quot;</span><span class="p">:</span>
+                <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span> <span class="o">=</span> <span class="n">cumsimps</span><span class="p">(</span>
+                    <span class="n">bins_upsampled</span><span class="p">,</span>
+                    <span class="n">density_upsampled</span><span class="p">,</span>
+                    <span class="n">err_upsampled</span><span class="p">,</span>
+                    <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">initial_condition</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># set potential to zero at the symmetry center</span>
+                <span class="n">potential_upsampled</span> <span class="o">-=</span> <span class="n">potential_upsampled</span><span class="p">[</span><span class="n">idx_symmetry</span><span class="p">]</span>
+
+                <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span> <span class="o">=</span> <span class="n">cumsimps</span><span class="p">(</span>
+                    <span class="n">bins_upsampled</span><span class="p">,</span>
+                    <span class="n">potential_upsampled</span> <span class="o">-</span> <span class="n">sigma_e</span><span class="p">,</span>
+                    <span class="n">potential_err_upsampled</span><span class="p">,</span>
+                    <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">initial_condition</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">potential_upsampled</span> <span class="o">-=</span> <span class="n">potential_upsampled</span><span class="p">[</span><span class="n">idx_symmetry</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;cumtrapz&quot;</span><span class="p">:</span>
+                <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span> <span class="o">=</span> <span class="n">cumtrapz</span><span class="p">(</span>
+                    <span class="n">bins_upsampled</span><span class="p">,</span>
+                    <span class="n">density_upsampled</span><span class="p">,</span>
+                    <span class="n">err_upsampled</span><span class="p">,</span>
+                    <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">initial_condition</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">potential_upsampled</span> <span class="o">-=</span> <span class="n">potential_upsampled</span><span class="p">[</span><span class="n">idx_symmetry</span><span class="p">]</span>
+
+                <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span> <span class="o">=</span> <span class="n">cumtrapz</span><span class="p">(</span>
+                    <span class="n">bins_upsampled</span><span class="p">,</span>
+                    <span class="n">potential_upsampled</span> <span class="o">-</span> <span class="n">sigma_e</span><span class="p">,</span>
+                    <span class="n">potential_err_upsampled</span><span class="p">,</span>
+                    <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">initial_condition</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">potential_upsampled</span> <span class="o">-=</span> <span class="n">potential_upsampled</span><span class="p">[</span><span class="n">idx_symmetry</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;periodic_bvp&quot;</span><span class="p">:</span>
+                <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span> <span class="o">=</span> <span class="n">periodic_bvp</span><span class="p">(</span>
+                    <span class="n">bins_upsampled</span><span class="p">,</span>
+                    <span class="n">density_upsampled</span><span class="p">,</span>
+                    <span class="n">err_upsampled</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># downsample the potential to the original number of bins</span>
+            <span class="n">potential</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">bins_upsampled</span><span class="p">,</span> <span class="n">potential_upsampled</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span>
+            <span class="p">)(</span><span class="n">bins</span><span class="p">)</span>
+            <span class="n">potential_err</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">bins_upsampled</span><span class="p">,</span> <span class="n">potential_err_upsampled</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span>
+            <span class="p">)(</span><span class="n">bins</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential_stddev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential_err</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.save">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_out</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the results of the analysis to a parquet file. The results</span>
+<span class="sd">        are saved to the `data` directory in the `dir_out` directory.</span>
+
+<span class="sd">        This method should only be called after the analysis has been</span>
+<span class="sd">        run.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dir_out : str, optional</span>
+<span class="sd">            The directory to save the results to. If not specified, the</span>
+<span class="sd">            results are saved to the directory specified in the</span>
+<span class="sd">            `dir_out` attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dir_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dir_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving results for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">dir_out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">dir_out</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># save the dataframe to a file</span>
+        <span class="c1"># self._logger.debug(f&quot;Saving results to {dir_out / self._df_filename}&quot;)</span>
+        <span class="c1"># self._df.to_parquet(dir_out / self._df_filename)</span>
+
+        <span class="c1"># save the results to a compressed numpy file</span>
+        <span class="k">def</span> <span class="nf">save_results</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span>
+                <span class="n">dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;lineardensity_</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">,</span>
+                <span class="n">position</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">],</span>
+                <span class="n">number_density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density&quot;</span><span class="p">],</span>
+                <span class="n">number_density_stddev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density_stddev&quot;</span><span class="p">],</span>
+                <span class="n">mass_density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density&quot;</span><span class="p">],</span>
+                <span class="n">mass_density_stddev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density_stddev&quot;</span><span class="p">],</span>
+                <span class="n">charge_density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density&quot;</span><span class="p">],</span>
+                <span class="n">charge_density_stddev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density_stddev&quot;</span><span class="p">],</span>
+                <span class="n">potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential&quot;</span><span class="p">],</span>
+                <span class="n">potential_stddev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential_stddev&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">save_results</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.figures">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.figures">[docs]</a>
+    <span class="k">def</span> <span class="nf">figures</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Linear Density&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the mass and charge density profiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Axis to plot. Default is None. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figures and axes of the plots.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dim</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_number</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_number_density</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_mass</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_mass_density</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_charge</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_charge_density</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_potential</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plt_potential_nondim</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+                <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">figs</span><span class="p">,</span> <span class="n">axs</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.plt_number_density">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.plt_number_density">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_number_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the number density profiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Dimension to plot. Default is &#39;z&#39;. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figure and axes of the plot.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dim` is not one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">$-axis&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;number_density&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">-axis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Position [nm]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number density [nm$^{-3}$]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures/</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_number_density_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.plt_mass_density">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.plt_mass_density">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_mass_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the mass density profiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Dimension to plot. Default is &#39;z&#39;. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figure and axes of the plot.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dim` is not one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">$-axis&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">kg_per_g</span> <span class="o">=</span> <span class="mf">0.001</span>
+        <span class="n">nm_per_angstrom</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">m_per_angstrom</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+        <span class="n">x_nm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">nm_per_angstrom</span>
+        <span class="n">y_kg_m3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;mass_density&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">kg_per_g</span> <span class="o">/</span> <span class="p">(</span><span class="n">m_per_angstrom</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">x_nm</span><span class="p">,</span>
+            <span class="n">y_kg_m3</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">-axis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Position [nm]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Mass density [kg/m$^3$]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures/</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_mass_density_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.plt_charge_density">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.plt_charge_density">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_charge_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the charge density profiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Dimension to plot. Default is &#39;z&#39;. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figure and axes of the plot.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dim` is not one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">$-axis&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;charge_density&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">-axis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Position [nm]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Charge density [$e$/nm$^3$]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures/</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_charge_density_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.plt_potential">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.plt_potential">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the electrostatic potential profiles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Dimension to plot. Default is &#39;z&#39;. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figure and axes of the plot.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dim` is not one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">$-axis&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential&quot;</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">-axis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Position [nm]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Electrostatic Potential [V]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures/</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_potential_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="LinearDensity.plt_potential_nondim">
+<a class="viewcode-back" href="../../colvar.lineardensity.html#colvar.lineardensity.LinearDensity.plt_potential_nondim">[docs]</a>
+    <span class="k">def</span> <span class="nf">plt_potential_nondim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the electrostatic potential profiles in non-dimensional units.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+<span class="sd">            Dimension to plot. Default is &#39;z&#39;. Must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Title of the plot</span>
+<span class="sd">        ext : str, optional</span>
+<span class="sd">            Extension of the plot file. Default is &#39;png&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[plt.figure, plt.axes]</span>
+<span class="sd">            The figure and axes of the plot.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dim` is not one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dim must be one of &#39;x&#39;, &#39;y&#39;, or &#39;z&#39;. Got </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">$-axis&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">kB</span> <span class="o">=</span> <span class="mf">1.38064852e-23</span>  <span class="c1"># [J/K]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="mf">300.0</span>  <span class="c1"># [K]</span>
+        <span class="n">e_electron</span> <span class="o">=</span> <span class="mf">1.602176634e-19</span>  <span class="c1"># [C]</span>
+        <span class="n">dimensionless_factor</span> <span class="o">=</span> <span class="n">e_electron</span> <span class="o">/</span> <span class="p">(</span><span class="n">kB</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+        <span class="c1"># add major and minor grid</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;potential&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dimensionless_factor</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">-axis&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Position [nm]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Electrostatic Potential [k$_B$T/e]&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dir_out</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;figures/</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_potential_nondim_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tag</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Alec Glisman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

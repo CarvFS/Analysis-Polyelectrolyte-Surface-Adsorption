@@ -48,6 +48,7 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - pytest-xdist
   - coverage
   - pre-commit
   # formatting

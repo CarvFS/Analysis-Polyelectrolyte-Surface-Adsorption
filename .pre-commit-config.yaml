@@ -4,12 +4,16 @@
 # To run pre-commit hooks on a specific file, run `pre-commit run <hook_id> --files <path/to/file>` in the root of your repository
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+
+default_stages: [commit, push]
+fail_fast: true
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-    - id: trailing-whitespace
-      exclude: '^docs/|README.md'
+      - id: trailing-whitespace
+        exclude: "^docs/|README.md"
 
   - repo: https://github.com/ambv/black
     rev: 23.11.0
@@ -26,34 +30,38 @@ repos:
     rev: 0.0.1
     hooks:
       - id: build-docs
-        args: ['--cache-dir', 'docs/build/doctrees', '--html-dir', 'docs/build/html', '--source-dir', 'docs/source']
+        args:
+          [
+            "--cache-dir",
+            "docs/build/doctrees",
+            "--html-dir",
+            "docs/build/html",
+            "--source-dir",
+            "docs/source",
+          ]
         language_version: python3.10
 
   - repo: local
     hooks:
       - id: pytest-with-coverage
         name: pytest with coverage
-        entry: coverage
+        entry: coverage run -m pytest
         language: system
         types: [python]
-        args: ['run', '-m', 'pytest', 'src']
+        exclude: ^docs/|^analysis/
 
       - id: coverage-report
         name: coverage report
-        entry: bash -c -o pipefail 'coverage report --show-missing --fail-under=0 | tee coverage.log && git add coverage.log'
+        entry: bash -c -o pipefail 'coverage report --show-missing --fail-under=0 | tee coverage.log'
         language: system
-        types: [python]
 
       - id: coverage-generate-html
         name: coverage generate html
-        entry: coverage
+        entry: bash -c -o pipefail 'coverage html -d docs/build/coverage'
         language: system
-        types: [python]
-        args: ['html', '-d', 'docs/build/coverage']
 
       - id: remove-test-files
         name: remove test files
         entry: bash -c -o pipefail 'rm .coverage test*.log || true'
         language: system
-        types: [python]
         always_run: true
