@@ -4,7 +4,7 @@
 # Node configuration
 #SBATCH --partition=all --qos=dow --account=dow
 #SBATCH --ntasks=32 --nodes=1
-#SBATCH --mem=40G
+#SBATCH --mem=60G
 #SBATCH --gres=gpu:0 --gpu-bind=closest
 
 # Job information

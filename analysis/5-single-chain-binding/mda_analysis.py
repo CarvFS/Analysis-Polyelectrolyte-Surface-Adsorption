@@ -27,7 +27,9 @@ import time
 import sys
 
 # External dependencies
+from distributed import Client
 import MDAnalysis as mda
+from MDAnalysis.analysis import polymer
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
@@ -574,7 +576,7 @@ def wrapper_lineardensity(
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_all)
+        dims.append(dims_z)
         props.append(props_charge)
         # O_water
         label_groups.append(sel_dict["O_water"])
@@ -586,7 +588,7 @@ def wrapper_lineardensity(
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_all)
+        dims.append(dims_z)
         props.append(props_charge)
 
     for group, grouping, bin, dim in tqdm(
@@ -1020,7 +1022,7 @@ if __name__ == "__main__":
         # load data for method
         df_plumed = pipeline.load_plumed_colvar(method)
         pipeline.save_plumed_colvar(method, directory=dir_out / "plumed")
-        universe = pipeline.load_universe(method)
+        universe = pipeline.load_universe(method, refresh_offsets=REFRESH_OFFSETS)
 
         # non-base replicas are down-sampled by a factor of 10
         if ("replica" in method) and (method.split("_")[1] != "00"):

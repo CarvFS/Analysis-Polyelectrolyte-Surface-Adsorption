@@ -30,6 +30,7 @@ from tqdm.auto import tqdm
 
 try:
     import dask
+    from dask.distributed import progress, worker, Client, TimeoutError
 
     FOUND_DASK = True
 
@@ -169,7 +170,7 @@ class ParallelAnalysisBase(AnalysisBase):
         frames: np.array = None,
         verbose: bool = None,
         n_jobs: int = 1,
-        module: str = "dask",
+        module: str = "multiprocessing",
         method: str = None,
         n_blocks: int = None,
         **kwargs,
@@ -247,8 +248,13 @@ class ParallelAnalysisBase(AnalysisBase):
 
         # dask scheduler
         if module == "dask" and FOUND_DASK:
+            # make a dask client if it doesn't exist
             try:
-                config = {"scheduler": dask.distributed.worker.get_client(), **kwargs}
+                client = Client("tcp://localhost:8786", timeout="2s")
+            except Exception as exc:
+                pass
+            try:
+                config = {"scheduler": worker.get_client(), **kwargs}
                 n_jobs = min(len(config["scheduler"].get_worker_logs()), n_jobs)
             except Exception as exc:
                 if method is None:
@@ -308,7 +314,7 @@ class ParallelAnalysisBase(AnalysisBase):
 
             blocks = dask.delayed(jobs)
             blocks = blocks.persist(**config)
-            dask.distributed.progress(blocks, minimum=1, dt=1)
+            progress(blocks, minimum=1, dt=1)
             block_results = blocks.compute(**config)
 
         # joblib backend
