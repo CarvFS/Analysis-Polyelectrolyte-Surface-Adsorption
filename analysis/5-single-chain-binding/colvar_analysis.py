@@ -370,9 +370,9 @@ if __name__ == "__main__":
         if VERBOSE:
             print(f"{i}: {d}")
 
-        # if output file exists, skip
-        if (CWDIR / OUTPUT_SDIR / "analysis_complete.txt").exists():
-            continue
+        # # if output file exists, skip
+        # if (CWDIR / OUTPUT_SDIR / "analysis_complete.txt").exists():
+        #     continue
 
         try:
             # create data pipeline
