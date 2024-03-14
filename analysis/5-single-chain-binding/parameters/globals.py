@@ -21,6 +21,7 @@ SOLVENT: bool = True  # Whether or not to include solvent in the analysis
 VERBOSE: bool = True  # Verbose output
 RELOAD_DATA: bool = False  # if True, remake all data
 REFRESH_OFFSETS: bool = False  # if True, remake all offsets on trajectory files
+ALL_REPLICAS: bool = False  # if True, process all replicas
 
 # system information
 TEMPERATURE_K: float = 300  # [K] System temperature

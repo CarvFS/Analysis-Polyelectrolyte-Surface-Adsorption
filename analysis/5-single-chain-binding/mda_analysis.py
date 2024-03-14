@@ -58,6 +58,7 @@ from parameters.globals import (  # noqa: E402
     VERBOSE,
     RELOAD_DATA,
     REFRESH_OFFSETS,
+    ALL_REPLICAS,
     TEMPERATURE_K,
     FIG_EXT,
     DEFAULT_PATH,
@@ -1023,8 +1024,7 @@ if __name__ == "__main__":
         total=len(pipeline.sampling_methods),
         desc="Sampling Methods",
     ):
-        # FIXME: remove this
-        if method.split("_")[1] != "00":
+        if (method.split("_")[1] != "00") and (not ALL_REPLICAS):
             log.critical("Skipping non-base replica")
             continue
 
