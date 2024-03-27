@@ -717,7 +717,7 @@ def wrapper_solvent_orientation(
             label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
             selection = (
                 f"same resid as ({group} and "
-                + f"(prop z > {dim_min} and prop z <= {dim_max}))"
+                + f"(prop z > {dim_min:.3f} and prop z <= {dim_max:.3f}))"
             )
             ag = uni.select_atoms(selection, updating=True)
 
