@@ -54,6 +54,7 @@ from parameters.globals import (  # noqa: E402
     STEP,
     N_JOBS,
     N_BLOCKS,
+    MODULE,
     SOLVENT,
     VERBOSE,
     RELOAD_DATA,
@@ -132,6 +133,7 @@ def wrapper_polymerlength(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -208,6 +210,7 @@ def wrapper_dihedrals(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -326,6 +329,7 @@ def wrapper_contacts(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -450,6 +454,7 @@ def wrapper_rdf(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -516,7 +521,6 @@ def wrapper_lineardensity(
     bins_normal = int(1e3)
 
     dims_all = ["x", "y", "z"]
-    dims_z = ["z"]
 
     props_all = ["number", "mass", "charge"]
     props_charge = ["charge"]
@@ -588,7 +592,7 @@ def wrapper_lineardensity(
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_z)
+        dims.append(dims_all)
         props.append(props_charge)
         # O_water
         label_groups.append(sel_dict["O_water"])
@@ -600,7 +604,7 @@ def wrapper_lineardensity(
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_z)
+        dims.append(dims_all)
         props.append(props_charge)
 
     for group, grouping, bin, dim in tqdm(
@@ -613,7 +617,7 @@ def wrapper_lineardensity(
         label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
 
-        file_gr = f"lineardensity_z_{label}.npz"
+        file_gr = f"lineardensity_y_{label}.npz"
         output_np = output_path / "data" / file_gr
 
         if output_np.exists() and not RELOAD_DATA:
@@ -635,6 +639,7 @@ def wrapper_lineardensity(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -692,8 +697,8 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_angulardistribution")
-    min_dist = 20  # [Angstrom]
-    max_dist = 50  # [Angstrom]
+    min_dist = 22  # [Angstrom]
+    max_dist = 40  # [Angstrom]
     bin_width = 0.2  # [Angstrom]
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
     nbins_angle = 100
@@ -707,12 +712,7 @@ def wrapper_solvent_orientation(
         log.info(f"Collective variable: SolventOrientation({group})")
 
         # iterate over all bins
-        for dim_min, dim_max in tqdm(
-            zip(bins[:-1], bins[1:]),
-            total=len(bins) - 1,
-            desc="Axis Binning",
-            dynamic_ncols=True,
-        ):
+        for dim_min, dim_max in zip(bins[:-1], bins[1:]):
             # select atoms
             label = f"{group.replace(' ', '_')}-{dim_min:.3f}_min-{dim_max:.3f}_max"
             selection = (
@@ -751,6 +751,7 @@ def wrapper_solvent_orientation(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -838,6 +839,7 @@ def wrapper_dipole(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -933,6 +935,7 @@ def wrapper_survivalprobability(
                 start=START,
                 stop=STOP,
                 step=STEP,
+                module=MODULE,
                 verbose=VERBOSE,
                 n_jobs=N_JOBS,
                 n_blocks=N_BLOCKS,
@@ -969,12 +972,12 @@ def universe_analysis(
     t_start_uni = time.time()
     wrapper_polymerlength(uni, df_weights, sel_dict)
     wrapper_dihedrals(uni, df_weights, sel_dict)
-    wrapper_contacts(uni, df_weights, sel_dict)
+    # wrapper_contacts(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
-    wrapper_survivalprobability(uni, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

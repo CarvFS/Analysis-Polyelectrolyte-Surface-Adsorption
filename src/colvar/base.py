@@ -170,7 +170,7 @@ class ParallelAnalysisBase(AnalysisBase):
         frames: np.array = None,
         verbose: bool = None,
         n_jobs: int = 1,
-        module: str = "multiprocessing",
+        module: str = "joblib",
         method: str = None,
         n_blocks: int = None,
         **kwargs,
@@ -323,7 +323,7 @@ class ParallelAnalysisBase(AnalysisBase):
             elif method not in {"processes", "threads"}:
                 raise ValueError("Invalid Joblib backend.")
 
-            msg = f"Starting analysis using Joblib ({n_jobs=}, backend={method})..."
+            msg = f"Starting analysis using Joblib ({n_jobs=}, method={method})..."
             self._logger.debug(msg)
             time_start = datetime.now()
             if verbose:
