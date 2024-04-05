@@ -377,6 +377,12 @@ class DataPipeline:
                 self.sampling_paths.remove(repl_base)
                 self.sampling_paths += repl_paths
 
+        # if "replica-00", replace "replica-00" with "replica-00/2-concatenated"
+        self.sampling_paths = [
+            x / "2-concatenated" if x.name == "replica_00" else x
+            for x in self.sampling_paths
+        ]
+
         # sort sampling methods and paths by sampling method name in ascending order
         if len(self.sampling_paths) > 0:
             self.sampling_methods, self.sampling_paths = zip(
