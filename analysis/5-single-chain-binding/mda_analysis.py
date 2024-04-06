@@ -47,6 +47,7 @@ from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.polymerlengths import PolymerLengths  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
+from utils.dask import get_client  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
 from parameters.globals import (  # noqa: E402
     START,
@@ -597,19 +598,18 @@ def wrapper_lineardensity(
         bins.append(bins_tight)
         dims.append(dims_x)
         props.append(props_charge)
-        
+
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
         dims.append(dims_y)
         props.append(props_charge)
-        
+
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
         dims.append(dims_z)
         props.append(props_charge)
-
 
         # O_water
         label_groups.append(sel_dict["O_water"])
@@ -624,13 +624,13 @@ def wrapper_lineardensity(
         bins.append(bins_tight)
         dims.append(dims_x)
         props.append(props_charge)
-        
+
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
         dims.append(dims_y)
         props.append(props_charge)
-        
+
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
@@ -1037,6 +1037,13 @@ if __name__ == "__main__":
     set_style()
     with open("parameters/selections.json", "r") as f:
         sel = json.load(f)
+
+    # #########################################################################
+    # Dask setup
+    # #########################################################################
+    if MODULE == "dask":
+        client = get_client(n_workers=N_JOBS)
+        log.info(f"Dask client: {client}")
 
     # #########################################################################
     # Data processing

@@ -20,6 +20,10 @@ This module requires the following packages:
 - dask
 """
 
+# Standard library
+import time
+
+# Third-party packages
 import dask
 from dask.distributed import Client, LocalCluster
 
@@ -63,3 +67,15 @@ def get_client(n_workers: int, memory_limit: str = "60GB", timeout: int = 2) -> 
         client = Client(cluster)
 
     return client
+
+
+if __name__ == "__main__":
+    # local cluster parameters
+    N_JOBS = 32
+
+    # get a Dask client
+    client = get_client(n_workers=N_JOBS)
+
+    # sleep forever
+    while True:
+        time.sleep(10)
