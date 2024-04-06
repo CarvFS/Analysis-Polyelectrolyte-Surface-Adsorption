@@ -4,11 +4,11 @@
 # Node configuration
 #SBATCH --partition=all --qos=dow --account=dow
 #SBATCH --ntasks=32 --nodes=1
-#SBATCH --mem=40G
+#SBATCH --mem=60G
 #SBATCH --gres=gpu:0 --gpu-bind=closest
 
 # Job information
-#SBATCH --job-name=Analysis
+#SBATCH --job-name=Colvar-Anl
 #SBATCH --time=2-0:00:00
 
 # Runtime I/O
@@ -27,6 +27,7 @@ python_script='colvar_analysis.py'
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding/cleaned'
 
 # dir sims is all subdirectories in the base directory
+mkdir -p "logs"
 mapfile -t dir_sims < <(find "${dir_sims_base}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 mapfile -t dir_sims < <(printf "%s\n" "${dir_sims[@]}" | sort)
 n_sims="${#dir_sims[@]}"
@@ -47,7 +48,6 @@ if [[ "${#}" -gt 0 ]]; then
 fi
 
 # run analysis script
-mkdir -p "logs"
 if [[ "${single_analysis}" != "1" ]]; then
     if [[ "${gnu_parallel}" != "1" ]]; then
         for ((sim_idx = 0; sim_idx < n_sims; sim_idx++)); do

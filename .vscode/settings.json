@@ -60,6 +60,7 @@
         "dataframes",
         "datapoints",
         "ddpm",
+        "debugpy",
         "decorrelation",
         "denoising",
         "dimensionalize",

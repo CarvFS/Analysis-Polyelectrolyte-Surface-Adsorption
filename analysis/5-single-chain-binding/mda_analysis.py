@@ -521,6 +521,9 @@ def wrapper_lineardensity(
     bins_normal = int(1e3)
 
     dims_all = ["x", "y", "z"]
+    dims_x = ["x"]
+    dims_y = ["y"]
+    dims_z = ["z"]
 
     props_all = ["number", "mass", "charge"]
     props_charge = ["charge"]
@@ -592,19 +595,46 @@ def wrapper_lineardensity(
         label_groups.append(sel_dict["sol"])
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_all)
+        dims.append(dims_x)
         props.append(props_charge)
+        
+        label_groups.append(sel_dict["sol"])
+        groupings.append("atoms")
+        bins.append(bins_tight)
+        dims.append(dims_y)
+        props.append(props_charge)
+        
+        label_groups.append(sel_dict["sol"])
+        groupings.append("atoms")
+        bins.append(bins_tight)
+        dims.append(dims_z)
+        props.append(props_charge)
+
+
         # O_water
         label_groups.append(sel_dict["O_water"])
         groupings.append("atoms")
         bins.append(bins_normal)
         dims.append(dims_all)
         props.append(props_all)
+
         # all atoms
         label_groups.append("all")
         groupings.append("atoms")
         bins.append(bins_tight)
-        dims.append(dims_all)
+        dims.append(dims_x)
+        props.append(props_charge)
+        
+        label_groups.append("all")
+        groupings.append("atoms")
+        bins.append(bins_tight)
+        dims.append(dims_y)
+        props.append(props_charge)
+        
+        label_groups.append("all")
+        groupings.append("atoms")
+        bins.append(bins_tight)
+        dims.append(dims_z)
         props.append(props_charge)
 
     for group, grouping, bin, dim in tqdm(
@@ -617,7 +647,7 @@ def wrapper_lineardensity(
         label = f"{group.replace(' ', '_')}_{grouping}"
         select = uni.select_atoms(group)
 
-        file_gr = f"lineardensity_y_{label}.npz"
+        file_gr = f"lineardensity_{dim[0]}_{label}.npz"
         output_np = output_path / "data" / file_gr
 
         if output_np.exists() and not RELOAD_DATA:
@@ -976,8 +1006,8 @@ def universe_analysis(
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
-    wrapper_survivalprobability(uni, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

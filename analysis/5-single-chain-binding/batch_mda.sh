@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:0 --gpu-bind=closest
 
 # Job information
-#SBATCH --job-name=Analysis
+#SBATCH --job-name=MDA-Anl
 #SBATCH --time=2-0:00:00
 
 # Runtime I/O
@@ -31,6 +31,7 @@ mkdir -p "logs"
 mapfile -t dir_sims < <(find "${dir_sims_base}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n")
 mapfile -t dir_sims < <(printf "%s\n" "${dir_sims[@]}" | sort)
 n_sims="${#dir_sims[@]}"
+
 echo "Found ${#dir_sims[@]} simulations in ${dir_sims_base}"
 for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${i}: ${dir_sims[${i}]}"

@@ -92,6 +92,15 @@ class ParallelTqdm(Parallel):
 
     def print_progress(self):
         """Display the process of the parallel execution using tqdm"""
+        # start progress_bar, if not started yet.
+        if self.progress_bar is None:
+            self.progress_bar = tqdm.tqdm(
+                desc=self.desc,
+                total=self.total_tasks,
+                disable=self.disable_progressbar,
+                unit="tasks",
+                dynamic_ncols=True,
+            )
         # if we finish dispatching, find total_tasks from the number of remaining items
         if self.total_tasks is None and self._original_iterator is None:
             self.total_tasks = self.n_dispatched_tasks
