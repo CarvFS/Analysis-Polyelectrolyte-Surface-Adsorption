@@ -37,6 +37,11 @@ for ((i = 0; i < ${#dir_sims[@]}; i++)); do
     echo "  ${i}: ${dir_sims[${i}]}"
 done
 
+# start a dask server
+# echo "- Starting Dask server..."
+# python3 ./../../src/utils/dask_helper.py &
+# sleep 5
+
 # if there is more than 1 command line argument, then the first argument is the index of the simulation to analyze
 if [[ "${#}" -gt 0 ]]; then
     single_analysis='1'

@@ -13,7 +13,7 @@ from pathlib import Path
 START: int = int(25e3)  # First frame to read
 STOP: int = int(500e3)  # Last frame to read
 STEP: int = 5  # Step between frames to read
-MODULE: str = "dask"  # parallel processing {joblib (problematic), multiprocessing, dask}
+MODULE: str = "multiprocessing"  # parallel processing {joblib, multiprocessing, dask}
 N_JOBS: int = 32  # Number of parallel jobs
 N_BLOCKS: int = 160  # Number of blocks to split trajectory into
 SOLVENT: bool = True  # Whether or not to include solvent in the analysis
@@ -30,5 +30,7 @@ TEMPERATURE_K: float = 300  # [K] System temperature
 # File I/O
 FIG_EXT: str = "png"  # Figure file extension
 DEFAULT_PATH: Path = Path(
-    "/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding/cleaned/6.5.4-calcite-104surface-12nm_surface-13nm_vertical-1chain-PAcr-32mer-0Crb-32Ca-32Na-64Cl-300K-1bar-NVT"
+    "/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption"
+    + "/data_archive/6_single_chain_binding/cleaned/6.5.4-calcite-104surface-12nm_"
+    + "surface-13nm_vertical-1chain-PAcr-32mer-0Crb-32Ca-32Na-64Cl-300K-1bar-NVT"
 )

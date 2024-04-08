@@ -7,7 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   utils.dask
+   utils.dask_helper
    utils.logs
 
 Module contents

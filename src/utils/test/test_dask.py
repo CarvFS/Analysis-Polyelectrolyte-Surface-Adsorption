@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
-from utils.dask import get_client  # noqa: E402
+from utils.dask_helper import get_client  # noqa: E402
 
 
 @pytest.fixture(scope="module")

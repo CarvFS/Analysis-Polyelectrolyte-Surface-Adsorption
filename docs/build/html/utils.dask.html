@@ -20,9 +20,7 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="utils.logs module" href="utils.logs.html" />
-    <link rel="prev" title="utils package" href="utils.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,23 +43,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="colvar.html">colvar package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="render.html">render package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html">stats package</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="utils.html">utils package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="utils.html#submodules">Submodules</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">utils.dask module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="utils.logs.html">utils.logs module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Key files:</span></p>
 <ul>
@@ -93,8 +76,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
-          <li class="breadcrumb-item"><a href="utils.html">utils package</a></li>
       <li class="breadcrumb-item active">utils.dask module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/utils.dask.rst.txt" rel="nofollow"> View page source</a>
@@ -105,63 +86,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-utils.dask">
-<span id="utils-dask-module"></span><h1>utils.dask module<a class="headerlink" href="#module-utils.dask" title="Link to this heading"></a></h1>
-<p>Dask utilities for parallel processing.
-| Author: Alec Glisman (GitHub: &#64;alec-glisman)
-| Date: 2021-08-31</p>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>get_client(n_workers: int, memory_limit: str = “60GB”) -&gt; Client:</dt><dd><p>Get a Dask client for parallel processing. If a client is already running,
-return that client. Otherwise, start a new client.</p>
-</dd>
-</dl>
-</section>
-<section id="raises">
-<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>OSError</dt><dd><p>If a client is already running on port 8785.</p>
-</dd>
-</dl>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
-<p>This module requires the following packages:
-- dask</p>
-</section>
-<dl class="py function">
-<dt class="sig sig-object py" id="utils.dask.get_client">
-<span class="sig-prename descclassname"><span class="pre">utils.dask.</span></span><span class="sig-name descname"><span class="pre">get_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'60GB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dask.distributed.Client</span></span></span><a class="reference internal" href="_modules/utils/dask.html#get_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.dask.get_client" title="Link to this definition"></a></dt>
-<dd><p>Get a Dask client for parallel processing. If a client is already running,
-return that client. Otherwise, start a new client.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>n_workers<span class="classifier">int</span></dt><dd><p>Number of workers to use for parallel processing.</p>
-</dd>
-<dt>memory_limit<span class="classifier">str, optional</span></dt><dd><p>Memory limit for each worker, by default “60GB” (60 GB).</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>Client</dt><dd><p>Dask client for parallel processing.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
+  <section id="utils-dask-module">
+<h1>utils.dask module<a class="headerlink" href="#utils-dask-module" title="Link to this heading"></a></h1>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="utils.html" class="btn btn-neutral float-left" title="utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="utils.logs.html" class="btn btn-neutral float-right" title="utils.logs module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

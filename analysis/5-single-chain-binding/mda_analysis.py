@@ -47,7 +47,6 @@ from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.polymerlengths import PolymerLengths  # noqa: E402
 from colvar.rdf import InterRDF  # noqa: E402
 from render.util import set_style  # noqa: E402
-from utils.dask import get_client  # noqa: E402
 from utils.logs import setup_logging  # noqa: E402
 from parameters.globals import (  # noqa: E402
     START,
@@ -403,6 +402,24 @@ def wrapper_rdf(
     exclusions.append(None)
 
     if SOLVENT:
+        # {O_water, O_carboxylate}
+        label_references.append(sel_dict["O_water"])
+        label_groups.append(sel_dict["O_carb"])
+        updating.append((False, False))
+        exclusions.append(None)
+
+        # {O_water, PE}
+        label_references.append(sel_dict["O_water"])
+        label_groups.append(sel_dict["polyelectrolyte"])
+        updating.append((False, False))
+        exclusions.append(None)
+
+        # {Water, PE}
+        label_references.append(sel_dict["sol"])
+        label_groups.append(sel_dict["polyelectrolyte"])
+        updating.append((False, False))
+        exclusions.append(None)
+
         # {O_water, Ca_ion}
         label_references.append(sel_dict["O_water"])
         label_groups.append(sel_dict["Ca_ion"])
@@ -412,12 +429,6 @@ def wrapper_rdf(
         # {O_water, Carbonate C}
         label_references.append(sel_dict["O_water"])
         label_groups.append(sel_dict["C_crb_ion"])
-        updating.append((False, False))
-        exclusions.append(None)
-
-        # {O_water, O_carb}
-        label_references.append(sel_dict["O_water"])
-        label_groups.append(sel_dict["O_carb"])
         updating.append((False, False))
         exclusions.append(None)
 
@@ -1037,13 +1048,6 @@ if __name__ == "__main__":
     set_style()
     with open("parameters/selections.json", "r") as f:
         sel = json.load(f)
-
-    # #########################################################################
-    # Dask setup
-    # #########################################################################
-    if MODULE == "dask":
-        client = get_client(n_workers=N_JOBS)
-        log.info(f"Dask client: {client}")
 
     # #########################################################################
     # Data processing
