@@ -15,7 +15,7 @@ STOP: int = int(500e3)  # Last frame to read
 STEP: int = 5  # Step between frames to read
 MODULE: str = "multiprocessing"  # parallel processing {joblib, multiprocessing, dask}
 N_JOBS: int = 32  # Number of parallel jobs
-N_BLOCKS: int = 160  # Number of blocks to split trajectory into
+N_BLOCKS: int = 256  # Number of blocks to split trajectory into
 SOLVENT: bool = True  # Whether or not to include solvent in the analysis
 
 # Data processing parameters

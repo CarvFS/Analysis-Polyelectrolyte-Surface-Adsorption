@@ -20,11 +20,17 @@ set -o errexit # exit when a command fails. Add || true to commands allowed to f
 set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
+dask='0'
 gnu_parallel='0'
 single_analysis='0'
 sim_idx='0'
 python_script='mda_analysis.py'
 dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding/cleaned'
+
+
+# on ctrl-c, kill the dask server
+dask_pid=''
+trap "echo 'Caught signal'; kill -9 ${dask_pid}" SIGINT SIGTERM
 
 # dir sims is all subdirectories in the base directory
 mkdir -p "logs"
@@ -38,9 +44,12 @@ for ((i = 0; i < ${#dir_sims[@]}; i++)); do
 done
 
 # start a dask server
-# echo "- Starting Dask server..."
-# python3 ./../../src/utils/dask_helper.py &
-# sleep 5
+if [[ "${dask}" == "1" ]]; then
+    echo "- Starting Dask server..."
+    python3 ./../../src/utils/dask_helper.py &
+    dask_pid="${!}"
+    sleep 3
+fi
 
 # if there is more than 1 command line argument, then the first argument is the index of the simulation to analyze
 if [[ "${#}" -gt 0 ]]; then
@@ -82,4 +91,10 @@ else
         python3 "${python_script}" \
             --dir "${dir_sims_base}/${dir_sims[${sim_idx}]}"
     } | tee "logs/${python_script%%.*}_idx_${sim_idx}.log" 2>&1
+fi
+
+# kill the dask server
+if [[ "${dask}" == "1" ]]; then
+    echo "- Killing Dask server..."
+    kill -9 "${dask_pid}"
 fi
