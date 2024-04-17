@@ -529,7 +529,7 @@ def wrapper_lineardensity(
     output_path = Path("mdanalysis_lineardensity")
     label_groups, groupings, bins, dims, props = [], [], [], [], []
 
-    bins_tight = int(50e3)
+    bins_tight = int(10e3)
     bins_normal = int(1e3)
 
     dims_all = ["x", "y", "z"]
@@ -1017,7 +1017,7 @@ def universe_analysis(
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")

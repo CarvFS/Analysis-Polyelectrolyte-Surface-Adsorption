@@ -246,8 +246,17 @@ class ParallelAnalysisBase(AnalysisBase):
         if self.n_frames < n_blocks:
             warnings.warn("run() uses more blocks than frames: " "decrease n_blocks")
 
+        # serial processing
+        if n_jobs == 1:
+            self._logger.debug("Starting analysis using serial processing...")
+            time_start = datetime.now()
+            # ignore blocks and process all frames
+            block_results = [None] * len(ts_indices)
+            for idx, frame in tqdm(enumerate(ts_indices), total=len(ts_indices)):
+                block_results[idx] = self._single_frame(frame)
+
         # dask scheduler
-        if module == "dask" and FOUND_DASK:
+        elif module == "dask" and FOUND_DASK:
             # make a dask client if it doesn't exist
             try:
                 _ = Client("tcp://localhost:8786", timeout="2s")

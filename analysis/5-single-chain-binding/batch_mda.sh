@@ -21,12 +21,12 @@ set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
 dask='0'
-gnu_parallel='0'
+gnu_parallel='1'
 single_analysis='0'
 sim_idx='0'
 python_script='mda_analysis.py'
-dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding/cleaned'
-
+# dir_sims_base='/nfs/zeal_nas/home_mount/aglisman/GitHub/Polyelectrolyte-Surface-Adsorption/data_archive/6_single_chain_binding/cleaned'
+dir_sims_base='/media/aglisman/Data/Single-Chain-Adsorption/cleaned'
 
 # on ctrl-c, kill the dask server
 dask_pid=''
@@ -67,7 +67,7 @@ if [[ "${single_analysis}" != "1" ]]; then
     # run parallel analysis using GNU parallel
     if [[ "${gnu_parallel}" == "1" ]]; then
         echo "- Running analysis in parallel..."
-        parallel -j 32 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
+        parallel -j 16 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
             python3 "${python_script}" --dir "${dir_sims_base}/{1}" \
             ::: "${dir_sims[@]}"
 
