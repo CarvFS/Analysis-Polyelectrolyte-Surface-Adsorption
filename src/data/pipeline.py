@@ -718,6 +718,34 @@ class DataPipeline:
 
         return files
 
+    def get_top_trajs(self, method: str) -> tuple:
+        """
+        Get the topology and trajectory files for a given sampling method.
+
+        Parameters
+        ----------
+        method : str
+            The name of the sampling method.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the topology and trajectory files.
+        """
+        # check that there is only one topology file for this method
+        num_top_files = len(self.data_files[method]["top"])
+        if num_top_files != 1:
+            raise ValueError(
+                f"Expected 1 topology file for method {method}. "
+                + f"Found {num_top_files} topology files."
+            )
+
+        top = self.data_files[method]["top"][0]
+        trajs = self.data_files[method]["traj"]
+        self._log.debug(f"Topology file: {top}")
+        self._log.debug(f"Trajectory files ({len(trajs)}): {trajs}")
+        return top, trajs
+
     def load_universe(self, method: str, **kwargs) -> mda.Universe:
         """
         Load the MDAnalysis universe for a given sampling method.
@@ -737,23 +765,11 @@ class DataPipeline:
         ValueError
             If there is not exactly one topology file for the given method.
         """
-        # check that there is only one topology file for this method
-        num_top_files = len(self.data_files[method]["top"])
-        if num_top_files != 1:
-            raise ValueError(
-                f"Expected 1 topology file for method {method}. "
-                + f"Found {num_top_files} topology files."
-            )
-
-        self._log.debug(f"Loading MDA universe for method: {method}")
-        self._log.debug(
-            f"Found {len(self.data_files[method]['traj'])} trajectory files"
-        )
-        self._log.debug(f"Topology file: {self.data_files[method]['top'][0]}")
-        self._log.debug(f"Trajectory files: {self.data_files[method]['traj']}")
+        self._log.info(f"Loading MDA universe for method: {method}")
+        top, trajs = self.get_top_trajs(method)
         universe = mda.Universe(
-            self.data_files[method]["top"][0],
-            self.data_files[method]["traj"],
+            top,
+            trajs,
             verbose=self._verbose,
             **kwargs,
         )

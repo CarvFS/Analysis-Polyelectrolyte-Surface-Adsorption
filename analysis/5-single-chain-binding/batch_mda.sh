@@ -21,7 +21,7 @@ set -o nounset # exit when script tries to use undeclared variable
 
 # analysis method
 dask='0'
-gnu_parallel='1'
+gnu_parallel='0'
 single_analysis='0'
 sim_idx='0'
 python_script='mda_analysis.py'
@@ -30,7 +30,7 @@ dir_sims_base='/media/aglisman/Data/Single-Chain-Adsorption/cleaned'
 
 # on ctrl-c, kill the dask server
 dask_pid=''
-trap "echo 'Caught signal'; kill -9 ${dask_pid}" SIGINT SIGTERM
+trap 'echo "Caught signal"; kill -9 ${dask_pid}' SIGINT SIGTERM
 
 # dir sims is all subdirectories in the base directory
 mkdir -p "logs"

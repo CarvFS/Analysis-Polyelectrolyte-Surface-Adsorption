@@ -226,19 +226,25 @@ class ParallelAnalysisBase(AnalysisBase):
         verbose = getattr(self, "_verbose", False) if verbose is None else verbose
 
         self._setup_frames(
-            self._atomgroups[0].universe.trajectory,
+            self._trajectory,
             start=start,
             stop=stop,
             step=step,
             frames=frames,
         )
-
         self._prepare()
 
-        n_jobs = n_jobs if n_jobs != -1 else multiprocessing.cpu_count()
-        n_blocks = n_blocks if n_blocks else n_jobs
-        ts_indices = frames if frames else np.arange(self.start, self.stop, self.step)
-        block_indices = np.array_split(ts_indices, n_blocks)
+        if n_jobs == -1:
+            n_jobs = multiprocessing.cpu_count()
+        if n_blocks is None:
+            n_blocks = n_jobs
+        if frames is None:
+            frames = np.arange(self.start, self.stop, self.step)
+
+        if n_blocks > 1:
+            block_indices = np.array_split(frames, n_blocks)
+        else:
+            block_indices = [frames]
 
         # issue errors
         if self.n_frames == 0:
@@ -251,8 +257,8 @@ class ParallelAnalysisBase(AnalysisBase):
             self._logger.debug("Starting analysis using serial processing...")
             time_start = datetime.now()
             # ignore blocks and process all frames
-            block_results = [None] * len(ts_indices)
-            for idx, frame in tqdm(enumerate(ts_indices), total=len(ts_indices)):
+            block_results = [None] * len(frames)
+            for idx, frame in tqdm(enumerate(frames), total=len(frames)):
                 block_results[idx] = self._single_frame(frame)
 
         # dask scheduler
@@ -327,9 +333,7 @@ class ParallelAnalysisBase(AnalysisBase):
 
         # joblib backend
         elif module == "joblib" and FOUND_JOBLIB:
-            if method is None:
-                method = "processes"
-            elif method not in {"processes", "threads"}:
+            if method is None and method not in {"processes", "threads", None}:
                 raise ValueError("Invalid Joblib backend.")
 
             msg = f"Starting analysis using Joblib ({n_jobs=}, method={method})..."
