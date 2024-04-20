@@ -19,7 +19,7 @@ dependencies:
   - pip
   # parallelization
   - dask>=2023.0.0
-  - joblib
+  - joblib<1.4.0
   - numba
   - tqdm
   # data analysis

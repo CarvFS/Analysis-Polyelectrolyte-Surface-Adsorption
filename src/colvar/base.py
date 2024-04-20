@@ -16,17 +16,20 @@ should return a `np.ndarray` instead of writing to a `self.results` list.
 
 # Standard library
 from __future__ import annotations
+from collections.abc import Generator, Iterable
+import contextlib
 from datetime import datetime
 from functools import partial
 import multiprocessing
 from pathlib import Path
+from typing import Any, Callable
 import sys
 import warnings
 
 # External dependencies
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 try:
     import dask
@@ -56,7 +59,50 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "src"))
 
 # Local internal dependencies
 from utils.logs import setup_logging  # noqa: E402
-from colvar.parallel import ParallelTqdm  # noqa: E402
+
+
+@contextlib.contextmanager
+def _tqdm_joblib(tqdm_obj: tqdm) -> Generator:
+
+    class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
+        def __call__(self, *args, **kwargs) -> None:
+            tqdm_obj.update(n=self.batch_size)
+            return super().__call__(*args, **kwargs)
+
+    old_batch_callback = joblib.parallel.BatchCompletionCallBack
+    joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
+    try:
+        yield tqdm_obj
+    finally:
+        joblib.parallel.BatchCompletionCallBack = old_batch_callback
+        tqdm_obj.close()
+
+
+def _istarmap(
+    self: multiprocessing.pool.Pool,
+    func: Callable[[Any], Any],
+    iterable: Iterable,
+    chunk_size: int = 1,
+) -> Iterable:
+
+    self._check_running()
+    if chunk_size < 1:
+        raise ValueError("Chunk size must be greater than 1.")
+
+    task_batches = multiprocessing.pool.Pool._get_tasks(func, iterable, chunk_size)
+    result = multiprocessing.pool.IMapIterator(self)
+    self._taskqueue.put(
+        (
+            self._guarded_task_generation(
+                result._job, multiprocessing.pool.starmapstar, task_batches
+            ),
+            result._set_length,
+        )
+    )
+    return (item for chunk in result for item in chunk)
+
+
+multiprocessing.pool.Pool.istarmap = _istarmap
 
 
 class ParallelAnalysisBase(AnalysisBase):
@@ -263,15 +309,11 @@ class ParallelAnalysisBase(AnalysisBase):
 
         # dask scheduler
         elif module == "dask" and FOUND_DASK:
-            # make a dask client if it doesn't exist
-            try:
-                _ = Client("tcp://localhost:8786", timeout="2s")
-            except Exception:
-                pass
             try:
                 config = {"scheduler": worker.get_client(), **kwargs}
                 n_jobs = min(len(config["scheduler"].get_worker_logs()), n_jobs)
-            except Exception as exc:
+            
+            except ValueError as exc:
                 if method is None:
                     method = "processes"
                 elif method not in {
@@ -326,9 +368,9 @@ class ParallelAnalysisBase(AnalysisBase):
 
             time_start = datetime.now()
 
-            blocks = dask.delayed(jobs)
-            blocks = blocks.persist(**config)
-            progress(blocks, minimum=1, dt=1)
+            blocks = dask.delayed(jobs).persist(**config)
+            if self._verbose:
+                progress(blocks, minimum=1, dt=1)
             block_results = blocks.compute(**config)
 
         # joblib backend
@@ -342,11 +384,15 @@ class ParallelAnalysisBase(AnalysisBase):
             if verbose:
                 print(msg)
 
-            block_results = ParallelTqdm(
-                n_jobs=n_jobs,
-                prefer=method,
-                desc="Analysis",
-            )([joblib.delayed(self._job_block)(indices) for indices in block_indices])
+                with (
+                    _tqdm_joblib(tqdm(total=len(block_indices)))
+                    if verbose
+                    else contextlib.suppress()
+                ):
+                    block_results = joblib.Parallel(n_jobs=n_jobs, prefer=method)(
+                        joblib.delayed(self._job_block)(indices)
+                        for indices in block_indices
+                    )
 
         # multiprocessing
         else:
@@ -369,17 +415,26 @@ class ParallelAnalysisBase(AnalysisBase):
                 print(msg)
 
             with multiprocessing.get_context(method).Pool(n_jobs) as p:
-                block_results = list(
-                    tqdm(
-                        p.imap(partial(self._job_block), block_indices),
-                        total=n_blocks,
-                        unit="block",
-                        desc="Analysis",
-                        mininterval=1,
-                        dynamic_ncols=True,
-                        disable=(not self._verbose),
+                if self._verbose:
+                    block_results = list(
+                        tqdm(
+                            p.istarmap(
+                                partial(self._job_block),
+                                ((indices,) for indices in block_indices),
+                            ),
+                            total=len(block_indices),
+                            desc="Blocks",
+                            dynamic_ncols=True,
+                            leave=False,
+                        )
                     )
-                )
+                else:
+                    block_results = list(
+                        p.starmap(
+                            self._job_block,
+                            ((indices,) for indices in block_indices),
+                        )
+                    )
 
         time_analysis = datetime.now()
         self._logger.debug(
