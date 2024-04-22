@@ -43,6 +43,7 @@ class DataPipeline:
         data_path_base: Path,
         temperature: float = 300.0,
         verbose: bool = False,
+        concatenated: bool = False,
         logger: logging.Logger = None,
         ext_top: str = "tpr",
         ext_traj: str = "xtc",
@@ -60,6 +61,8 @@ class DataPipeline:
             The temperature of the simulation in Kelvin, by default 300.0.
         verbose : bool, optional
             Whether to print verbose logging messages, by default False.
+        concatenated : bool, optional
+            Whether to use concatenated trajectory files, by default False.
         logger : logging.Logger, optional
             A logger object for logging messages, by default None.
         ext_top : str, optional
@@ -122,6 +125,7 @@ class DataPipeline:
         self._repl_prefix = "replica_"
 
         # loaded data
+        self.concatenated = concatenated
         self.sampling_methods = None
         self.sampling_paths = None
         self.data_files = None
@@ -378,10 +382,11 @@ class DataPipeline:
                 self.sampling_paths += repl_paths
 
         # if "replica-00", replace "replica-00" with "replica-00/2-concatenated"
-        self.sampling_paths = [
-            x / "2-concatenated" if x.name == "replica_00" else x
-            for x in self.sampling_paths
-        ]
+        if self.concatenated:
+            self.sampling_paths = [
+                x / "2-concatenated" if x.name == "replica_00" else x
+                for x in self.sampling_paths
+            ]
 
         # sort sampling methods and paths by sampling method name in ascending order
         if len(self.sampling_paths) > 0:

@@ -312,7 +312,7 @@ class ParallelAnalysisBase(AnalysisBase):
             try:
                 config = {"scheduler": worker.get_client(), **kwargs}
                 n_jobs = min(len(config["scheduler"].get_worker_logs()), n_jobs)
-            
+
             except ValueError as exc:
                 if method is None:
                     method = "processes"

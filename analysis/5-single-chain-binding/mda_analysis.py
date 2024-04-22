@@ -60,6 +60,7 @@ from parameters.globals import (  # noqa: E402
     RELOAD_DATA,
     REFRESH_OFFSETS,
     ALL_REPLICAS,
+    CONCATENATED,
     TEMPERATURE_K,
     FIG_EXT,
     DEFAULT_PATH,
@@ -1054,7 +1055,10 @@ if __name__ == "__main__":
     # #########################################################################
     # load data pipeline
     pipeline = DataPipeline(
-        data_path_base=data_dir, temperature=TEMPERATURE_K, verbose=VERBOSE
+        data_path_base=data_dir,
+        temperature=TEMPERATURE_K,
+        concatenated=CONCATENATED,
+        verbose=VERBOSE,
     )
     if VERBOSE:
         print(f"Found {len(pipeline.sampling_methods)} sampling methods")
