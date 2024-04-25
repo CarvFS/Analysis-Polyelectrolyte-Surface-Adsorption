@@ -385,51 +385,51 @@ def wrapper_rdf(
     output_path = Path("mdanalysis_rdf/data")
 
     # {Cl_ion, Ca_ion}
-    label_references.append(sel_dict["Cl_ion"])
-    label_groups.append(sel_dict["Ca_ion"])
+    label_groups.append(sel_dict["Cl_ion"])
+    label_references.append(sel_dict["Ca_ion"])
     updating.append((False, False))
     exclusions.append(None)
 
     # {Ca_ion, O_carbonate}
-    label_references.append(sel_dict["Ca_ion"])
-    label_groups.append(sel_dict["O_carb"])
+    label_groups.append(sel_dict["Ca_ion"])
+    label_references.append(sel_dict["O_carb"])
     updating.append((False, False))
     exclusions.append(None)
 
     # {C_alpha, C_alpha}
-    label_references.append(sel_dict["C_alpha"])
     label_groups.append(sel_dict["C_alpha"])
+    label_references.append(sel_dict["C_alpha"])
     updating.append((False, False))
     exclusions.append(None)
 
     if SOLVENT:
         # {O_water, O_carboxylate}
-        label_references.append(sel_dict["O_water"])
-        label_groups.append(sel_dict["O_carb"])
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["O_carb"])
         updating.append((False, False))
         exclusions.append(None)
 
         # {O_water, PE}
-        label_references.append(sel_dict["O_water"])
-        label_groups.append(sel_dict["polyelectrolyte"])
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["polyelectrolyte"])
         updating.append((False, False))
         exclusions.append(None)
 
         # {Water, PE}
-        label_references.append(sel_dict["sol"])
-        label_groups.append(sel_dict["polyelectrolyte"])
+        label_groups.append(sel_dict["sol"])
+        label_references.append(sel_dict["polyelectrolyte"])
         updating.append((False, False))
         exclusions.append(None)
 
         # {O_water, Ca_ion}
-        label_references.append(sel_dict["O_water"])
-        label_groups.append(sel_dict["Ca_ion"])
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["Ca_ion"])
         updating.append((False, False))
         exclusions.append(None)
 
         # {O_water, Carbonate C}
-        label_references.append(sel_dict["O_water"])
-        label_groups.append(sel_dict["C_crb_ion"])
+        label_groups.append(sel_dict["O_water"])
+        label_references.append(sel_dict["C_crb_ion"])
         updating.append((False, False))
         exclusions.append(None)
 
@@ -749,6 +749,8 @@ def wrapper_solvent_orientation(
     label_groups = [sel_dict["sol"]]
     grouping = "residues"
 
+    # TODO: add polymer solvation groups
+
     # iterate over all groups
     for group in label_groups:
         log.info(f"Collective variable: SolventOrientation({group})")
@@ -1018,8 +1020,8 @@ def universe_analysis(
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    # wrapper_rdf(uni, df_weights, sel_dict)
-    # wrapper_survivalprobability(uni, sel_dict)
+    wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 
