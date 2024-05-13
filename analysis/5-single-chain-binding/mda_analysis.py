@@ -739,20 +739,24 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_angulardistribution")
-    min_dist = 22  # [Angstrom]
-    max_dist = 40  # [Angstrom]
+    min_dist = 25  # [Angstrom]
+    max_dist = 36  # [Angstrom]
     bin_width = 0.2  # [Angstrom]
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
     nbins_angle = 100
 
-    # water
+    # all water
     label_groups = [sel_dict["sol"]]
-    grouping = "residues"
+    groupings = ["residues"]
 
-    # TODO: add polymer solvation groups
+    # polyelectrolyte solvation shell
+    label_groups.append(
+        f"same resid as ({sel_dict['sol']} and around 3.5 {sel_dict['polyelectrolyte']})"
+    )
+    groupings.append("residues")
 
     # iterate over all groups
-    for group in label_groups:
+    for group, grouping in zip(label_groups, groupings):
         log.info(f"Collective variable: SolventOrientation({group})")
 
         # iterate over all bins
@@ -775,7 +779,7 @@ def wrapper_solvent_orientation(
                 raise ValueError(
                     f"Number of atoms not divisible by 3 for selection {selection}"
                 )
-            elif len(uni.select_atoms(selection)) < 3 * 10:
+            elif len(uni.select_atoms(selection)) < 3 * 10 and group == sel_dict["sol"]:
                 log.warning(f"Not enough atoms found for selection {selection}")
                 continue
             else:
@@ -1020,8 +1024,8 @@ def universe_analysis(
     wrapper_lineardensity(uni, df_weights, sel_dict)
     wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    wrapper_rdf(uni, df_weights, sel_dict)
-    wrapper_survivalprobability(uni, sel_dict)
+    # wrapper_rdf(uni, df_weights, sel_dict)
+    # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
 

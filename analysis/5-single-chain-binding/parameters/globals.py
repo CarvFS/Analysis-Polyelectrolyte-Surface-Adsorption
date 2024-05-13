@@ -12,16 +12,16 @@ from pathlib import Path
 # MDAnalysis trajectory parameters
 START: int = int(25e3)  # First frame to read
 STOP: int = int(500e3)  # Last frame to read
-STEP: int = 5  # Step between frames to read
+STEP: int = 10  # Step between frames to read
 MODULE: str = "multiprocessing"  # parallel processing {joblib, multiprocessing, dask}
-N_JOBS: int = 32  # Number of parallel jobs
-N_BLOCKS: int = 32 * 8  # Number of blocks to split trajectory into
+N_JOBS: int = 30  # Number of parallel jobs
+N_BLOCKS: int = 30 * 8  # Number of blocks to split trajectory into
 SOLVENT: bool = True  # Whether or not to include solvent in the analysis
 
 # Data processing parameters
 VERBOSE: bool = True  # Verbose output
 RELOAD_DATA: bool = False  # if True, remake all data
-REFRESH_OFFSETS: bool = False  # if True, remake all offsets on trajectory files
+REFRESH_OFFSETS: bool = True  # if True, remake all offsets on trajectory files
 ALL_REPLICAS: bool = False  # if True, process all replicas
 CONCATENATED: bool = True  # if True, use concatenated trajectory files
 
