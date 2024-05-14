@@ -41,7 +41,7 @@ from data.pipeline import DataPipeline  # noqa: E402
 from colvar.angulardistribution import AngularDistribution  # noqa: E402
 from colvar.atompair import AtomPair  # noqa: E402
 from colvar.contacts import Contacts  # noqa: E402
-from colvar.dipole import Dipole  # noqa: E402
+from colvar.dipole import Dipole, DipoleField  # noqa: E402
 from colvar.dihedrals import Dihedral  # noqa: E402
 from colvar.lineardensity import LinearDensity  # noqa: E402
 from colvar.polymerlengths import PolymerLengths  # noqa: E402
@@ -396,9 +396,32 @@ def wrapper_rdf(
     updating.append((False, False))
     exclusions.append(None)
 
+    # {C_carbonate, O_carboxylate}
+    label_groups.append(sel_dict["C_crb_ion"])
+    label_references.append(sel_dict["O_carb"])
+    updating.append((False, False))
+    exclusions.append(None)
+
+    # {O_carbonate, O_carboxylate}
+    label_groups.append(sel_dict["O_crb_ion"])
+    label_references.append(sel_dict["O_carb"])
+    updating.append((False, False))
+    exclusions.append(None)
+
+    # {Ca_ion, O_carboxylate}
+    label_groups.append(sel_dict["Ca_ion"])
+    label_references.append(sel_dict["O_carb"])
+    updating.append((False, False))
+
     # {C_alpha, C_alpha}
     label_groups.append(sel_dict["C_alpha"])
     label_references.append(sel_dict["C_alpha"])
+    updating.append((False, False))
+    exclusions.append(None)
+
+    # {C_carbonate, Polyelectrolyte}
+    label_groups.append(sel_dict["C_crb_ion"])
+    label_references.append(sel_dict["polyelectrolyte"])
     updating.append((False, False))
     exclusions.append(None)
 
@@ -706,6 +729,112 @@ def wrapper_lineardensity(
             plt.close("all")
 
 
+def wrapper_dipole_field(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+    """
+    Wrapper function for dipole field calculation.
+
+    Parameters
+    ----------
+    uni : mda.Universe
+        Universe object to analyze
+    df_weights : pd.DataFrame
+        Dataframe with column "weights" containing statistical weights for each frame
+    sel_dict : dict
+        Dictionary of selection strings
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is designed to be called from the universe_analysis function.
+
+    The following collective variables are calculated:
+    | - TODO
+    """
+
+    output_path = Path("mdanalysis_dipolefield")
+    label_groups, axes, compounds, updating = [], [], [], []
+
+    # {Polyelectrolyte}
+    label_groups.append(sel_dict["polyelectrolyte"])
+    compounds.append("molecules")
+    updating.append(False)
+    axes.append("z")
+
+    # {Polyelectrolyte solvation shell}
+    if SOLVENT:
+        label_groups.append(
+            f"same resid as (around 4 {sel_dict['polyelectrolyte']})"
+            f"and ({sel_dict['sol']})"
+        )
+        compounds.append("molecules")
+        updating.append(True)
+        axes.append("z")
+
+    # {Solvent}
+    if SOLVENT:
+        label_groups.append(sel_dict["sol"])
+        compounds.append("molecules")
+        updating.append(False)
+        axes.append("z")
+
+    for group, compound, axis, update in tqdm(
+        zip(label_groups, compounds, axes, updating),
+        total=len(label_groups),
+        desc="DipoleField",
+        dynamic_ncols=True,
+    ):
+        log.info(f"Collective variable: DipoleField({group})")
+        label = f"{group.replace(' ', '_')}"
+        select = uni.select_atoms(group, updating=update)
+
+        file_gr = f"histo_dipolefield_{axis}_{label}.npz"
+        output_np = output_path / "data" / file_gr
+
+        if output_np.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+            continue
+
+        mda_df = DipoleField(
+            atomgroup=select,
+            compound=compound,
+            axis=axis,
+            label=label,
+            df_weights=df_weights if df_weights is not None else None,
+            verbose=VERBOSE,
+        )
+        t_start = time.time()
+        mda_df.run(
+            start=START,
+            stop=STOP,
+            step=STEP,
+            module=MODULE,
+            verbose=VERBOSE,
+            n_jobs=N_JOBS,
+            n_blocks=N_BLOCKS,
+        )
+        t_end = time.time()
+        log.debug(f"DF with {N_JOBS} threads took {(t_end - t_start)/60:.2f} min")
+
+        t_start = time.time()
+        mda_df.save()
+        t_end = time.time()
+        log.debug(f"Saving took {(t_end - t_start)/60:.2f} min")
+
+        t_start = time.time()
+        mda_df.figures(ext=FIG_EXT)
+        t_end = time.time()
+        log.debug(f"Figures took {(t_end - t_start)/60:.2f} min")
+        mda_df = None
+        plt.close("all")
+
+
 def wrapper_solvent_orientation(
     uni: mda.Universe,
     df_weights: pd.DataFrame,
@@ -739,8 +868,8 @@ def wrapper_solvent_orientation(
         return
 
     output_path = Path("mdanalysis_angulardistribution")
-    min_dist = 25  # [Angstrom]
-    max_dist = 36  # [Angstrom]
+    min_dist = 25 - 13  # [Angstrom]
+    max_dist = 36 - 13  # [Angstrom]
     bin_width = 0.2  # [Angstrom]
     bins = np.arange(min_dist, max_dist + bin_width, bin_width)
     nbins_angle = 100
@@ -748,12 +877,6 @@ def wrapper_solvent_orientation(
     # all water
     label_groups = [sel_dict["sol"]]
     groupings = ["residues"]
-
-    # polyelectrolyte solvation shell
-    label_groups.append(
-        f"same resid as ({sel_dict['sol']} and around 3.5 {sel_dict['polyelectrolyte']})"
-    )
-    groupings.append("residues")
 
     # iterate over all groups
     for group, grouping in zip(label_groups, groupings):
@@ -1022,9 +1145,10 @@ def universe_analysis(
     wrapper_dihedrals(uni, df_weights, sel_dict)
     wrapper_contacts(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
-    wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    # wrapper_solvent_orientation(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
-    # wrapper_rdf(uni, df_weights, sel_dict)
+    wrapper_dipole_field(uni, df_weights, sel_dict)
+    wrapper_rdf(uni, df_weights, sel_dict)
     # wrapper_survivalprobability(uni, sel_dict)
     t_end_uni = time.time()
     log.debug(f"Analysis took {(t_end_uni - t_start_uni)/60:.2f} min")
