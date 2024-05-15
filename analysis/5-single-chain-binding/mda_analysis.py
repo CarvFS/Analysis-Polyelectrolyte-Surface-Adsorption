@@ -417,7 +417,7 @@ def wrapper_rdf(
     label_groups.append(sel_dict["C_alpha"])
     label_references.append(sel_dict["C_alpha"])
     updating.append((False, False))
-    exclusions.append(None)
+    exclusions.append((1, 1))
 
     # {C_carbonate, Polyelectrolyte}
     label_groups.append(sel_dict["C_crb_ion"])
