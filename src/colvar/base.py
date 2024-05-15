@@ -21,6 +21,7 @@ import contextlib
 from datetime import datetime
 from functools import partial
 import multiprocessing
+from multiprocessing.pool import Pool  # noqa: F401
 from pathlib import Path
 from typing import Any, Callable
 import sys
@@ -33,7 +34,7 @@ from tqdm import tqdm
 
 try:
     import dask
-    from dask.distributed import progress, worker, Client
+    from dask.distributed import progress, worker
 
     FOUND_DASK = True
 
@@ -63,7 +64,6 @@ from utils.logs import setup_logging  # noqa: E402
 
 @contextlib.contextmanager
 def _tqdm_joblib(tqdm_obj: tqdm) -> Generator:
-
     class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
         def __call__(self, *args, **kwargs) -> None:
             tqdm_obj.update(n=self.batch_size)
@@ -84,7 +84,6 @@ def _istarmap(
     iterable: Iterable,
     chunk_size: int = 1,
 ) -> Iterable:
-
     self._check_running()
     if chunk_size < 1:
         raise ValueError("Chunk size must be greater than 1.")
@@ -216,7 +215,7 @@ class ParallelAnalysisBase(AnalysisBase):
         frames: np.array = None,
         verbose: bool = None,
         n_jobs: int = 1,
-        module: str = "joblib",
+        module: str = "multiprocessing",
         method: str = None,
         n_blocks: int = None,
         **kwargs,

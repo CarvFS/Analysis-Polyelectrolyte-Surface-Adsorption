@@ -18,6 +18,7 @@
         <script src="_static/documentation_options.js?v=2fea6348"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -114,8 +115,658 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="colvar-lineardensity-module">
-<h1>colvar.lineardensity module<a class="headerlink" href="#colvar-lineardensity-module" title="Link to this heading"></a></h1>
+  <section id="module-colvar.lineardensity">
+<span id="colvar-lineardensity-module"></span><h1>colvar.lineardensity module<a class="headerlink" href="#module-colvar.lineardensity" title="Link to this heading"></a></h1>
+<section id="linear-density-colvar-lineardensity">
+<h2>Linear Density — <a class="reference internal" href="#module-colvar.lineardensity" title="colvar.lineardensity"><code class="xref py py-mod docutils literal notranslate"><span class="pre">colvar.lineardensity</span></code></a><a class="headerlink" href="#linear-density-colvar-lineardensity" title="Link to this heading"></a></h2>
+<p>A tool to compute mass and charge density profiles along the three
+cartesian axes [xyz] of the simulation cell. Works only for orthorombic,
+fixed volume cells (thus for simulations in canonical NVT ensemble).</p>
+<p>Modified from the original MDAnalysis.analysis.lineardensity module to
+allow for parallelization as well as weighted data from a biased
+simulation.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="colvar.lineardensity.cumsimps">
+<span class="sig-prename descclassname"><span class="pre">colvar.lineardensity.</span></span><span class="sig-name descname"><span class="pre">cumsimps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#cumsimps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.cumsimps" title="Link to this definition"></a></dt>
+<dd><p>Cumulative integral of y using Simpson’s rule.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>x<span class="classifier">array_like</span></dt><dd><p>1-D array of x values.</p>
+</dd>
+<dt>y<span class="classifier">array_like</span></dt><dd><p>1-D array of y values.</p>
+</dd>
+<dt>y_err<span class="classifier">array_like, optional</span></dt><dd><p>1-D array of y errors. Default is None.</p>
+</dd>
+<dt>initial_condition<span class="classifier">float, optional</span></dt><dd><p>Initial condition for the cumulative integral. Default is 0.</p>
+</dd>
+<dt>reverse_order<span class="classifier">bool, optional</span></dt><dd><p>If True, the cumulative integral will be calculated in reverse order.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple[np.ndarray, np.ndarray]</dt><dd><p>The cumulative integral and its error.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the length of x and y do not match.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the length of x and y_err do not match.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If x is not equally spaced.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="colvar.lineardensity.cumtrapz">
+<span class="sig-prename descclassname"><span class="pre">colvar.lineardensity.</span></span><span class="sig-name descname"><span class="pre">cumtrapz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#cumtrapz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.cumtrapz" title="Link to this definition"></a></dt>
+<dd><p>Cumulative integral of y using the trapezoidal rule.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>x<span class="classifier">array_like</span></dt><dd><p>1-D array of x values.</p>
+</dd>
+<dt>y<span class="classifier">array_like</span></dt><dd><p>1-D array of y values.</p>
+</dd>
+<dt>y_err<span class="classifier">array_like, optional</span></dt><dd><p>1-D array of y errors. Default is None.</p>
+</dd>
+<dt>initial_condition<span class="classifier">float, optional</span></dt><dd><p>Initial condition for the cumulative integral. Default is 0.</p>
+</dd>
+<dt>reverse_order<span class="classifier">bool, optional</span></dt><dd><p>If True, the cumulative integral will be calculated in reverse order.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple[np.ndarray, np.ndarray]</dt><dd><p>The cumulative integral and its error.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Raises<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the length of x and y do not match.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the length of x and y_err do not match.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="colvar.lineardensity.periodic_bvp">
+<span class="sig-prename descclassname"><span class="pre">colvar.lineardensity.</span></span><span class="sig-name descname"><span class="pre">periodic_bvp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#periodic_bvp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.periodic_bvp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="colvar.lineardensity.Results">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">colvar.lineardensity.</span></span><span class="sig-name descname"><span class="pre">Results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#Results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.Results" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis/base.html#MDAnalysis.analysis.base.Results" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Results</span></code></a></p>
+<p>From version 3.0.0 onwards, some entries in Results will be renamed. See
+the docstring for LinearDensity for details. The Results class is defined
+here to implement deprecation warnings for the user.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="colvar.lineardensity.Results._deprecation_dict">
+<span class="sig-name descname"><span class="pre">_deprecation_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'char':</span> <span class="pre">'charge_density',</span> <span class="pre">'char_std':</span> <span class="pre">'charge_density_stddev',</span> <span class="pre">'pos':</span> <span class="pre">'mass_density',</span> <span class="pre">'pos_std':</span> <span class="pre">'mass_density_stddev'}</span></em><a class="headerlink" href="#colvar.lineardensity.Results._deprecation_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.Results._deprecation_warning">
+<span class="sig-name descname"><span class="pre">_deprecation_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#Results._deprecation_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.Results._deprecation_warning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">colvar.lineardensity.</span></span><span class="sig-name descname"><span class="pre">LinearDensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code></a></p>
+<p>Linear density profile</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>select<span class="classifier">AtomGroup</span></dt><dd><p>any atomgroup</p>
+</dd>
+<dt>grouping<span class="classifier">str {‘atoms’, ‘residues’, ‘segments’, ‘fragments’}</span></dt><dd><p>Density profiles will be computed either on the atom positions (in
+the case of ‘atoms’) or on the center of mass of the specified
+grouping unit (‘residues’, ‘segments’, or ‘fragments’).</p>
+</dd>
+<dt>binsize<span class="classifier">float</span></dt><dd><p>Bin width in Angstrom used to build linear density
+histograms. Defines the resolution of the resulting density
+profile (smaller –&gt; higher resolution)</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Show detailed progress of the calculation if set to <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl>
+<dt>results.x.dim<span class="classifier">int</span></dt><dd><p>index of the [xyz] axes</p>
+</dd>
+<dt>results.x.mass_density<span class="classifier">numpy.ndarray</span></dt><dd><p>mass density in <span class="math notranslate nohighlight">\(g \cdot cm^{-3}\)</span> in [xyz] direction</p>
+</dd>
+<dt>results.x.mass_density_stddev<span class="classifier">numpy.ndarray</span></dt><dd><p>standard deviation of the mass density in [xyz] direction</p>
+</dd>
+<dt>results.x.charge_density<span class="classifier">numpy.ndarray</span></dt><dd><p>charge density in <span class="math notranslate nohighlight">\(\mathrm{e} \cdot mol \cdot cm^{-3}\)</span> in
+[xyz] direction</p>
+</dd>
+<dt>results.x.charge_density_stddev<span class="classifier">numpy.ndarray</span></dt><dd><p>standard deviation of the charge density in [xyz] direction</p>
+</dd>
+<dt>results.x.pos: numpy.ndarray</dt><dd><p>Alias to the <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density</span></code> attribute.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.2.0: </span>Will be removed in MDAnalysis 3.0.0. Please use
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density</span></code> instead.</p>
+</div>
+</dd>
+<dt>results.x.pos_std: numpy.ndarray</dt><dd><p>Alias to the <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density_stddev</span></code> attribute.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.2.0: </span>Will be removed in MDAnalysis 3.0.0. Please use
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density_stddev</span></code> instead.</p>
+</div>
+</dd>
+<dt>results.x.char: numpy.ndarray</dt><dd><p>Alias to the <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density</span></code> attribute.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.2.0: </span>Will be removed in MDAnalysis 3.0.0. Please use
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density</span></code> instead.</p>
+</div>
+</dd>
+<dt>results.x.char_std: numpy.ndarray</dt><dd><p>Alias to the <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density_stddev</span></code> attribute.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.2.0: </span>Will be removed in MDAnalysis 3.0.0. Please use
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density_stddev</span></code> instead.</p>
+</div>
+</dd>
+<dt>results.x.slice_volume<span class="classifier">float</span></dt><dd><p>volume of bin in [xyz] direction</p>
+</dd>
+<dt>results.x.position<span class="classifier">numpy.ndarray</span></dt><dd><p>centers of histogram bins for mass/charge densities, useful for, e.g.,
+plotting of histogram data.</p>
+</dd>
+</dl>
+<p>Note: These density units are likely to be changed in the future.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>First create a <a class="reference internal" href="#colvar.lineardensity.LinearDensity" title="colvar.lineardensity.LinearDensity"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearDensity</span></code></a> object by supplying a selection,
+then use the <a class="reference internal" href="#colvar.lineardensity.LinearDensity.run" title="colvar.lineardensity.LinearDensity.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method. Finally access the results
+stored in results, i.e. the mass density in the x direction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ldens</span> <span class="o">=</span> <span class="n">LinearDensity</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+<span class="n">ldens</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ldens</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">mass_density</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, other types of grouping can be selected using the
+<code class="docutils literal notranslate"><span class="pre">grouping</span></code> keyword. For example to calculate the density based on
+a grouping of the <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/core/groups.html#MDAnalysis.core.groups.ResidueGroup" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidueGroup</span></code></a>
+of the input <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/core/groups.html#MDAnalysis.core.groups.AtomGroup" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomGroup</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ldens</span> <span class="o">=</span> <span class="n">LinearDensity</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">grouping</span><span class="o">=</span><span class="s1">&#39;residues&#39;</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ldens</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.14.0.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>Support for the <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, and <code class="docutils literal notranslate"><span class="pre">step</span></code> keywords has been
+removed. These should instead be passed to <a class="reference internal" href="#colvar.lineardensity.LinearDensity.run" title="colvar.lineardensity.LinearDensity.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LinearDensity.run()</span></code></a>.
+The <code class="docutils literal notranslate"><span class="pre">save()</span></code> method was also removed, you can use <code class="docutils literal notranslate"><span class="pre">np.savetxt()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">np.save()</span></code> on the <code class="xref py py-attr docutils literal notranslate"><span class="pre">LinearDensity.results</span></code> dictionary contents
+instead.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>Changed <cite>selection</cite> keyword to <cite>select</cite></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.0.0: </span>Results are now instances of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Results</span></code> allowing access
+via key and attribute.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.2.0: </span></p>
+<ul class="simple">
+<li><p>Fixed a bug that caused LinearDensity to fail if grouping=”residues”
+or grouping=”segments” were set.</p></li>
+<li><p>Residues, segments, and fragments will be analysed based on their
+centre of mass, not centre of geometry as previously stated.</p></li>
+<li><p>LinearDensity now works with updating atom groups.</p></li>
+<li><p>Added new result container <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.hist_bin_edges</span></code>.
+It contains the bin edges of the histrogram bins for calculated
+densities and can be used for easier plotting of histogram data.</p></li>
+</ul>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.2.0: </span>The <cite>results</cite> dictionary has been changed and the attributes
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.pos</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.pos_std</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.char</span></code>
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.char_std</span></code> are now deprecated. They will be removed
+in 3.0.0. Please use <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density</span></code>,
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.mass_density_stddev</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density</span></code>,
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">results.x.charge_density_stddev</span></code> instead.</p>
+</div>
+<p>Initialize the analysis object.</p>
+</section>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl>
+<dt>trajectory<span class="classifier"><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/coordinates/base.html#MDAnalysis.coordinates.base.ReaderBase" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReaderBase</span></code></a></span></dt><dd><p>A trajectory reader.</p>
+</dd>
+<dt>atomgroups<span class="classifier">tuple[<a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/core/groups.html#MDAnalysis.core.groups.AtomGroup" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomGroup</span></code></a>]</span></dt><dd><p>A tuple of atomgroups to be analyzed.</p>
+</dd>
+<dt>label<span class="classifier">str, optional</span></dt><dd><p>A label for the data. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Turn on verbosity. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt><a href="#id6"><span class="problematic" id="id7">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to the base class.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity._single_frame">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity._single_frame" title="Link to this definition"></a></dt>
+<dd><p>Perform computation on a single trajectory frame.
+Must return computed values as a list. You can only <strong>read</strong>
+from member variables stored in <code class="docutils literal notranslate"><span class="pre">self</span></code>. Changing them during
+a run will result in undefined behavior. <cite>ts</cite> and any of the
+atomgroups can be changed (but changes will be overwritten
+when the next time step is read).</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>idx_frame<span class="classifier">int</span></dt><dd><p>The index of the current frame.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>values<span class="classifier">anything</span></dt><dd><p>The output from the computation over a single frame must
+be returned. The <cite>value</cite> will be added to a list for each
+block and the list of blocks is stored as <code class="xref py py-attr docutils literal notranslate"><span class="pre">_results</span></code>
+before <a class="reference internal" href="#colvar.lineardensity.LinearDensity._conclude" title="colvar.lineardensity.LinearDensity._conclude"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_conclude()</span></code></a> is run. In order to simplify
+processing, the <cite>values</cite> should be “simple” shallow data
+structures such as arrays or lists of numbers. It is easiest
+if the return value is a single array or list of numbers.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Raises<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NotImplementedError</dt><dd><p>If this method is not implemented in a subclass.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity._conclude">
+<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity._conclude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity._conclude" title="Link to this definition"></a></dt>
+<dd><p>Finalize the results of the calculation. This is called once
+after the analysis is finished inside the run() method. The method
+concatenates the results from the single frame analysis and
+input weights dataframe, if provided.</p>
+<section id="id11">
+<h3>Raises<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are found.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.calculate_potential">
+<span class="sig-name descname"><span class="pre">calculate_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma_e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dielectric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'periodic_bvp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.calculate_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.calculate_potential" title="Link to this definition"></a></dt>
+<dd><p>Calculate the electrostatic potential from the charge density profile.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl>
+<dt>sigma_e<span class="classifier">float, optional</span></dt><dd><p>Surface charge density [e/A^2]. Default is 0.0.</p>
+</dd>
+<dt>dielectric<span class="classifier">float, optional</span></dt><dd><p>Relative dielectric constant [unitless]. Default is 1.0.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><dl class="simple">
+<dt>Method to use for numerical integration. Must be one of ‘cumtrapz’,</dt><dd><p>‘cumsimps’, or ‘periodic_bvp’.</p>
+</dd>
+</dl>
+<p>o’cumsimps’. Default is ‘cumtrapz’.</p>
+</dd>
+<dt>n_layers<span class="classifier">int, optional</span></dt><dd><p>Number of crystal layers to consider. Default is 4.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.save" title="Link to this definition"></a></dt>
+<dd><p>Save the results of the analysis to a parquet file. The results
+are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
+results are saved to the directory specified in the
+<cite>dir_out</cite> attribute.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.figures">
+<span class="sig-name descname"><span class="pre">figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Linear</span> <span class="pre">Density'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.figures" title="Link to this definition"></a></dt>
+<dd><p>Plot the mass and charge density profiles.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Axis to plot. Default is None. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figures and axes of the plots.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.plt_number_density">
+<span class="sig-name descname"><span class="pre">plt_number_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.plt_number_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.plt_number_density" title="Link to this definition"></a></dt>
+<dd><p>Plot the number density profiles.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Dimension to plot. Default is ‘z’. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Raises<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>dim</cite> is not one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity._job_block">
+<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#colvar.lineardensity.LinearDensity._job_block" title="Link to this definition"></a></dt>
+<dd><p>Helper function to actually setup the Dask tasks</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
+and refer to frame numbers in the trajectory.</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity._prepare">
+<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#colvar.lineardensity.LinearDensity._prepare" title="Link to this definition"></a></dt>
+<dd><p>Prepare the analysis class for the single frame analysis.
+This is called once before the analysis is started inside
+the run() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity._reduce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#colvar.lineardensity.LinearDensity._reduce" title="Link to this definition"></a></dt>
+<dd><p>‘append’ action for a time series</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.merge_external_data">
+<span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></span><a class="headerlink" href="#colvar.lineardensity.LinearDensity.merge_external_data" title="Link to this definition"></a></dt>
+<dd><p>Merge external data with the results of the analysis</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>Dataframe containing the data to merge</p>
+</dd>
+<dt>col<span class="classifier">str, optional</span></dt><dd><p>Column name to merge on, by default “time”</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Dataframe with merged data</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Raises<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are present</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no data is merged</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.plt_mass_density">
+<span class="sig-name descname"><span class="pre">plt_mass_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.plt_mass_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.plt_mass_density" title="Link to this definition"></a></dt>
+<dd><p>Plot the mass density profiles.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Dimension to plot. Default is ‘z’. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>Raises<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>dim</cite> is not one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'multiprocessing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><span class="pre">ParallelAnalysisBase</span></a></span></span><a class="headerlink" href="#colvar.lineardensity.LinearDensity.run" title="Link to this definition"></a></dt>
+<dd><p>Perform the calculation</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>start<span class="classifier">int, optional</span></dt><dd><p>start frame of analysis</p>
+</dd>
+<dt>stop<span class="classifier">int, optional</span></dt><dd><p>stop frame of analysis</p>
+</dd>
+<dt>step<span class="classifier">int, optional</span></dt><dd><p>number of frames to skip between each analysed frame</p>
+</dd>
+<dt>frames<span class="classifier">array_like, optional</span></dt><dd><p>array of integers or booleans to slice trajectory; <cite>frames</cite> can
+only be used <em>instead</em> of <cite>start</cite>, <cite>stop</cite>, and <cite>step</cite>. Setting
+<em>both</em> <cite>frames</cite> and at least one of <cite>start</cite>, <cite>stop</cite>, <cite>step</cite> to a
+non-default value will raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.
+.. versionadded:: 2.2.0</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Turn on verbosity</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional</span></dt><dd><p>number of jobs to start, if <cite>-1</cite> use number of logical cpu cores.
+This argument will be ignored when the distributed scheduler is
+used</p>
+</dd>
+<dt>module<span class="classifier">str, optional</span></dt><dd><p>Parallelization module to use. Default: <code class="docutils literal notranslate"><span class="pre">&quot;joblib&quot;</span></code>.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>Parallelization method to use. This is the Dask scheduler,
+Joblib backend, or the multiprocessing method. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>n_blocks<span class="classifier">int, optional</span></dt><dd><p>number of blocks to divide trajectory into. If <code class="docutils literal notranslate"><span class="pre">None</span></code> set equal
+to n_jobs or number of available workers in scheduler.</p>
+</dd>
+<dt><a href="#id28"><span class="problematic" id="id29">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.base.compute()</span></code>.</p>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.2.0: </span>Added ability to analyze arbitrary frames by passing a list of
+frame indices in the <cite>frames</cite> keyword argument.</p>
+</div>
+</section>
+<section id="id30">
+<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<dl>
+<dt>self<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code> instance</span></dt><dd><p>The instance itself.</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h3>Raises<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>frames</cite> is used in conjunction with <cite>start</cite>, <cite>stop</cite>, or <cite>step</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.plt_charge_density">
+<span class="sig-name descname"><span class="pre">plt_charge_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.plt_charge_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.plt_charge_density" title="Link to this definition"></a></dt>
+<dd><p>Plot the charge density profiles.</p>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Dimension to plot. Default is ‘z’. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Raises<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>dim</cite> is not one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.plt_potential">
+<span class="sig-name descname"><span class="pre">plt_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.plt_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.plt_potential" title="Link to this definition"></a></dt>
+<dd><p>Plot the electrostatic potential profiles.</p>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Dimension to plot. Default is ‘z’. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Raises<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>dim</cite> is not one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.lineardensity.LinearDensity.plt_potential_nondim">
+<span class="sig-name descname"><span class="pre">plt_potential_nondim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/lineardensity.html#LinearDensity.plt_potential_nondim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.lineardensity.LinearDensity.plt_potential_nondim" title="Link to this definition"></a></dt>
+<dd><p>Plot the electrostatic potential profiles in non-dimensional units.</p>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dim<span class="classifier">str, optional</span></dt><dd><p>Dimension to plot. Default is ‘z’. Must be one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title of the plot</p>
+</dd>
+<dt>ext<span class="classifier">str, optional</span></dt><dd><p>Extension of the plot file. Default is ‘png’.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[plt.figure, plt.axes]</dt><dd><p>The figure and axes of the plot.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>Raises<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>dim</cite> is not one of ‘x’, ‘y’, or ‘z’.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
 </section>
 
 

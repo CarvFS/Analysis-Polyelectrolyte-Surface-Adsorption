@@ -114,8 +114,509 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="colvar-dihedrals-module">
-<h1>colvar.dihedrals module<a class="headerlink" href="#colvar-dihedrals-module" title="Link to this heading"></a></h1>
+  <section id="module-colvar.dihedrals">
+<span id="colvar-dihedrals-module"></span><h1>colvar.dihedrals module<a class="headerlink" href="#module-colvar.dihedrals" title="Link to this heading"></a></h1>
+<section id="dihedral-angles-analysis-colvar-dihedrals">
+<h2>Dihedral angles analysis — <a class="reference internal" href="#module-colvar.dihedrals" title="colvar.dihedrals"><code class="xref py py-mod docutils literal notranslate"><span class="pre">colvar.dihedrals</span></code></a><a class="headerlink" href="#dihedral-angles-analysis-colvar-dihedrals" title="Link to this heading"></a></h2>
+<p>This module contains parallel versions of analysis tasks in
+<a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis/dihedrals.html#module-MDAnalysis.analysis.dihedrals" title="(in MDAnalysis v2.7.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">MDAnalysis.analysis.dihedrals</span></code></a>.</p>
+<p>This module contains classes for calculating dihedral angles for a given set of
+atoms or residues. This can be done for selected frames or whole trajectories.
+A list of time steps that contain angles of interest is generated and can be
+easily plotted if desired.</p>
+<section id="see-also">
+<h3>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis/dihedrals.html#module-MDAnalysis.analysis.dihedrals" title="(in MDAnalysis v2.7.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">MDAnalysis.analysis.dihedrals</span></code></a>
+<a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/lib/distances.html#MDAnalysis.lib.distances.calc_dihedrals" title="(in MDAnalysis v2.7.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">MDAnalysis.lib.distances.calc_dihedrals()</span></code></a></p>
+<blockquote>
+<div><p>function to calculate dihedral angles from atom positions</p>
+</div></blockquote>
+</section>
+<section id="example-applications">
+<h3>Example applications<a class="headerlink" href="#example-applications" title="Link to this heading"></a></h3>
+<section id="general-dihedral-analysis">
+<h4>General dihedral analysis<a class="headerlink" href="#general-dihedral-analysis" title="Link to this heading"></a></h4>
+<p>The <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/analysis/dihedrals.html#MDAnalysis.analysis.dihedrals.Dihedral" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dihedral</span></code></a> class is useful for calculating
+angles for many dihedrals of interest. For example, we can find the phi angles
+for residues 5-10 of adenylate kinase (AdK). The trajectory is included within
+the test data files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">MDAnalysis</span> <span class="k">as</span> <span class="nn">mda</span>
+<span class="kn">from</span> <span class="nn">MDAnalysisTests.datafiles</span> <span class="kn">import</span> <span class="n">GRO</span><span class="p">,</span> <span class="n">XTC</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">mda</span><span class="o">.</span><span class="n">Universe</span><span class="p">(</span><span class="n">GRO</span><span class="p">,</span> <span class="n">XTC</span><span class="p">)</span>
+
+<span class="c1"># selection of atomgroups</span>
+<span class="n">ags</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">phi_selection</span><span class="p">()</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">9</span><span class="p">]]</span>
+
+<span class="kn">from</span> <span class="nn">MDAnalysis.analysis.dihedrals</span> <span class="kn">import</span> <span class="n">Dihedral</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">ags</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">colvar.dihedrals.</span></span><span class="sig-name descname"><span class="pre">Dihedral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.dihedrals.Dihedral" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code></a></p>
+<p>Calculate dihedral angles for specified atomgroups.</p>
+<p>Dihedral angles will be calculated for each atomgroup that is given for
+each step in the trajectory. Each <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/core/groups.html#MDAnalysis.core.groups.AtomGroup" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomGroup</span></code></a>
+must contain 4 atoms.</p>
+<section id="note">
+<h5>Note<a class="headerlink" href="#note" title="Link to this heading"></a></h5>
+<p>This class takes a list as an input and is most useful for a large
+selection of atomgroups. If there is only one atomgroup of interest, then
+it must be given as a list of one atomgroup.</p>
+<p>Set up the analysis.</p>
+</section>
+<section id="parameters">
+<h5>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h5>
+<dl class="simple">
+<dt>atomgroup<span class="classifier">AtomGroup</span></dt><dd><p>AtomGroup to calculate dihedral angles for.</p>
+</dd>
+<dt>monomer<span class="classifier">str, optional</span></dt><dd><p>Monomer unit of chains in the system. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>label<span class="classifier">str, optional</span></dt><dd><p>Text label for system.</p>
+</dd>
+<dt>superposition<span class="classifier">bool, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> perform a RMSD-superposition, <code class="docutils literal notranslate"><span class="pre">False</span></code> only
+calculates the RMSD. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: print progress bar to the screen; <code class="docutils literal notranslate"><span class="pre">False</span></code>: no
+progress bar. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._set_asp_glu_dihedrals">
+<span class="sig-name descname"><span class="pre">_set_asp_glu_dihedrals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral._set_asp_glu_dihedrals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.dihedrals.Dihedral._set_asp_glu_dihedrals" title="Link to this definition"></a></dt>
+<dd><p>Copying source code of MDAnalysis.analysis.dihedrals.Ramachandran</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._single_frame">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.dihedrals.Dihedral._single_frame" title="Link to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<section id="id1">
+<h6>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h6>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
+pair distances at the current frame.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._conclude">
+<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#colvar.dihedrals.Dihedral._conclude" title="Link to this definition"></a></dt>
+<dd><p>Finalize the results of the calculation. This is called once
+after the analysis is finished inside the run() method. The method
+concatenates the results from the single frame analysis and
+input weights dataframe, if provided.</p>
+<section id="raises">
+<h6>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are found.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._job_block">
+<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#colvar.dihedrals.Dihedral._job_block" title="Link to this definition"></a></dt>
+<dd><p>Helper function to actually setup the Dask tasks</p>
+<section id="id2">
+<h6>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
+and refer to frame numbers in the trajectory.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h6>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._prepare">
+<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#colvar.dihedrals.Dihedral._prepare" title="Link to this definition"></a></dt>
+<dd><p>Prepare the analysis class for the single frame analysis.
+This is called once before the analysis is started inside
+the run() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._reduce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#colvar.dihedrals.Dihedral._reduce" title="Link to this definition"></a></dt>
+<dd><p>‘append’ action for a time series</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral.merge_external_data">
+<span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></span><a class="headerlink" href="#colvar.dihedrals.Dihedral.merge_external_data" title="Link to this definition"></a></dt>
+<dd><p>Merge external data with the results of the analysis</p>
+<section id="id4">
+<h6>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>Dataframe containing the data to merge</p>
+</dd>
+<dt>col<span class="classifier">str, optional</span></dt><dd><p>Column name to merge on, by default “time”</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h6>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Dataframe with merged data</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h6>Raises<a class="headerlink" href="#id6" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are present</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no data is merged</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'multiprocessing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><span class="pre">ParallelAnalysisBase</span></a></span></span><a class="headerlink" href="#colvar.dihedrals.Dihedral.run" title="Link to this definition"></a></dt>
+<dd><p>Perform the calculation</p>
+<section id="id7">
+<h6>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>start<span class="classifier">int, optional</span></dt><dd><p>start frame of analysis</p>
+</dd>
+<dt>stop<span class="classifier">int, optional</span></dt><dd><p>stop frame of analysis</p>
+</dd>
+<dt>step<span class="classifier">int, optional</span></dt><dd><p>number of frames to skip between each analysed frame</p>
+</dd>
+<dt>frames<span class="classifier">array_like, optional</span></dt><dd><p>array of integers or booleans to slice trajectory; <cite>frames</cite> can
+only be used <em>instead</em> of <cite>start</cite>, <cite>stop</cite>, and <cite>step</cite>. Setting
+<em>both</em> <cite>frames</cite> and at least one of <cite>start</cite>, <cite>stop</cite>, <cite>step</cite> to a
+non-default value will raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.
+.. versionadded:: 2.2.0</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Turn on verbosity</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional</span></dt><dd><p>number of jobs to start, if <cite>-1</cite> use number of logical cpu cores.
+This argument will be ignored when the distributed scheduler is
+used</p>
+</dd>
+<dt>module<span class="classifier">str, optional</span></dt><dd><p>Parallelization module to use. Default: <code class="docutils literal notranslate"><span class="pre">&quot;joblib&quot;</span></code>.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>Parallelization method to use. This is the Dask scheduler,
+Joblib backend, or the multiprocessing method. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>n_blocks<span class="classifier">int, optional</span></dt><dd><p>number of blocks to divide trajectory into. If <code class="docutils literal notranslate"><span class="pre">None</span></code> set equal
+to n_jobs or number of available workers in scheduler.</p>
+</dd>
+<dt><a href="#id8"><span class="problematic" id="id9">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.base.compute()</span></code>.</p>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.2.0: </span>Added ability to analyze arbitrary frames by passing a list of
+frame indices in the <cite>frames</cite> keyword argument.</p>
+</div>
+</section>
+<section id="id10">
+<h6>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h6>
+<dl>
+<dt>self<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code> instance</span></dt><dd><p>The instance itself.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h6>Raises<a class="headerlink" href="#id11" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>frames</cite> is used in conjunction with <cite>start</cite>, <cite>stop</cite>, or <cite>step</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#colvar.dihedrals.Dihedral.save" title="Link to this definition"></a></dt>
+<dd><p>Save the results of the analysis to a parquet file. The results
+are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<section id="id12">
+<h6>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
+results are saved to the directory specified in the
+<cite>dir_out</cite> attribute.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h6>Raises<a class="headerlink" href="#id13" title="Link to this heading"></a></h6>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no filename is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">colvar.dihedrals.</span></span><span class="sig-name descname"><span class="pre">Dihedral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code></a></p>
+<p>Calculate dihedral angles for specified atomgroups.</p>
+<p>Dihedral angles will be calculated for each atomgroup that is given for
+each step in the trajectory. Each <a class="reference external" href="https://docs.mdanalysis.org/stable/documentation_pages/core/groups.html#MDAnalysis.core.groups.AtomGroup" title="(in MDAnalysis v2.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomGroup</span></code></a>
+must contain 4 atoms.</p>
+<section id="id14">
+<h2>Note<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<p>This class takes a list as an input and is most useful for a large
+selection of atomgroups. If there is only one atomgroup of interest, then
+it must be given as a list of one atomgroup.</p>
+<p>Set up the analysis.</p>
+</section>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>atomgroup<span class="classifier">AtomGroup</span></dt><dd><p>AtomGroup to calculate dihedral angles for.</p>
+</dd>
+<dt>monomer<span class="classifier">str, optional</span></dt><dd><p>Monomer unit of chains in the system. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>label<span class="classifier">str, optional</span></dt><dd><p>Text label for system.</p>
+</dd>
+<dt>superposition<span class="classifier">bool, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> perform a RMSD-superposition, <code class="docutils literal notranslate"><span class="pre">False</span></code> only
+calculates the RMSD. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: print progress bar to the screen; <code class="docutils literal notranslate"><span class="pre">False</span></code>: no
+progress bar. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">_set_asp_glu_dihedrals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral._set_asp_glu_dihedrals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<dd><p>Copying source code of MDAnalysis.analysis.dihedrals.Ramachandran</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="colvar.dihedrals.Dihedral._set_acr_dihedrals">
+<span class="sig-name descname"><span class="pre">_set_acr_dihedrals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral._set_acr_dihedrals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#colvar.dihedrals.Dihedral._set_acr_dihedrals" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">_single_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/colvar/dihedrals.html#Dihedral._single_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dd><p>Analyze a single frame in the trajectory.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>idx_frame: int</dt><dd><p>Index of the frame to analyze.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>np.array</dt><dd><p>The weight, the volume of the box, and the histogram of the
+pair distances at the current frame.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id20">
+<span class="sig-name descname"><span class="pre">_conclude</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<dd><p>Finalize the results of the calculation. This is called once
+after the analysis is finished inside the run() method. The method
+concatenates the results from the single frame analysis and
+input weights dataframe, if provided.</p>
+<section id="id21">
+<h3>Raises<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are found.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">_job_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absolute_frame_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
+<dd><p>Helper function to actually setup the Dask tasks</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>absolute_frame_indices<span class="classifier">np.array</span></dt><dd><p>Array of frame indices to analyze. These indices are absolute
+and refer to frame numbers in the trajectory.</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>np.array</dt><dd><p>Array of results from the analysis of the frames</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id25">
+<span class="sig-name descname"><span class="pre">_prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dd><p>Prepare the analysis class for the single frame analysis.
+This is called once before the analysis is started inside
+the run() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id26">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_single_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
+<dd><p>‘append’ action for a time series</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id27">
+<span class="sig-name descname"><span class="pre">merge_external_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'time'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">pandas.DataFrame</span></a></span></span><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
+<dd><p>Merge external data with the results of the analysis</p>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>df<span class="classifier">pd.DataFrame</span></dt><dd><p>Dataframe containing the data to merge</p>
+</dd>
+<dt>col<span class="classifier">str, optional</span></dt><dd><p>Column name to merge on, by default “time”</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Dataframe with merged data</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h3>Raises<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no results are present</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no data is merged</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id31">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'multiprocessing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="colvar.base.html#colvar.base.ParallelAnalysisBase" title="colvar.base.ParallelAnalysisBase"><span class="pre">ParallelAnalysisBase</span></a></span></span><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
+<dd><p>Perform the calculation</p>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>start<span class="classifier">int, optional</span></dt><dd><p>start frame of analysis</p>
+</dd>
+<dt>stop<span class="classifier">int, optional</span></dt><dd><p>stop frame of analysis</p>
+</dd>
+<dt>step<span class="classifier">int, optional</span></dt><dd><p>number of frames to skip between each analysed frame</p>
+</dd>
+<dt>frames<span class="classifier">array_like, optional</span></dt><dd><p>array of integers or booleans to slice trajectory; <cite>frames</cite> can
+only be used <em>instead</em> of <cite>start</cite>, <cite>stop</cite>, and <cite>step</cite>. Setting
+<em>both</em> <cite>frames</cite> and at least one of <cite>start</cite>, <cite>stop</cite>, <cite>step</cite> to a
+non-default value will raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>.
+.. versionadded:: 2.2.0</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Turn on verbosity</p>
+</dd>
+<dt>n_jobs<span class="classifier">int, optional</span></dt><dd><p>number of jobs to start, if <cite>-1</cite> use number of logical cpu cores.
+This argument will be ignored when the distributed scheduler is
+used</p>
+</dd>
+<dt>module<span class="classifier">str, optional</span></dt><dd><p>Parallelization module to use. Default: <code class="docutils literal notranslate"><span class="pre">&quot;joblib&quot;</span></code>.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>Parallelization method to use. This is the Dask scheduler,
+Joblib backend, or the multiprocessing method. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt>n_blocks<span class="classifier">int, optional</span></dt><dd><p>number of blocks to divide trajectory into. If <code class="docutils literal notranslate"><span class="pre">None</span></code> set equal
+to n_jobs or number of available workers in scheduler.</p>
+</dd>
+<dt><a href="#id33"><span class="problematic" id="id34">**</span></a>kwargs</dt><dd><p>Other keyword arguments passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.base.compute()</span></code>.</p>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.2.0: </span>Added ability to analyze arbitrary frames by passing a list of
+frame indices in the <cite>frames</cite> keyword argument.</p>
+</div>
+</section>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<dl>
+<dt>self<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelAnalysisBase</span></code> instance</span></dt><dd><p>The instance itself.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h3>Raises<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>frames</cite> is used in conjunction with <cite>start</cite>, <cite>stop</cite>, or <cite>step</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id37">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#id37" title="Link to this definition"></a></dt>
+<dd><p>Save the results of the analysis to a parquet file. The results
+are saved to the <cite>data</cite> directory in the <cite>dir_out</cite> directory.</p>
+<p>This method should only be called after the analysis has been
+run.</p>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dir_out<span class="classifier">str, optional</span></dt><dd><p>The directory to save the results to. If not specified, the
+results are saved to the directory specified in the
+<cite>dir_out</cite> attribute.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>Raises<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no dataframe is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no filename is found.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If no output directory is specified.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
 </section>
 
 

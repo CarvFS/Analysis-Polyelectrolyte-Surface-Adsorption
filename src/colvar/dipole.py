@@ -3,11 +3,9 @@ from pathlib import Path
 import sys
 
 # Third-party libraries
-import cmasher as cmr
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy import stats
 
 # MDAnalysis inheritance
 from MDAnalysis.core.groups import AtomGroup
@@ -344,7 +342,6 @@ class DipoleField(ParallelAnalysisBase):
         return results
 
     def _conclude(self) -> None:
-
         # time-averaged dipole field
         if self._weighted:
             # merge the rdf results with the weights
@@ -381,7 +378,6 @@ class DipoleField(ParallelAnalysisBase):
         histo_1d_z_mean = np.zeros(self.axis_bins.size - 1)
         cos_avg = 0.5 * (self.cos_theta_bins[1:] + self.cos_theta_bins[:-1])
         for i in range(self.axis_bins.size - 1):
-
             histo_1d_x_mean[i] = np.average(
                 cos_avg,
                 weights=(
@@ -476,7 +472,6 @@ class DipoleField(ParallelAnalysisBase):
             ],
             aspect="auto",
             interpolation="gaussian",
-            cmap=cmr.get_sub_cmap("cmr.rainforest", 0.1, 0.9),
         )
         fig.colorbar(im, ax=ax, label=r"$\Delta F$ [k$_B$ T]")
         ax.set_xlabel(f"{self.axis_label} [nm]")

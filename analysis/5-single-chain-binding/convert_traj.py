@@ -31,7 +31,10 @@ def convert_traj(
 
 if __name__ == "__main__":
     dir_base = Path(
-        "/media/aglisman/Data/Single-Chain-Adsorption/cleaned/6.3.1-calcite-104surface-12nm_surface-13nm_vertical-1chain-PAcr-32mer-0Crb-0Ca-32Na-0Cl-300K-1bar-NVT/3-sampling-opes-one/replica_00/2-concatenated"
+        "/media/aglisman/Data/Single-Chain-Adsorption/cleaned"
+        + "/6.3.1-calcite-104surface-12nm_surface-13nm_vertical-1chain-PAcr"
+        + "-32mer-0Crb-0Ca-32Na-0Cl-300K-1bar-NVT/3-sampling-opes-one"
+        + "/replica_00/2-concatenated"
     )
     file_stem = "prod_opes_one_multicv"
     slice = (0, 10000, 10)
