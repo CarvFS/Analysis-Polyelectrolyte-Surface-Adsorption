@@ -208,6 +208,27 @@ def periodic_bvp(
     dx = x[1] - x[0]
     assert np.allclose(x[1:] - x[:-1], dx), "x is not equally spaced"
 
+    # find relative peaks in the charge density profile
+    maxima, _ = find_peaks(y, distance=1000, prominence=0.01)
+    if len(maxima) == 0:
+        new_center = np.nanmean(x)
+        shift = 0
+
+        print("No peaks found in the charge density profile")
+
+    else:
+        new_center = np.nanmean(x[maxima])
+        half_width = 0.5 * (x[-1] - x[0])
+        shift = int(np.round((half_width - new_center) / dx))
+
+        print(f"Found {len(maxima)} peaks in the charge density profile")
+        print(f"New center: {new_center}")
+        print(f"Peaks: {x[maxima]}")
+
+    # wrap input arrays to have relative peaks in the center of the x profile
+    y = np.roll(y, shift)
+    x = np.roll(x, shift)
+
     # Laplacian matrix
     N = len(x)
     A = sparse.diags((1, -2, 1), (-1, 0, 1), shape=(N, N), format="csc")
@@ -224,6 +245,13 @@ def periodic_bvp(
     u = np.zeros(N)
     u[1:] = sparse.linalg.spsolve(A[1:, 1:], b[1:])
     u[0] = u[-1]
+
+    # unwrap output arrays to have same ordering as input array
+    u = np.roll(u, -shift)
+
+    # set the potential to zero at the center of the profile
+    u -= u[np.argmin(np.abs(x - new_center))]
+
     return u, np.zeros_like(u)
 
 

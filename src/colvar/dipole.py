@@ -458,11 +458,8 @@ class DipoleField(ParallelAnalysisBase):
         else:
             raise ValueError("Invalid dimension. Choose 'x', 'y', or 'z'.")
 
-        fes = -np.log(histo_2d)
-        fes -= np.nanmin(fes)
-
         im = ax.imshow(
-            fes.T,
+            histo_2d.T,
             origin="lower",
             extent=[
                 self.axis_bins[0] / 10.0,
@@ -473,7 +470,7 @@ class DipoleField(ParallelAnalysisBase):
             aspect="auto",
             interpolation="gaussian",
         )
-        fig.colorbar(im, ax=ax, label=r"$\Delta F$ [k$_B$ T]")
+        fig.colorbar(im, ax=ax, label=r"Density")
         ax.set_xlabel(f"{self.axis_label} [nm]")
         ax.set_ylabel(r"$\cos(\theta)$ from $" + dim + r"$")
 
