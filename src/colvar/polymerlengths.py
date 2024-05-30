@@ -107,6 +107,9 @@ class PolymerLengths(ParallelAnalysisBase):
             "ree_x",
             "ree_y",
             "ree_z",
+            "com_x",
+            "com_y",
+            "com_z",
         ]
 
         self._logger.info(f"Initialized polymer length analysis for {self._tag}.")
@@ -190,7 +193,10 @@ class PolymerLengths(ParallelAnalysisBase):
             )
 
         results[18] = np.linalg.norm(ree)
-        results[19:] = ree
+        results[19:22] = ree
+
+        # ANCHOR: Calculate center of mass
+        results[22:25] = ag.center_of_mass()
 
         return results
 
