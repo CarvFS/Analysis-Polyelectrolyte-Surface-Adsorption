@@ -28,6 +28,7 @@ import sys
 
 # External dependencies
 import MDAnalysis as mda
+from MDAnalysis.analysis.hydrogenbonds import WaterBridgeAnalysis
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
@@ -70,6 +71,129 @@ from parameters.globals import (  # noqa: E402
 # #############################################################################
 # Functions
 # #############################################################################
+
+
+def wrapper_waterbridge(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+
+    def analysis_single(current, output, u):
+        r"""This function defines how the type of water bridge should be
+        specified.
+
+        Parameters
+        ----------
+        current : list
+            The current water bridge being analysed is a list of hydrogen bonds
+            from selection 1 to selection 2.
+        output : dict
+            A dictionary which is modified in-place where the key is the type
+            of the water bridge and the value is the weight of this type of
+            water bridge.
+        u : MDAnalysis.universe
+            The current Universe for looking up atoms.
+        """
+        # output the water bridge number
+        order_of_water_bridge = len(current) - 1
+        key = order_of_water_bridge
+        if order_of_water_bridge == 1:
+            output[key] += 1
+
+    def analysis_double(current, output, u):
+        order_of_water_bridge = len(current) - 1
+        key = order_of_water_bridge
+        if order_of_water_bridge == 2:
+            output[key] += 1
+
+    def analysis_triple(current, output, u):
+        order_of_water_bridge = len(current) - 1
+        key = order_of_water_bridge
+        if order_of_water_bridge == 3:
+            output[key] += 1
+
+    # TODO: find the surface z-coordinate
+    z_surface = 25
+
+    # default selections for H-bonds
+    donors_sel = ("OW", "OB2", "OA")
+    acceptors_sel = ("OW", "OB1", "OB2", "OA", "OB")
+
+    # set output path and information for analysis section
+    label_groups, label_references, kwargs = [], [], []
+    output_path = Path("mdanalysis_waterbridge")
+
+    # {Polyelectrolyte, CaCO3 Crystal}
+    label_references.append(sel_dict["polyelectrolyte"])
+    label_groups.append(f"(({sel_dict['CaCO3']}) and prop z <= {z_surface})")
+    kwargs.append(
+        {
+            "order": 3,
+            "forcefield": "other",
+            "donors": donors_sel,
+            "acceptors": acceptors_sel,
+        }
+    )
+
+    for group, reference, kwarg in tqdm(
+        zip(label_groups, label_references, kwargs),
+        total=len(label_groups),
+        desc="Bridges",
+        dynamic_ncols=True,
+    ):
+
+        log.info(f"Collective variable: WaterBridge(\n\t{group}, \n\t{reference}\n)")
+        label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
+        output_pd = output_path / "data" / f"contact_{label}.parquet"
+
+        if output_pd.exists() and not RELOAD_DATA:
+            log.debug("Skipping calculation")
+            continue
+
+        # run the water bridge analysis
+        wb = WaterBridgeAnalysis(uni, group, reference, **kwarg, verbose=VERBOSE)
+        wb.run(
+            start=START,
+            stop=STOP,
+            step=STEP,
+        )
+
+        # count the number of bridges of each order at each frame
+        counts_single = wb.count_by_time(analysis_func=analysis_single)
+        counts_double = wb.count_by_time(analysis_func=analysis_double)
+        counts_triple = wb.count_by_time(analysis_func=analysis_triple)
+
+        # convert to numpy arrays
+        counts_single = np.array(counts_single)
+        counts_double = np.array(counts_double)
+        counts_triple = np.array(counts_triple)
+
+        # save the data
+        data = {}
+        data["time"] = counts_single[:, 0]
+        data["order_1"] = counts_single[:, 1]
+        data["order_2"] = counts_double[:, 1]
+        data["order_3"] = counts_triple[:, 1]
+        df = pd.DataFrame(data)
+        df = pd.merge(df, df_weights, on="time")
+        Path(output_path / "data").mkdir(parents=True, exist_ok=True)
+        df.to_parquet(output_pd)
+
+        # calculate the average number of each type of bridge weighted
+        avg_counts = np.zeros(3)
+        for i, counts in enumerate([counts_single, counts_double, counts_triple]):
+            avg_counts[i] = np.average(counts[:, 1], weights=df["weight"])
+
+        with open(output_path / "data" / f"avg_counts_{label}.json", "w") as f:
+            json.dump(
+                {
+                    "order_1": avg_counts[0],
+                    "order_2": avg_counts[1],
+                    "order_3": avg_counts[2],
+                },
+                f,
+            )
 
 
 def wrapper_polymerlength(
@@ -1146,6 +1270,7 @@ def universe_analysis(
     wrapper_contacts(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     # wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_waterbridge(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
     wrapper_dipole_field(uni, df_weights, sel_dict)
     wrapper_rdf(uni, df_weights, sel_dict)
