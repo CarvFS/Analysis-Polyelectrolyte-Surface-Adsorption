@@ -23,12 +23,15 @@ import argparse
 import json
 import os
 from pathlib import Path
+import pickle
 import time
 import sys
 
 # External dependencies
+import gromacs as gmx
 import MDAnalysis as mda
 from MDAnalysis.analysis.hydrogenbonds import WaterBridgeAnalysis
+from MDAnalysis.analysis.base import AnalysisFromFunction
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import numpy as np
@@ -113,23 +116,40 @@ def wrapper_waterbridge(
         if order_of_water_bridge == 3:
             output[key] += 1
 
-    # TODO: find the surface z-coordinate
-    z_surface = 25
+    def analysis_fourx(current, output, u):
+        order_of_water_bridge = len(current) - 1
+        key = order_of_water_bridge
+        if order_of_water_bridge == 4:
+            output[key] += 1
+
+    def analysis_fivex(current, output, u):
+        order_of_water_bridge = len(current) - 1
+        key = order_of_water_bridge
+        if order_of_water_bridge == 5:
+            output[key] += 1
 
     # default selections for H-bonds
     donors_sel = ("OW", "OB2", "OA")
-    acceptors_sel = ("OW", "OB1", "OB2", "OA", "OB")
+    acceptors_sel = ("OW", "OB1", "OB2", "OA", "OB", "OX1", "OX2", "OX3")
 
     # set output path and information for analysis section
     label_groups, label_references, kwargs = [], [], []
     output_path = Path("mdanalysis_waterbridge")
 
+    # find topology file for universe to get crystal atoms
+    tpr_file = Path(uni.filename)
+    ndx_file = tpr_file.parents[1] / "index.ndx"
+    ndx = gmx.fileformats.ndx.NDX()
+    ndx.read(ndx_file)
+    crystal = ndx["Crystal"]
+    crystal = np.array(crystal) - 1
+
     # {Polyelectrolyte, CaCO3 Crystal}
     label_references.append(sel_dict["polyelectrolyte"])
-    label_groups.append(f"(({sel_dict['CaCO3']}) and prop z <= {z_surface})")
+    label_groups.append(f"index {' '.join(str(i) for i in crystal)}")
     kwargs.append(
         {
-            "order": 3,
+            "order": 5,
             "forcefield": "other",
             "donors": donors_sel,
             "acceptors": acceptors_sel,
@@ -145,11 +165,23 @@ def wrapper_waterbridge(
 
         log.info(f"Collective variable: WaterBridge(\n\t{group}, \n\t{reference}\n)")
         label = f"{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
-        output_pd = output_path / "data" / f"contact_{label}.parquet"
+
+        # shorten label if it is too long
+        if len(label) > 100:
+            label = label[:100]
+
+        output_pd = output_path / "data" / f"wb_{label}.parquet"
 
         if output_pd.exists() and not RELOAD_DATA:
             log.debug("Skipping calculation")
             continue
+        else:
+            log.debug("Number of atoms in group: " + str(len(uni.select_atoms(group))))
+            log.debug(
+                "Number of atoms in reference: " + str(len(uni.select_atoms(reference)))
+            )
+
+        Path(output_path / "data").mkdir(parents=True, exist_ok=True)
 
         # run the water bridge analysis
         wb = WaterBridgeAnalysis(uni, group, reference, **kwarg, verbose=VERBOSE)
@@ -159,15 +191,25 @@ def wrapper_waterbridge(
             step=STEP,
         )
 
+        # save the results
+        results = wb.results
+        print(results)
+        with open(output_path / "data" / f"results_{label}.pkl", "wb") as f:
+            pickle.dump(results, f)
+
         # count the number of bridges of each order at each frame
         counts_single = wb.count_by_time(analysis_func=analysis_single)
         counts_double = wb.count_by_time(analysis_func=analysis_double)
         counts_triple = wb.count_by_time(analysis_func=analysis_triple)
+        # counts_fourx = wb.count_by_time(analysis_func=analysis_fourx)
+        # counts_fivex = wb.count_by_time(analysis_func=analysis_fivex)
 
         # convert to numpy arrays
         counts_single = np.array(counts_single)
         counts_double = np.array(counts_double)
         counts_triple = np.array(counts_triple)
+        # counts_fourx = np.array(counts_fourx)
+        # counts_fivex = np.array(counts_fivex)
 
         # save the data
         data = {}
@@ -175,14 +217,23 @@ def wrapper_waterbridge(
         data["order_1"] = counts_single[:, 1]
         data["order_2"] = counts_double[:, 1]
         data["order_3"] = counts_triple[:, 1]
+        # data["order_4"] = counts_fourx[:, 1]
+        # data["order_5"] = counts_fivex[:, 1]
         df = pd.DataFrame(data)
         df = pd.merge(df, df_weights, on="time")
-        Path(output_path / "data").mkdir(parents=True, exist_ok=True)
         df.to_parquet(output_pd)
 
         # calculate the average number of each type of bridge weighted
-        avg_counts = np.zeros(3)
-        for i, counts in enumerate([counts_single, counts_double, counts_triple]):
+        avg_counts = np.zeros(3)  # (5)
+        for i, counts in enumerate(
+            [
+                counts_single,
+                counts_double,
+                counts_triple,
+                # counts_fourx,
+                # counts_fivex,
+            ]
+        ):
             avg_counts[i] = np.average(counts[:, 1], weights=df["weight"])
 
         with open(output_path / "data" / f"avg_counts_{label}.json", "w") as f:
@@ -191,9 +242,124 @@ def wrapper_waterbridge(
                     "order_1": avg_counts[0],
                     "order_2": avg_counts[1],
                     "order_3": avg_counts[2],
+                    # "order_4": avg_counts[3],
+                    # "order_5": avg_counts[4],
                 },
                 f,
             )
+
+
+def wrapper_saltbridge(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+
+    def n_atoms(atomgroup) -> list:
+        return [atomgroup.universe.trajectory.time, len(atomgroup)]
+
+    cutoff_ang = 3.5
+
+    # find topology file for universe to get crystal atoms
+    tpr_file = Path(uni.filename)
+    ndx_file = tpr_file.parents[1] / "index.ndx"
+    ndx = gmx.fileformats.ndx.NDX()
+    ndx.read(ndx_file)
+    crystal = ndx["Crystal"]
+    crystal = np.array(crystal) - 1
+    sel_crystal = f"index {' '.join(str(i) for i in crystal)}"
+
+    # select the polymer atoms
+    sel_pe = sel_dict["polyelectrolyte"]
+
+    # calculate the number of sodium bridges
+    sel_na = sel_dict["Na_ion"]
+    atomgroup_na = uni.select_atoms(
+        f"{sel_na}"
+        + f" and (around {cutoff_ang} {sel_pe})"
+        + f" and (around {cutoff_ang} {sel_crystal})",
+        updating=True,
+    )
+    analysis_na = AnalysisFromFunction(n_atoms, uni.trajectory, atomgroup_na)
+    analysis_na.run(start=START, stop=STOP, step=STEP, verbose=VERBOSE)
+    df_na = pd.DataFrame(analysis_na.results.timeseries, columns=["time", "n_na"])
+
+    # calculate the number of calcium bridges
+    sel_ca = f"({sel_dict["Ca_ion"]}) and not ({sel_crystal})"
+    atomgroup_ca = uni.select_atoms(
+        f"{sel_ca}"
+        + f" and (around {cutoff_ang} {sel_pe})"
+        + f" and (around {cutoff_ang} {sel_crystal})",
+        updating=True,
+    )
+    analysis_ca = AnalysisFromFunction(n_atoms, uni.trajectory, atomgroup_ca)
+    analysis_ca.run(start=START, stop=STOP, step=STEP, verbose=VERBOSE)
+    df_ca = pd.DataFrame(analysis_ca.results.timeseries, columns=["time", "n_ca"])
+
+    # merge with the weights
+    df = pd.merge(df_na, df_ca, on="time", how="inner")
+    df = pd.merge(df, df_weights, on="time", how="inner")
+
+    # save the data
+    output_path = Path("mdanalysis_saltbridge")
+    Path(output_path / "data").mkdir(parents=True, exist_ok=True)
+    df.to_parquet(output_path / "data" / "saltbridge.parquet")
+
+    # calculate the average number of each type of bridge weighted
+    avg_counts = np.zeros(2)
+    for i, counts in enumerate([df["n_na"], df["n_ca"]]):
+        avg_counts[i] = np.average(counts, weights=df["weight"])
+
+    with open(output_path / "data" / "avg_counts_saltbridge.json", "w") as f:
+        json.dump({"n_na": avg_counts[0], "n_ca": avg_counts[1]}, f)
+
+
+def wrapper_pebind(
+    uni: mda.Universe,
+    df_weights: pd.DataFrame,
+    sel_dict: dict,
+) -> None:
+
+    def n_residues(atomgroup) -> list:
+        resids = atomgroup.residues.resids
+        return [atomgroup.universe.trajectory.time, len(set(resids))]
+
+    cutoff_ang = 3.5
+
+    # find topology file for universe to get crystal atoms
+    tpr_file = Path(uni.filename)
+    ndx_file = tpr_file.parents[1] / "index.ndx"
+    ndx = gmx.fileformats.ndx.NDX()
+    ndx.read(ndx_file)
+    crystal = ndx["Crystal"]
+    crystal = np.array(crystal) - 1
+    sel_crystal = f"index {' '.join(str(i) for i in crystal)}"
+
+    # calculate the number of direct binding residues
+    sel_pe = sel_dict["polyelectrolyte"]
+    atomgroup_pe = uni.select_atoms(
+        f"{sel_pe}" + f" and (around {cutoff_ang} {sel_crystal})",
+        updating=True,
+    )
+    analysis_pe = AnalysisFromFunction(n_residues, uni.trajectory, atomgroup_pe)
+    analysis_pe.run(start=START, stop=STOP, step=STEP, verbose=VERBOSE)
+    df_pe = pd.DataFrame(analysis_pe.results.timeseries, columns=["time", "n_pe"])
+
+    # merge with the weights
+    df = pd.merge(df_pe, df_weights, on="time", how="inner")
+
+    # save the data
+    output_path = Path("mdanalysis_pebind")
+    Path(output_path / "data").mkdir(parents=True, exist_ok=True)
+    df.to_parquet(output_path / "data" / "pebind.parquet")
+
+    # calculate the average number of each type of bridge weighted
+    avg_counts = np.zeros(1)
+    for i, counts in enumerate([df["n_pe"]]):
+        avg_counts[i] = np.average(counts, weights=df["weight"])
+
+    with open(output_path / "data" / "avg_counts_pebind.json", "w") as f:
+        json.dump({"n_bind": avg_counts[0]}, f)
 
 
 def wrapper_polymerlength(
@@ -1270,6 +1436,7 @@ def universe_analysis(
     wrapper_contacts(uni, df_weights, sel_dict)
     wrapper_lineardensity(uni, df_weights, sel_dict)
     # wrapper_solvent_orientation(uni, df_weights, sel_dict)
+    wrapper_saltbridge(uni, df_weights, sel_dict)
     wrapper_waterbridge(uni, df_weights, sel_dict)
     wrapper_dipole(uni, df_weights, sel_dict)
     wrapper_dipole_field(uni, df_weights, sel_dict)
