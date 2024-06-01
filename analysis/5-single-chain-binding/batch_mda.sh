@@ -3,7 +3,7 @@
 
 # Node configuration
 #SBATCH --partition=all --qos=dow --account=dow
-#SBATCH --ntasks=4 --nodes=1
+#SBATCH --ntasks=8 --nodes=1
 #SBATCH --mem=4G
 #SBATCH --gres=gpu:0 --gpu-bind=closest
 
@@ -67,7 +67,7 @@ if [[ "${single_analysis}" != "1" ]]; then
     # run parallel analysis using GNU parallel
     if [[ "${gnu_parallel}" == "1" ]]; then
         echo "- Running analysis in parallel..."
-        parallel -j 16 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
+        parallel -j 32 --joblog "data/${python_script%%.*}_parallel.log" --halt-on-error 2 --keep-order \
             python3 "${python_script}" --dir "${dir_sims_base}/{1}" \
             ::: "${dir_sims[@]}"
 
