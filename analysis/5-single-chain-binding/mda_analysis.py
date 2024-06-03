@@ -20,6 +20,7 @@ script at the same time.
 
 # Standard library
 import argparse
+from functools import partial
 import json
 import os
 from pathlib import Path
@@ -82,7 +83,7 @@ def wrapper_waterbridge(
     sel_dict: dict,
 ) -> None:
 
-    def analysis_single(current, output, u):
+    def analysis_order(current, output, u, order=1):
         r"""This function defines how the type of water bridge should be
         specified.
 
@@ -98,34 +99,21 @@ def wrapper_waterbridge(
         u : MDAnalysis.universe
             The current Universe for looking up atoms.
         """
+        # decompose the first hydrogen bond.
+        sele1_index, sele1_heavy_index, atom2, heavy_atom2, dist, angle = current[0]
+        # decompose the last hydrogen bond.
+        atom1, heavy_atom1, sele2_index, sele2_heavy_index, dist, angle = current[-1]
+        # expand the atom index to the resname, resid, atom names
+        sele1 = u.atoms[sele1_index]
+        sele2 = u.atoms[sele2_index]
+        (s1_resname, s1_resid, s1_name) = (sele1.resname, sele1.resid, sele1.name)
+        (s2_resname, s2_resid, s2_name) = (sele2.resname, sele2.resid, sele2.name)
+        # bridge order
+        bridge_order = len(current) - 1
+
         # output the water bridge number
-        order_of_water_bridge = len(current) - 1
-        key = order_of_water_bridge
-        if order_of_water_bridge == 1:
-            output[key] += 1
-
-    def analysis_double(current, output, u):
-        order_of_water_bridge = len(current) - 1
-        key = order_of_water_bridge
-        if order_of_water_bridge == 2:
-            output[key] += 1
-
-    def analysis_triple(current, output, u):
-        order_of_water_bridge = len(current) - 1
-        key = order_of_water_bridge
-        if order_of_water_bridge == 3:
-            output[key] += 1
-
-    def analysis_fourx(current, output, u):
-        order_of_water_bridge = len(current) - 1
-        key = order_of_water_bridge
-        if order_of_water_bridge == 4:
-            output[key] += 1
-
-    def analysis_fivex(current, output, u):
-        order_of_water_bridge = len(current) - 1
-        key = order_of_water_bridge
-        if order_of_water_bridge == 5:
+        key = (s1_resname, s1_resid, s1_name, s2_resname, s2_resid, s2_name, bridge_order)
+        if bridge_order == order:
             output[key] += 1
 
     # default selections for H-bonds
@@ -141,8 +129,7 @@ def wrapper_waterbridge(
     ndx_file = tpr_file.parents[1] / "index.ndx"
     ndx = gmx.fileformats.ndx.NDX()
     ndx.read(ndx_file)
-    crystal = ndx["Crystal"]
-    crystal = np.array(crystal) - 1
+    crystal = np.array(ndx["Crystal"]) - 1
 
     # {Polyelectrolyte, CaCO3 Crystal} 2nd order
     label_references.append(sel_dict["polyelectrolyte"])
@@ -153,6 +140,7 @@ def wrapper_waterbridge(
             "forcefield": "other",
             "donors": donors_sel,
             "acceptors": acceptors_sel,
+            "update_selection": True,
         }
     )
 
@@ -165,6 +153,7 @@ def wrapper_waterbridge(
             "forcefield": "other",
             "donors": donors_sel,
             "acceptors": acceptors_sel,
+            "update_selection": True,
         }
     )
 
@@ -177,6 +166,7 @@ def wrapper_waterbridge(
             "forcefield": "other",
             "donors": donors_sel,
             "acceptors": acceptors_sel,
+            "update_selection": True,
         }
     )
 
@@ -188,7 +178,10 @@ def wrapper_waterbridge(
     ):
 
         log.info(f"Collective variable: WaterBridge({kwarg['order']})")
-        label = f"{kwarg['order']}-{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
+        label = (
+            f"{kwarg['order']}"
+            + f"-{group.replace(' ', '_')}-{reference.replace(' ', '_')}"
+        )
 
         # shorten label if it is too long
         if len(label) > 50:
@@ -220,21 +213,12 @@ def wrapper_waterbridge(
         with open(output_path / "data" / f"results_{label}.pkl", "wb") as f:
             pickle.dump(results, f)
 
-        funcs = [
-            analysis_single,
-            analysis_double,
-            analysis_triple,
-            analysis_fourx,
-            analysis_fivex,
-        ]
-
         data = {}
         for i in range(kwarg["order"]):
-            counts = wb.count_by_time(analysis_func=funcs[i])
-            counts = np.array(counts)
+            counts = wb.count_by_time(analysis_func=partial(analysis_order, order=i+1))
             if i == 0:
-                data["time"] = counts[:, 0]
-            data[f"order_{i+1}"] = counts[:, 1]
+                data["time"] = [c[0] for c in counts]
+            data[f"order_{i+1}"] = [c[1] for c in counts]
 
         df = pd.DataFrame(data)
         df = pd.merge(df, df_weights, on="time", how="inner")
@@ -247,6 +231,7 @@ def wrapper_waterbridge(
                 df[f"order_{i+1}"],
                 weights=df["weight"],
             )
+        log.info(f"Average counts: {avg_counts}")
 
         with open(output_path / "data" / f"avg_counts_{label}.json", "w") as f:
             json.dump(avg_counts, f)
