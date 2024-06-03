@@ -292,6 +292,7 @@
         "xlim",
         "xscale",
         "xtick",
+        "xticklabels",
         "xticks",
         "ydata",
         "ydim",

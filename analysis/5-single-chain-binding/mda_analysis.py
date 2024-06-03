@@ -112,7 +112,9 @@ def wrapper_waterbridge(
         bridge_order = len(current) - 1
 
         # output the water bridge number
-        key = (s1_resname, s1_resid, s1_name, s2_resname, s2_resid, s2_name, bridge_order)
+        key = (
+            s1_resname, s1_resid, s1_name, s2_resname, s2_resid, s2_name, bridge_order,
+        )
         if bridge_order == order:
             output[key] += 1
 
