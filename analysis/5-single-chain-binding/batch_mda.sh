@@ -26,7 +26,6 @@ single_analysis='0'
 sim_idx='0'
 python_script='mda_analysis.py'
 dir_sims_base='/nfs/zeal_nas/data_mount/aglisman-data/1-electronic-continuum-correction/7-single-chain-surface-binding/6_single_chain_binding/cleaned'
-# dir_sims_base='/media/aglisman/Data/Single-Chain-Adsorption/cleaned'
 
 # on ctrl-c, kill the dask server
 dask_pid=''

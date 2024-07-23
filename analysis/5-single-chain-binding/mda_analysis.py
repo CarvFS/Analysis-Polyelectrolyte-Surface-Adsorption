@@ -1063,21 +1063,47 @@ def wrapper_dipole_field(
     updating.append(False)
     axes.append("z")
 
-    # {Polyelectrolyte solvation shell}
-    if SOLVENT:
-        label_groups.append(
-            f"same resid as (around 4 {sel_dict['polyelectrolyte']})"
-            f"and ({sel_dict['sol']})"
-        )
-        compounds.append("molecules")
-        updating.append(True)
-        axes.append("z")
-
     # {Solvent}
     if SOLVENT:
         label_groups.append(sel_dict["sol"])
         compounds.append("molecules")
         updating.append(False)
+        axes.append("z")
+
+    # {Polyelectrolyte solvation shell}
+    if SOLVENT:
+        first_solvation_shell = (
+            f"same resid as (around 3.1 {sel_dict['polyelectrolyte']})"
+            + f" and ({sel_dict['sol']})"
+        )
+        second_solvation_shell = (
+            f"same resid as (around 5.6 {first_solvation_shell})"
+            + f" and ({sel_dict['sol']})"
+            + f" and not ({first_solvation_shell})"
+        )
+        third_solvation_shell = (
+            f"same resid as (around 8.1 {second_solvation_shell})"
+            + f" and ({sel_dict['sol']})"
+            + f" and not ({first_solvation_shell})"
+            + f" and not ({second_solvation_shell})"
+        )
+
+        # first solvation shell
+        label_groups.append(first_solvation_shell)
+        compounds.append("molecules")
+        updating.append(True)
+        axes.append("z")
+
+        # second solvation shell
+        label_groups.append(second_solvation_shell)
+        compounds.append("molecules")
+        updating.append(True)
+        axes.append("z")
+
+        # third solvation shell
+        label_groups.append(third_solvation_shell)
+        compounds.append("molecules")
+        updating.append(True)
         axes.append("z")
 
     for group, compound, axis, update in tqdm(
@@ -1090,7 +1116,13 @@ def wrapper_dipole_field(
         label = f"{group.replace(' ', '_')}"
         select = uni.select_atoms(group, updating=update)
 
-        file_gr = f"histo_dipolefield_{axis}_{label}.npz"
+        tag = f"histo_dipolefield_{axis}_{label}"
+        if len(tag) > 128:
+            log.warning(f"Filename too long: {tag}")
+            log.warning(f"Truncating to {tag[:128]}")
+            tag = tag[:128]
+
+        file_gr = f"{tag}.npz"
         output_np = output_path / "data" / file_gr
 
         if output_np.exists() and not RELOAD_DATA:
