@@ -3,7 +3,7 @@
 
 # Node configuration
 #SBATCH --partition=all --qos=dow --account=dow
-#SBATCH --ntasks=8 --nodes=1
+#SBATCH --ntasks=16 --nodes=1
 #SBATCH --mem=4G
 #SBATCH --gres=gpu:0 --gpu-bind=closest
 

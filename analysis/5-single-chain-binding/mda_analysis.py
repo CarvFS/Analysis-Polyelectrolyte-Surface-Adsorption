@@ -1051,7 +1051,11 @@ def wrapper_dipole_field(
     This function is designed to be called from the universe_analysis function.
 
     The following collective variables are calculated:
-    | - TODO
+    | - DipoleField of polyelectrolyte
+    | - DipoleField of solvent
+    | - DipoleField of first solvation shell around polyelectrolyte
+    | - DipoleField of second solvation shell around polyelectrolyte
+    | - DipoleField of third solvation shell around polyelectrolyte
     """
 
     output_path = Path("mdanalysis_dipolefield")
@@ -1073,17 +1077,17 @@ def wrapper_dipole_field(
     # {Polyelectrolyte solvation shell}
     if SOLVENT:
         first_solvation_shell = (
-            f"same resid as (around 3.1 {sel_dict['polyelectrolyte']})"
-            + f" and ({sel_dict['sol']})"
+            f"(same resid as (around 3.1 {sel_dict['polyelectrolyte']})"
+            + f" and ({sel_dict['sol']}))"
         )
         second_solvation_shell = (
-            f"same resid as (around 5.6 {first_solvation_shell})"
-            + f" and ({sel_dict['sol']})"
+            f"(same resid as (around 5.6 {first_solvation_shell})"
+            + f" and ({sel_dict['sol']}))"
             + f" and not ({first_solvation_shell})"
         )
         third_solvation_shell = (
-            f"same resid as (around 8.1 {second_solvation_shell})"
-            + f" and ({sel_dict['sol']})"
+            f"(same resid as (around 8.1 {second_solvation_shell})"
+            + f" and ({sel_dict['sol']}))"
             + f" and not ({first_solvation_shell})"
             + f" and not ({second_solvation_shell})"
         )
