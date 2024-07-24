@@ -1117,15 +1117,16 @@ def wrapper_dipole_field(
         dynamic_ncols=True,
     ):
         log.info(f"Collective variable: DipoleField({group})")
-        label = f"{group.replace(' ', '_')}"
         select = uni.select_atoms(group, updating=update)
 
-        tag = f"histo_dipolefield_{axis}_{label}"
-        if len(tag) > 128:
-            log.warning(f"Filename too long: {tag}")
-            log.warning(f"Truncating to {tag[:128]}")
-            tag = tag[:128]
+        max_label_len = 128
+        label = f"{group.replace(' ', '_')}"
+        if len(label) > max_label_len:
+            log.warning(f"Label too long: {label}")
+            label = label[:max_label_len]
+            log.warning(f"Truncating to {label}")
 
+        tag = f"histo_dipolefield_{axis}_{label}"
         file_gr = f"{tag}.npz"
         output_np = output_path / "data" / file_gr
 
